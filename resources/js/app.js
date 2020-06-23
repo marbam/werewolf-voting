@@ -13,4 +13,5 @@ require('./bootstrap');
  */
 
 require('./components/Setup/Setup');
+require('./components/ModView/ModView');
 

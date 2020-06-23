@@ -13,10 +13,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('/', function () {
     return view('gameSetup');
+});
+
+Route::get('/game/1', function () {
+    return view('modView');
 });
