@@ -19,3 +19,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/get_roles', 'SetupController@getRoles');
+Route::post('/save_players', 'SetupController@savePlayers');

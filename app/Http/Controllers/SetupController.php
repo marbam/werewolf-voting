@@ -8,6 +8,7 @@ class SetupController extends Controller
 {
     public function getRoles()
     {
+        // plug this in later
         return [
             ['id' => 1, 'name' => 'Clairvoyant'],
             ['id' => 2, 'name' => 'Witch'],
@@ -18,5 +19,10 @@ class SetupController extends Controller
             ['id' => 7, 'name' => 'Pup'],
             ['id' => 8, 'name' => 'Defector'],
         ];
+    }
+
+    public function savePlayers()
+    {
+        // to be done when we've got the database ready.
     }
 }

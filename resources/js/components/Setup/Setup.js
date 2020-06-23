@@ -8,8 +8,8 @@ class Setup extends Component {
         this.state = {
             playerCount: 9,
             players: [
-                {name: '', roleId: ''},
-                {name: '', roleId: ''},
+                {name: 'Player A', roleId: ''},
+                {name: 'Player B', roleId: ''},
                 {name: '', roleId: ''},
                 {name: '', roleId: ''},
                 {name: '', roleId: ''},
@@ -18,10 +18,16 @@ class Setup extends Component {
                 {name: '', roleId: ''},
                 {name: '', roleId: ''}
             ],
-            roles: []
+            roles: [],
+            inputOK: true,
+            showError: false
         };
         this.addRemovePlayer = this.addRemovePlayer.bind(this);
         this.updatePlayerCount = this.updatePlayerCount.bind(this);
+        this.save = this.save.bind(this);
+        this.preSaveValidate = this.preSaveValidate.bind(this);
+        this.changeName = this.changeName.bind(this);
+        this.changeRole = this.changeRole.bind(this);
     }
 
     componentDidMount() {
@@ -51,6 +57,58 @@ class Setup extends Component {
         setPlayerCount(event.target.value);
     }
 
+    preSaveValidate() {
+        this.setState({
+            inputOK: true
+        })
+        let localThis = this;
+        this.state.players.forEach(function(player) {
+            if (player.name === '' || player.roleId === '') {
+                localThis.setState({
+                    showError:true,
+                    inputOK: false
+                });
+                return;
+            }
+        })
+    }
+
+    save() {
+        this.setState({
+            showError:false
+        });
+        // loop through all players and check they've got a name and a role!
+        this.preSaveValidate();
+        if (this.state.inputOK) {
+            // submit
+            axios.post('/api/save_players', [
+                this.state.players,
+            ])
+            .then(function(response){
+                // then wipe everything.
+                // if (response['status'] == 200) {
+                // do bits
+                // }
+            })
+        }
+    }
+
+    changeName(index) {
+        let players = this.state.players;
+        players[index].name = event.target.value;
+        this.setState({
+            players: players
+        });
+    }
+
+    changeRole(index) {
+        let players = this.state.players;
+        players[index].roleId = event.target.value;
+        this.setState({
+            players: players
+        });
+    }
+
     render() {
         return (
             <div className="container">
@@ -61,15 +119,26 @@ class Setup extends Component {
                         <button onClick={() => this.addRemovePlayer('add')}>+</button>
                     </div>
                     {this.state.players.map((player, index) =>
-                        <PlayerRow key={index} roles={this.state.roles}></PlayerRow>
+                        <PlayerRow
+                            key={index}
+                            index={index}
+                            name={player.name}
+                            role={player.roleId}
+                            roles={this.state.roles}
+                            nameC={this.changeName}
+                            roleC={this.changeRole}
+                        >
+                        </PlayerRow>
                     )}
                 </div>
+                { this.state.showError ?
+                    <p style={{color: 'red'}}>Please ensure all players have a name and a role!</p>
+                    : null
+                }
+                <button onClick={this.save}>Ready to go!</button>
             </div>
         );
     }
-
-
-
 }
 
 export default Setup;
