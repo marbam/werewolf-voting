@@ -21,6 +21,14 @@ Route::get('/', function () {
     return view('gameSetup');
 });
 
-Route::get('/game/1', function () {
+Route::get('/game/{id}', function () {
     return view('modView');
+});
+
+Route::get('/game/{id}/vote/{voteId}/accusation', function () {
+    return view('playerView');
+});
+
+Route::get('/game/{id}/vote/{voteId}/ballot', function () {
+    return view('playerView');
 });

@@ -12,6 +12,15 @@ class ModView extends Component {
         this.kill = this.kill.bind(this);
     }
 
+    componentDidMount() {
+        let gameId = 1; // testing
+        axios.get('/api/get_players/'+gameId).then(response => {
+            this.setState({
+              players: response.data
+            })
+        })
+    }
+
     kill(index) {
        let updatedPlayers = this.state.players;
        updatedPlayers[index].alive = !updatedPlayers[index].alive;
@@ -25,10 +34,12 @@ class ModView extends Component {
             <div className="container">
                 <table>
                     <thead>
-                        <td>Name</td>
-                        <td>Role</td>
-                        <td>Alive</td>
-                        <td>Actions</td>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Alive</th>
+                            <th>Actions</th>
+                        </tr>
                     </thead>
                     <tbody>
                         {this.state.players.map((player, index) =>

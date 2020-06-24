@@ -65757,6 +65757,8 @@ __webpack_require__(/*! ./components/Setup/Setup */ "./resources/js/components/S
 
 __webpack_require__(/*! ./components/ModView/ModView */ "./resources/js/components/ModView/ModView.js");
 
+__webpack_require__(/*! ./components/PlayerView/PlayerView */ "./resources/js/components/PlayerView/PlayerView.js");
+
 /***/ }),
 
 /***/ "./resources/js/bootstrap.js":
@@ -65867,6 +65869,19 @@ var ModView = /*#__PURE__*/function (_Component) {
   }
 
   _createClass(ModView, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      var gameId = 1; // testing
+
+      axios.get('/api/get_players/' + gameId).then(function (response) {
+        _this2.setState({
+          players: response.data
+        });
+      });
+    }
+  }, {
     key: "kill",
     value: function kill(index) {
       var updatedPlayers = this.state.players;
@@ -65878,16 +65893,16 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container"
-      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Role"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Alive"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Actions")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, index) {
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Role"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Alive"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Actions"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.alive ? 'Alive' : 'Dead'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this2.kill(index);
+            return _this3.kill(index);
           }
         }, "Toggle Life!")));
       }))));
@@ -65901,6 +65916,205 @@ var ModView = /*#__PURE__*/function (_Component) {
 
 if (document.getElementById('modview')) {
   react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ModView, null), document.getElementById('modview'));
+}
+
+/***/ }),
+
+/***/ "./resources/js/components/PlayerView/PlayerView.js":
+/*!**********************************************************!*\
+  !*** ./resources/js/components/PlayerView/PlayerView.js ***!
+  \**********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+
+
+
+var PlayerView = /*#__PURE__*/function (_Component) {
+  _inherits(PlayerView, _Component);
+
+  var _super = _createSuper(PlayerView);
+
+  function PlayerView() {
+    var _this;
+
+    _classCallCheck(this, PlayerView);
+
+    _this = _super.call(this);
+    _this.state = {
+      players: [{
+        id: 1,
+        name: 'Martin',
+        roleId: 1
+      }],
+      showInitialCheck: true,
+      firstResult: null,
+      showDoubleCheck: false,
+      enteredName: '',
+      showError: false,
+      showOptions: false,
+      action: '',
+      showVotables: false,
+      choices: [],
+      showSubmit: false
+    };
+    _this.updateName = _this.updateName.bind(_assertThisInitialized(_this));
+    _this.completeDouble = _this.completeDouble.bind(_assertThisInitialized(_this));
+    _this.setOption = _this.setOption.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(PlayerView, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      var gameId = 1; // testing
+
+      axios.get('/api/get_accusable/' + gameId).then(function (response) {
+        _this2.setState({
+          players: response.data
+        });
+      });
+    }
+  }, {
+    key: "completeInitial",
+    value: function completeInitial(index) {
+      this.setState({
+        firstResult: this.state.players[index],
+        showDoubleCheck: true
+      });
+    }
+  }, {
+    key: "updateName",
+    value: function updateName(event) {
+      this.setState({
+        enteredName: event.target.value
+      });
+    }
+  }, {
+    key: "completeDouble",
+    value: function completeDouble() {
+      if (this.state.firstResult.name == this.state.enteredName) {
+        this.setState({
+          showError: false,
+          showInitialCheck: false,
+          showDoubleCheck: false,
+          showOptions: true
+        });
+      } else {
+        this.setState({
+          showError: true
+        });
+      }
+    }
+  }, {
+    key: "setOption",
+    value: function setOption(type) {
+      this.setState({
+        action: type,
+        showVotables: true
+      });
+    }
+  }, {
+    key: "selectChoices",
+    value: function selectChoices(index) {
+      this.setState({
+        choices: [this.state.players[index]],
+        showSubmit: true
+      });
+    }
+  }, {
+    key: "submitChoice",
+    value: function submitChoice() {
+      alert('submitted');
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this3 = this;
+
+      var initialHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Who are you?");
+      var initialCheck = this.state.players.map(function (player, index) {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          key: index,
+          onClick: function onClick() {
+            return _this3.completeInitial(index);
+          }
+        }, player.name);
+      });
+      var doubleHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Type it (with Capitals) to confirm!");
+      var doubleCheck = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        value: this.enteredName,
+        onChange: this.updateName
+      });
+      var nameSubmit = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.completeDouble
+      }, "Confirm!"); // We'll populate this further when we get to the two moon stuff!
+
+      var optionHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Hi, ", this.state.enteredName, "! What action will you take?");
+      var options = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your Options:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: function onClick() {
+          return _this3.setOption('vote');
+        }
+      }, "Vote"));
+      var votingHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, " Who receives your ", this.state.action, "?");
+      var votables = this.state.players.map(function (player, index) {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          key: index,
+          onClick: function onClick() {
+            return _this3.selectChoices(index);
+          }
+        }, player.name);
+      });
+      var submitButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.submitChoice
+      }, "Submit to Mod!");
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "container"
+      }, this.state.showInitialCheck ? initialHeading : null, this.state.showInitialCheck ? initialCheck : null, this.state.showDoubleCheck ? doubleHeading : null, this.state.showDoubleCheck ? doubleCheck : null, this.state.showDoubleCheck && this.state.enteredName.length > 2 ? nameSubmit : null, !this.state.showError ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+        style: {
+          color: "red"
+        }
+      }, "The name you have entered doesn't match!"), this.state.showOptions ? optionHeading : null, this.state.showOptions ? options : null, this.state.showVotables ? votingHeading : null, this.state.showVotables ? votables : null, this.state.showSubmit ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null) : null, this.state.showSubmit ? submitButton : null);
+    }
+  }]);
+
+  return PlayerView;
+}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (PlayerView);
+
+if (document.getElementById('voting')) {
+  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(PlayerView, null), document.getElementById('voting'));
 }
 
 /***/ }),
