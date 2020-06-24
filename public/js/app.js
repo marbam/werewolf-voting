@@ -65999,7 +65999,9 @@ var PlayerView = /*#__PURE__*/function (_Component) {
 
       var gameId = 1; // testing
 
-      axios.get('/api/get_accusable/' + gameId).then(function (response) {
+      var voteId = 1;
+      var type = 'accusations';
+      axios.get('/api/get_accusable/' + gameId + '/vote/' + voteId + '/' + type).then(function (response) {
         _this2.setState({
           players: response.data
         });
@@ -66242,7 +66244,8 @@ var Setup = /*#__PURE__*/function (_Component) {
       }],
       roles: [],
       inputOK: true,
-      showError: false
+      showError: false,
+      playerNames: ''
     };
     _this.addRemovePlayer = _this.addRemovePlayer.bind(_assertThisInitialized(_this));
     _this.updatePlayerCount = _this.updatePlayerCount.bind(_assertThisInitialized(_this));
@@ -66288,7 +66291,27 @@ var Setup = /*#__PURE__*/function (_Component) {
   }, {
     key: "updatePlayerCount",
     value: function updatePlayerCount(event) {
-      setPlayerCount(event.target.value);
+      var players = this.state.players;
+      var requiredSize = event.target.value;
+
+      if (requiredSize > players.length) {
+        while (players.length < requiredSize) {
+          players.push({
+            name: '',
+            roleId: ''
+          });
+        }
+      } else if (requiredSize < players.length) {
+        // we need to remove the last player from the array until the array length == the updated count.
+        while (requiredSize < players.length) {
+          players.pop();
+        }
+      }
+
+      this.setState({
+        players: players,
+        playerCount: players.length
+      });
     }
   }, {
     key: "preSaveValidate",
@@ -66381,7 +66404,14 @@ var Setup = /*#__PURE__*/function (_Component) {
         }
       }, "Please ensure all players have a name and a role!") : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.save
-      }, "Ready to go!"));
+      }, "Ready to go!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        value: this.state.playerNames,
+        onChange: function onChange(event) {
+          _this3.setState({
+            playerNames: event.target.value
+          });
+        }
+      }));
     }
   }]);
 

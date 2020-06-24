@@ -20,7 +20,7 @@ class Setup extends Component {
             ],
             roles: [],
             inputOK: true,
-            showError: false
+            showError: false,
         };
         this.addRemovePlayer = this.addRemovePlayer.bind(this);
         this.updatePlayerCount = this.updatePlayerCount.bind(this);
@@ -54,7 +54,22 @@ class Setup extends Component {
     }
 
     updatePlayerCount(event) {
-        setPlayerCount(event.target.value);
+        let players = this.state.players;
+        let requiredSize = event.target.value;
+        if (requiredSize > players.length) {
+            while (players.length < requiredSize) {
+                players.push({name: '', roleId: ''});
+            }
+        } else if (requiredSize < players.length) {
+            // we need to remove the last player from the array until the array length == the updated count.
+            while(requiredSize < players.length) {
+                players.pop();
+            }
+        }
+        this.setState({
+            players: players,
+            playerCount: players.length
+        })
     }
 
     preSaveValidate() {
