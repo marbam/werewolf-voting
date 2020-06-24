@@ -27,7 +27,9 @@ class PlayerView extends Component {
 
     componentDidMount() {
         let gameId = 1; // testing
-        axios.get('/api/get_accusable/'+gameId).then(response => {
+        let voteId = 1;
+        let type = 'accusations';
+        axios.get('/api/get_accusable/'+gameId+'/vote/'+voteId+'/'+type).then(response => {
             this.setState({
               players: response.data
             })
