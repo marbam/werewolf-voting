@@ -6,20 +6,15 @@ class Setup extends Component {
     constructor() {
         super();
         this.state = {
-            playerCount: 9,
+            playerCount: 5,
             players: [
                 {name: 'Player A', roleId: ''},
                 {name: 'Player B', roleId: ''},
                 {name: '', roleId: ''},
                 {name: '', roleId: ''},
                 {name: '', roleId: ''},
-                {name: '', roleId: ''},
-                {name: '', roleId: ''},
-                {name: '', roleId: ''},
-                {name: '', roleId: ''}
             ],
             roles: [],
-            inputOK: true,
             showError: false,
             playerNames: '',
             selectedRoles: [],
@@ -80,18 +75,19 @@ class Setup extends Component {
 
     preSaveValidate() {
         this.setState({
-            inputOK: true
+            showError:false,
         })
         let localThis = this;
+        let result = true;
         this.state.players.forEach(function(player) {
             if (player.name === '' || player.roleId === '') {
                 localThis.setState({
                     showError:true,
-                    inputOK: false
                 });
-                return;
+                result = false;
             }
         })
+        return result;
     }
 
     save() {
@@ -99,8 +95,7 @@ class Setup extends Component {
             showError:false
         });
         // loop through all players and check they've got a name and a role!
-        this.preSaveValidate();
-        if (this.state.inputOK) {
+        if (this.preSaveValidate() && confirm("Are you sure this is good to go? There's no going back if not!")) {
             // submit
             axios.post('/api/save_players', [
                 this.state.players,
@@ -215,7 +210,9 @@ class Setup extends Component {
                     value={this.state.playerNames}
                     onChange={(event) => {this.setState({playerNames: event.target.value})}}
                 ></input>
-                <button onClick={this.assignToPlayers}>Assign Names to Players</button>
+                { this.state.playerNames.length < 20 ? null :
+                    <button onClick={this.assignToPlayers}>Assign Names to Players</button>
+                }
                 <br/>
                 <h4>Selectable Roles</h4>
                 {this.state.roles.map((role, index) =>
@@ -234,7 +231,9 @@ class Setup extends Component {
                     </tbody>
                 </table>
                 <br/>
-                <button type="button" onClick={this.assignRoles}>Assign Roles to Players</button>
+                {this.state.selectedRoles.length <= 7 ? null :
+                    <button type="button" onClick={this.assignRoles}>Assign Roles to Players</button>
+                }
             </div>
         );
     }

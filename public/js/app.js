@@ -66226,7 +66226,7 @@ var Setup = /*#__PURE__*/function (_Component) {
 
     _this = _super.call(this);
     _this.state = {
-      playerCount: 9,
+      playerCount: 5,
       players: [{
         name: 'Player A',
         roleId: ''
@@ -66242,21 +66242,8 @@ var Setup = /*#__PURE__*/function (_Component) {
       }, {
         name: '',
         roleId: ''
-      }, {
-        name: '',
-        roleId: ''
-      }, {
-        name: '',
-        roleId: ''
-      }, {
-        name: '',
-        roleId: ''
-      }, {
-        name: '',
-        roleId: ''
       }],
       roles: [],
-      inputOK: true,
       showError: false,
       playerNames: '',
       selectedRoles: []
@@ -66335,18 +66322,19 @@ var Setup = /*#__PURE__*/function (_Component) {
     key: "preSaveValidate",
     value: function preSaveValidate() {
       this.setState({
-        inputOK: true
+        showError: false
       });
       var localThis = this;
+      var result = true;
       this.state.players.forEach(function (player) {
         if (player.name === '' || player.roleId === '') {
           localThis.setState({
-            showError: true,
-            inputOK: false
+            showError: true
           });
-          return;
+          result = false;
         }
       });
+      return result;
     }
   }, {
     key: "save",
@@ -66355,9 +66343,7 @@ var Setup = /*#__PURE__*/function (_Component) {
         showError: false
       }); // loop through all players and check they've got a name and a role!
 
-      this.preSaveValidate();
-
-      if (this.state.inputOK) {
+      if (this.preSaveValidate() && confirm("Are you sure this is good to go? There's no going back if not!")) {
         // submit
         axios.post('/api/save_players', [this.state.players]).then(function (response) {// then wipe everything.
           // if (response['status'] == 200) {
@@ -66485,7 +66471,7 @@ var Setup = /*#__PURE__*/function (_Component) {
             playerNames: event.target.value
           });
         }
-      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }), this.state.playerNames.length < 20 ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.assignToPlayers
       }, "Assign Names to Players"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Selectable Roles"), this.state.roles.map(function (role, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66504,7 +66490,7 @@ var Setup = /*#__PURE__*/function (_Component) {
             return _this3.removeSelected(index);
           }
         }, "Remove")));
-      }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), this.state.selectedRoles.length <= 7 ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "button",
         onClick: this.assignRoles
       }, "Assign Roles to Players"));
