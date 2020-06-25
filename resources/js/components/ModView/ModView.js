@@ -9,24 +9,27 @@ class ModView extends Component {
                 {id: 1, name: 'Martin', role: 'Clairvoyant', roleId: 1, alive: true},
             ]
         };
-        this.kill = this.kill.bind(this);
+        this.changeDeadAlive = this.changeDeadAlive.bind(this);
     }
 
     componentDidMount() {
-        let gameId = 1; // testing
-        axios.get('/api/get_players/'+gameId).then(response => {
+        axios.get('/api/get_players/'+this.props.game_id).then(response => {
             this.setState({
               players: response.data
             })
         })
     }
 
-    kill(index) {
-       let updatedPlayers = this.state.players;
-       updatedPlayers[index].alive = !updatedPlayers[index].alive;
-       this.setState({
-           players:updatedPlayers
-       });
+    changeDeadAlive(index) {
+        let updatedPlayers = this.state.players;
+        let playerId = updatedPlayers[index].id;
+
+        axios.get('/api/change_alive_status/'+playerId).then(response => {
+            updatedPlayers[index].alive = response.data;
+            this.setState({
+              players: updatedPlayers
+            })
+        })
     }
 
     render() {
@@ -48,7 +51,7 @@ class ModView extends Component {
                                 <td>{player.role}</td>
                                 <td>{player.alive ? 'Alive' : 'Dead'}</td>
                                 <td>
-                                    <button onClick={() => this.kill(index)}>
+                                    <button onClick={() => this.changeDeadAlive(index)}>
                                         Toggle Life!
                                     </button>
                                 </td>
@@ -64,5 +67,7 @@ class ModView extends Component {
 export default ModView;
 
 if (document.getElementById('modview')) {
-    ReactDOM.render(<ModView />, document.getElementById('modview'));
+    const element = document.getElementById('modview')
+    const props = Object.assign({}, element.dataset)
+    ReactDOM.render(<ModView {...props}/>, element);
 }

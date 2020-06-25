@@ -65864,7 +65864,7 @@ var ModView = /*#__PURE__*/function (_Component) {
         alive: true
       }]
     };
-    _this.kill = _this.kill.bind(_assertThisInitialized(_this));
+    _this.changeDeadAlive = _this.changeDeadAlive.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65873,27 +65873,31 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      var gameId = 1; // testing
-
-      axios.get('/api/get_players/' + gameId).then(function (response) {
+      axios.get('/api/get_players/' + this.props.game_id).then(function (response) {
         _this2.setState({
           players: response.data
         });
       });
     }
   }, {
-    key: "kill",
-    value: function kill(index) {
+    key: "changeDeadAlive",
+    value: function changeDeadAlive(index) {
+      var _this3 = this;
+
       var updatedPlayers = this.state.players;
-      updatedPlayers[index].alive = !updatedPlayers[index].alive;
-      this.setState({
-        players: updatedPlayers
+      var playerId = updatedPlayers[index].id;
+      axios.get('/api/change_alive_status/' + playerId).then(function (response) {
+        updatedPlayers[index].alive = response.data;
+
+        _this3.setState({
+          players: updatedPlayers
+        });
       });
     }
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container"
@@ -65902,7 +65906,7 @@ var ModView = /*#__PURE__*/function (_Component) {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.alive ? 'Alive' : 'Dead'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this3.kill(index);
+            return _this4.changeDeadAlive(index);
           }
         }, "Toggle Life!")));
       }))));
@@ -65915,7 +65919,9 @@ var ModView = /*#__PURE__*/function (_Component) {
 /* harmony default export */ __webpack_exports__["default"] = (ModView);
 
 if (document.getElementById('modview')) {
-  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ModView, null), document.getElementById('modview'));
+  var element = document.getElementById('modview');
+  var props = Object.assign({}, element.dataset);
+  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ModView, props), element);
 }
 
 /***/ }),
@@ -66144,6 +66150,7 @@ function PlayerRow(props) {
       return props.nameC(props.index);
     }
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Role:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("select", {
+    value: props.selectedRole,
     onChange: function onChange() {
       return props.roleC(props.index);
     }
@@ -66176,6 +66183,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _PlayerRow_PlayerRow__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./PlayerRow/PlayerRow */ "./resources/js/components/Setup/PlayerRow/PlayerRow.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -66213,7 +66232,7 @@ var Setup = /*#__PURE__*/function (_Component) {
 
     _this = _super.call(this);
     _this.state = {
-      playerCount: 9,
+      playerCount: 5,
       players: [{
         name: 'Player A',
         roleId: ''
@@ -66229,23 +66248,11 @@ var Setup = /*#__PURE__*/function (_Component) {
       }, {
         name: '',
         roleId: ''
-      }, {
-        name: '',
-        roleId: ''
-      }, {
-        name: '',
-        roleId: ''
-      }, {
-        name: '',
-        roleId: ''
-      }, {
-        name: '',
-        roleId: ''
       }],
       roles: [],
-      inputOK: true,
       showError: false,
-      playerNames: ''
+      playerNames: '',
+      selectedRoles: []
     };
     _this.addRemovePlayer = _this.addRemovePlayer.bind(_assertThisInitialized(_this));
     _this.updatePlayerCount = _this.updatePlayerCount.bind(_assertThisInitialized(_this));
@@ -66253,6 +66260,10 @@ var Setup = /*#__PURE__*/function (_Component) {
     _this.preSaveValidate = _this.preSaveValidate.bind(_assertThisInitialized(_this));
     _this.changeName = _this.changeName.bind(_assertThisInitialized(_this));
     _this.changeRole = _this.changeRole.bind(_assertThisInitialized(_this));
+    _this.assignToPlayers = _this.assignToPlayers.bind(_assertThisInitialized(_this));
+    _this.selectRole = _this.selectRole.bind(_assertThisInitialized(_this));
+    _this.removeSelected = _this.removeSelected.bind(_assertThisInitialized(_this));
+    _this.assignRoles = _this.assignRoles.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -66317,18 +66328,19 @@ var Setup = /*#__PURE__*/function (_Component) {
     key: "preSaveValidate",
     value: function preSaveValidate() {
       this.setState({
-        inputOK: true
+        showError: false
       });
       var localThis = this;
+      var result = true;
       this.state.players.forEach(function (player) {
         if (player.name === '' || player.roleId === '') {
           localThis.setState({
-            showError: true,
-            inputOK: false
+            showError: true
           });
-          return;
+          result = false;
         }
       });
+      return result;
     }
   }, {
     key: "save",
@@ -66337,14 +66349,13 @@ var Setup = /*#__PURE__*/function (_Component) {
         showError: false
       }); // loop through all players and check they've got a name and a role!
 
-      this.preSaveValidate();
-
-      if (this.state.inputOK) {
+      if (this.preSaveValidate() && confirm("Are you sure this is good to go? There's no going back if not!")) {
         // submit
-        axios.post('/api/save_players', [this.state.players]).then(function (response) {// then wipe everything.
-          // if (response['status'] == 200) {
-          // do bits
-          // }
+        axios.post('/api/save_players', [this.state.players]).then(function (response) {
+          if (response['status'] == 200 && response.data.game_id) {
+            window.location.replace("/game/" + response.data.game_id); // yes this should definitely be using BrowserRouter and whatnot but this isn't a SPA, and this works. Eh.
+            // can refactor later.
+          }
         });
       }
     }
@@ -66367,6 +66378,61 @@ var Setup = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
+    key: "assignToPlayers",
+    value: function assignToPlayers() {
+      var names = this.state.playerNames.split(",");
+      names.forEach(function (name, index) {
+        names[index] = name.trim();
+      });
+      var players = this.state.players;
+      names.forEach(function (name, index) {
+        if (players[index]) {
+          players[index].name = name;
+        }
+      });
+      this.setState({
+        players: players
+      });
+    }
+  }, {
+    key: "selectRole",
+    value: function selectRole(index) {
+      var selected = this.state.selectedRoles;
+      selected.push(this.state.roles[index]);
+      this.setState({
+        selectedRoles: selected
+      });
+    }
+  }, {
+    key: "removeSelected",
+    value: function removeSelected(index) {
+      var availableRoles = this.state.selectedRoles;
+      availableRoles.splice(index, 1);
+      this.setState({
+        selectedRoles: availableRoles
+      });
+    }
+  }, {
+    key: "assignRoles",
+    value: function assignRoles() {
+      // starting with player 0, assign a random role until there are no more roles left.
+      var availableRoles = _toConsumableArray(this.state.selectedRoles);
+
+      var players = this.state.players;
+      players.forEach(function (player, index) {
+        if (availableRoles.length) {
+          var rolesIndex = Math.floor(Math.random() * (availableRoles.length - 1));
+          var roleId = availableRoles[rolesIndex].id;
+          player.roleId = roleId;
+          players[index] = player;
+          availableRoles.splice(rolesIndex, 1);
+        }
+      });
+      this.setState({
+        players: players
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this3 = this;
@@ -66377,7 +66443,7 @@ var Setup = /*#__PURE__*/function (_Component) {
         className: "row justify-content-center"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-8"
-      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Number of Players:"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: function onClick() {
           return _this3.addRemovePlayer('minus');
         }
@@ -66388,12 +66454,12 @@ var Setup = /*#__PURE__*/function (_Component) {
         onClick: function onClick() {
           return _this3.addRemovePlayer('add');
         }
-      }, "+")), this.state.players.map(function (player, index) {
+      }, "+")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Player / Role List"), this.state.players.map(function (player, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PlayerRow_PlayerRow__WEBPACK_IMPORTED_MODULE_2__["default"], {
           key: index,
           index: index,
           name: player.name,
-          role: player.roleId,
+          selectedRole: player.roleId,
           roles: _this3.state.roles,
           nameC: _this3.changeName,
           roleC: _this3.changeRole
@@ -66403,15 +66469,38 @@ var Setup = /*#__PURE__*/function (_Component) {
           color: 'red'
         }
       }, "Please ensure all players have a name and a role!") : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        type: "button",
         onClick: this.save
-      }, "Ready to go!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+      }, "Ready to go!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Speedy Input"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Enter names separated with a comma: "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         value: this.state.playerNames,
         onChange: function onChange(event) {
           _this3.setState({
             playerNames: event.target.value
           });
         }
-      }));
+      }), this.state.playerNames.length < 20 ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.assignToPlayers
+      }, "Assign Names to Players"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Selectable Roles"), this.state.roles.map(function (role, index) {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          type: "button",
+          key: index,
+          onClick: function onClick() {
+            return _this3.selectRole(index);
+          }
+        }, role.name);
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Selected Roles"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.selectedRoles.map(function (role, index) {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
+          key: index
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, role.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          type: "button",
+          onClick: function onClick() {
+            return _this3.removeSelected(index);
+          }
+        }, "Remove")));
+      }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), this.state.selectedRoles.length <= 7 ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        type: "button",
+        onClick: this.assignRoles
+      }, "Assign Roles to Players"));
     }
   }]);
 

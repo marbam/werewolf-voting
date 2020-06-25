@@ -7,7 +7,7 @@
         <title>Werewolf Voting</title>
     </head>
     <body>
-        <div id="modview"></div>
+        <div id="modview" data-game_id="{{$game_id}}"></div>
 
         <script src="{{ asset('js/app.js') }}"></script>
     </body>

@@ -21,9 +21,7 @@ Route::get('/', function () {
     return view('gameSetup');
 });
 
-Route::get('/game/{id}', function () {
-    return view('modView');
-});
+Route::get('/game/{id}', 'ModController@showGame');
 
 Route::get('/game/{id}/vote/{voteId}/accusation', function () {
     return view('playerView');

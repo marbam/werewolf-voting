@@ -3,26 +3,46 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Role;
+use App\Game;
+use App\Player;
+use App\PlayerStatus;
+use Carbon\Carbon;
 
 class SetupController extends Controller
 {
     public function getRoles()
     {
-        // plug this in later
-        return [
-            ['id' => 1, 'name' => 'Clairvoyant'],
-            ['id' => 2, 'name' => 'Witch'],
-            ['id' => 3, 'name' => 'Wizard'],
-            ['id' => 4, 'name' => 'Healer'],
-            ['id' => 5, 'name' => 'Alpha'],
-            ['id' => 6, 'name' => 'Pack'],
-            ['id' => 7, 'name' => 'Pup'],
-            ['id' => 8, 'name' => 'Defector'],
-        ];
+        return Role::join('factions', 'roles.faction_id', '=', 'factions.id')
+                   ->where('factions.moons', 1)
+                   ->get(['roles.id', 'roles.name'])->toArray();
     }
 
-    public function savePlayers()
+    public function savePlayers(Request $request)
     {
-        // to be done when we've got the database ready.
+        $date = Carbon::now()->isoFormat('DDmmYY');
+        $random = rand(0, 1000);
+        $code = $date.$random;
+
+        $game = Game::create([
+            'code' => $code, // bodging these in for now, it's historical data but no harm in keeping it.
+            'moderator_id' => 1 // can look at this at a later date, use '1' for now.
+        ]);
+
+        $playerData = $request->all()[0];
+
+        foreach ($playerData as $index => $data) {
+            $player = Player::create([
+                'name' => $data['name'],
+                'game_id' => $game->id,
+                'allocated_role_id' => $data['roleId'],
+                'listing_order' => $index+1
+            ]);
+            PlayerStatus::create([
+                'player_id' => $player->id
+            ]);
+        }
+
+        return ['game_id' => $game->id];
     }
 }
