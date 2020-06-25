@@ -13,7 +13,7 @@ function PlayerRow (props) {
                 >
                 </input>
             <label>Role:
-                <select onChange={() => props.roleC(props.index)}>
+                <select value={props.selectedRole} onChange={() => props.roleC(props.index)}>
                     <option value="">Select...</option>
                     {
                         props.roles.map(role =>

@@ -21,6 +21,8 @@ class Setup extends Component {
             roles: [],
             inputOK: true,
             showError: false,
+            playerNames: '',
+            selectedRoles: [],
         };
         this.addRemovePlayer = this.addRemovePlayer.bind(this);
         this.updatePlayerCount = this.updatePlayerCount.bind(this);
@@ -28,6 +30,10 @@ class Setup extends Component {
         this.preSaveValidate = this.preSaveValidate.bind(this);
         this.changeName = this.changeName.bind(this);
         this.changeRole = this.changeRole.bind(this);
+        this.assignToPlayers = this.assignToPlayers.bind(this);
+        this.selectRole = this.selectRole.bind(this);
+        this.removeSelected = this.removeSelected.bind(this);
+        this.assignRoles = this.assignRoles.bind(this);
     }
 
     componentDidMount() {
@@ -124,6 +130,55 @@ class Setup extends Component {
         });
     }
 
+    assignToPlayers() {
+        let names = this.state.playerNames.split(",");
+        names.forEach((name, index) => {names[index] = name.trim()});
+        let players = this.state.players;
+        names.forEach((name, index) => {
+            if (players[index]) {
+                players[index].name = name;
+            }
+        })
+        this.setState({
+            players: players
+        });
+    }
+
+    selectRole(index) {
+        let selected = this.state.selectedRoles;
+        selected.push(this.state.roles[index]);
+        this.setState({
+            selectedRoles: selected
+        })
+    }
+
+    removeSelected(index) {
+        let availableRoles = this.state.selectedRoles;
+        availableRoles.splice(index, 1);
+        this.setState({
+            selectedRoles:availableRoles
+        });
+    }
+
+    assignRoles() {
+        // starting with player 0, assign a random role until there are no more roles left.
+        let availableRoles = [...this.state.selectedRoles];
+        let players = this.state.players;
+        players.forEach((player, index) => {
+            if (availableRoles.length) {
+                let rolesIndex = Math.floor(Math.random() * (availableRoles.length-1));
+                let roleId = availableRoles[rolesIndex].id;
+                player.roleId = roleId;
+                players[index] = player;
+                availableRoles.splice(rolesIndex, 1);
+            }
+        })
+
+        this.setState({
+            players: players
+        })
+    }
+
     render() {
         return (
             <div className="container">
@@ -138,7 +193,7 @@ class Setup extends Component {
                             key={index}
                             index={index}
                             name={player.name}
-                            role={player.roleId}
+                            selectedRole={player.roleId}
                             roles={this.state.roles}
                             nameC={this.changeName}
                             roleC={this.changeRole}
@@ -150,7 +205,31 @@ class Setup extends Component {
                     <p style={{color: 'red'}}>Please ensure all players have a name and a role!</p>
                     : null
                 }
-                <button onClick={this.save}>Ready to go!</button>
+                <button type="button" onClick={this.save}>Ready to go!</button>
+                <hr/>
+                <h4>Speedy Input</h4>
+                <input
+                    value={this.state.playerNames}
+                    onChange={(event) => {this.setState({playerNames: event.target.value})}}
+                ></input>
+                <button onClick={this.assignToPlayers}>Assign Names to Players</button>
+                {this.state.roles.map((role, index) =>
+                    <button type="button" key={index} onClick={() => this.selectRole(index)}>{role.name}</button>
+                )}
+                <hr/>
+                <h4>Selected Roles</h4>
+                <table>
+                    <tbody>
+                        {this.state.selectedRoles.map((role, index) =>
+                            <tr key={index}>
+                                <td>{role.name}</td>
+                                <td><button type="button" onClick={() => this.removeSelected(index)}>Remove</button></td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+                <hr/>
+                <button type="button" onClick={this.assignRoles}>Assign Roles to Players</button>
             </div>
         );
     }
