@@ -21,4 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/get_roles', 'SetupController@getRoles');
 Route::post('/save_players', 'SetupController@savePlayers');
 Route::get('/get_players/{id}', 'ModController@getPlayers');
+Route::get('/change_alive_status/{player_id}', 'ModController@changeAliveStatus');
 Route::get('/get_accusable/{id}', 'PlayerController@getAccusable');

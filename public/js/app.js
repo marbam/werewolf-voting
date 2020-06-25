@@ -65864,7 +65864,7 @@ var ModView = /*#__PURE__*/function (_Component) {
         alive: true
       }]
     };
-    _this.kill = _this.kill.bind(_assertThisInitialized(_this));
+    _this.changeDeadAlive = _this.changeDeadAlive.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65880,18 +65880,24 @@ var ModView = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
-    key: "kill",
-    value: function kill(index) {
+    key: "changeDeadAlive",
+    value: function changeDeadAlive(index) {
+      var _this3 = this;
+
       var updatedPlayers = this.state.players;
-      updatedPlayers[index].alive = !updatedPlayers[index].alive;
-      this.setState({
-        players: updatedPlayers
+      var playerId = updatedPlayers[index].id;
+      axios.get('/api/change_alive_status/' + playerId).then(function (response) {
+        updatedPlayers[index].alive = response.data;
+
+        _this3.setState({
+          players: updatedPlayers
+        });
       });
     }
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container"
@@ -65900,7 +65906,7 @@ var ModView = /*#__PURE__*/function (_Component) {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.alive ? 'Alive' : 'Dead'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this3.kill(index);
+            return _this4.changeDeadAlive(index);
           }
         }, "Toggle Life!")));
       }))));
@@ -66346,8 +66352,8 @@ var Setup = /*#__PURE__*/function (_Component) {
       if (this.preSaveValidate() && confirm("Are you sure this is good to go? There's no going back if not!")) {
         // submit
         axios.post('/api/save_players', [this.state.players]).then(function (response) {
-          if (response['status'] == 200 && response.data.game_id) {// window.location.replace("/game/"+response.data.game_id);
-            // yes this should definitely be using BrowserRouter and whatnot but this isn't a SPA, and this works. Eh.
+          if (response['status'] == 200 && response.data.game_id) {
+            window.location.replace("/game/" + response.data.game_id); // yes this should definitely be using BrowserRouter and whatnot but this isn't a SPA, and this works. Eh.
             // can refactor later.
           }
         });

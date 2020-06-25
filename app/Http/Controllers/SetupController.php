@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Role;
 use App\Game;
 use App\Player;
+use App\PlayerStatus;
 use Carbon\Carbon;
 
 class SetupController extends Controller
@@ -31,11 +32,14 @@ class SetupController extends Controller
         $playerData = $request->all()[0];
 
         foreach ($playerData as $index => $data) {
-            Player::create([
+            $player = Player::create([
                 'name' => $data['name'],
                 'game_id' => $game->id,
                 'allocated_role_id' => $data['roleId'],
                 'listing_order' => $index+1
+            ]);
+            PlayerStatus::create([
+                'player_id' => $player->id
             ]);
         }
 

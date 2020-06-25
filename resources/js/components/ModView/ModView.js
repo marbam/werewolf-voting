@@ -9,7 +9,7 @@ class ModView extends Component {
                 {id: 1, name: 'Martin', role: 'Clairvoyant', roleId: 1, alive: true},
             ]
         };
-        this.kill = this.kill.bind(this);
+        this.changeDeadAlive = this.changeDeadAlive.bind(this);
     }
 
     componentDidMount() {
@@ -20,12 +20,16 @@ class ModView extends Component {
         })
     }
 
-    kill(index) {
-       let updatedPlayers = this.state.players;
-       updatedPlayers[index].alive = !updatedPlayers[index].alive;
-       this.setState({
-           players:updatedPlayers
-       });
+    changeDeadAlive(index) {
+        let updatedPlayers = this.state.players;
+        let playerId = updatedPlayers[index].id;
+
+        axios.get('/api/change_alive_status/'+playerId).then(response => {
+            updatedPlayers[index].alive = response.data;
+            this.setState({
+              players: updatedPlayers
+            })
+        })
     }
 
     render() {
@@ -47,7 +51,7 @@ class ModView extends Component {
                                 <td>{player.role}</td>
                                 <td>{player.alive ? 'Alive' : 'Dead'}</td>
                                 <td>
-                                    <button onClick={() => this.kill(index)}>
+                                    <button onClick={() => this.changeDeadAlive(index)}>
                                         Toggle Life!
                                     </button>
                                 </td>

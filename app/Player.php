@@ -15,6 +15,11 @@ class Player extends Model
 
     public function role()
     {
-		return $this->hasOne("\App\Role", 'id', 'allocated_role_id');
+		    return $this->hasOne("\App\Role", 'id', 'allocated_role_id');
+    }
+
+    public function status()
+    {
+        return $this->hasOne("\App\Status", 'player_id', 'id');
     }
 }
