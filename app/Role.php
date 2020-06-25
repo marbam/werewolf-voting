@@ -8,6 +8,6 @@ class Role extends Model
 {
     public function faction()
     {
-		return $this->hasOne("\App\Faction", 'id', 'faction_id');
+		    return $this->hasOne("\App\Faction", 'id', 'faction_id');
     }
 }

@@ -184,10 +184,12 @@ class Setup extends Component {
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-8">
+                        <label>Number of Players:</label>
                         <button onClick={() => this.addRemovePlayer('minus')}>-</button>
                         <input value={this.state.playerCount} onChange={this.updatePlayerCount}></input>
                         <button onClick={() => this.addRemovePlayer('add')}>+</button>
                     </div>
+                    <h4>Player / Role List</h4>
                     {this.state.players.map((player, index) =>
                         <PlayerRow
                             key={index}
@@ -208,15 +210,18 @@ class Setup extends Component {
                 <button type="button" onClick={this.save}>Ready to go!</button>
                 <hr/>
                 <h4>Speedy Input</h4>
+                <label>Enter names separated with a comma: </label>
                 <input
                     value={this.state.playerNames}
                     onChange={(event) => {this.setState({playerNames: event.target.value})}}
                 ></input>
                 <button onClick={this.assignToPlayers}>Assign Names to Players</button>
+                <br/>
+                <h4>Selectable Roles</h4>
                 {this.state.roles.map((role, index) =>
                     <button type="button" key={index} onClick={() => this.selectRole(index)}>{role.name}</button>
                 )}
-                <hr/>
+                <br/>
                 <h4>Selected Roles</h4>
                 <table>
                     <tbody>
@@ -228,7 +233,7 @@ class Setup extends Component {
                         )}
                     </tbody>
                 </table>
-                <hr/>
+                <br/>
                 <button type="button" onClick={this.assignRoles}>Assign Roles to Players</button>
             </div>
         );
