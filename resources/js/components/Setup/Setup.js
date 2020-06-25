@@ -100,11 +100,12 @@ class Setup extends Component {
             axios.post('/api/save_players', [
                 this.state.players,
             ])
-            .then(function(response){
-                // then wipe everything.
-                // if (response['status'] == 200) {
-                // do bits
-                // }
+            .then(response => {
+                if (response['status'] == 200) {
+                    window.location.replace("/game/"+response.data.game_id);
+                    // yes this should definitely be using BrowserRouter and whatnot but this isn't a SPA, and this works. Eh.
+                    // can refactor later.
+                }
             })
         }
     }
@@ -209,7 +210,7 @@ class Setup extends Component {
                 <input
                     value={this.state.playerNames}
                     onChange={(event) => {this.setState({playerNames: event.target.value})}}
-                ></input>
+                    ></input>
                 { this.state.playerNames.length < 20 ? null :
                     <button onClick={this.assignToPlayers}>Assign Names to Players</button>
                 }
@@ -217,7 +218,7 @@ class Setup extends Component {
                 <h4>Selectable Roles</h4>
                 {this.state.roles.map((role, index) =>
                     <button type="button" key={index} onClick={() => this.selectRole(index)}>{role.name}</button>
-                )}
+                    )}
                 <br/>
                 <h4>Selected Roles</h4>
                 <table>
