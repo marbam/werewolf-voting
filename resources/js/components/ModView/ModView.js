@@ -13,8 +13,7 @@ class ModView extends Component {
     }
 
     componentDidMount() {
-        let gameId = 1; // testing
-        axios.get('/api/get_players/'+gameId).then(response => {
+        axios.get('/api/get_players/'+this.props.game_id).then(response => {
             this.setState({
               players: response.data
             })
@@ -64,5 +63,7 @@ class ModView extends Component {
 export default ModView;
 
 if (document.getElementById('modview')) {
-    ReactDOM.render(<ModView />, document.getElementById('modview'));
+    const element = document.getElementById('modview')
+    const props = Object.assign({}, element.dataset)
+    ReactDOM.render(<ModView {...props}/>, element);
 }

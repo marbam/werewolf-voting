@@ -9,6 +9,7 @@ class Player extends Model
     protected $fillable = [
         'name',
         'game_id',
+        'allocated_role_id',
         'listing_order'
     ];
 
