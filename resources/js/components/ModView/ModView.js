@@ -7,9 +7,14 @@ class ModView extends Component {
         this.state = {
             players: [
                 {id: 1, name: 'Martin', role: 'Clairvoyant', roleId: 1, alive: true},
-            ]
+            ],
+            roundType: 'accusations',
+            roundId: null,
+            url: null,
+            accusations_outcomes: []
         };
         this.changeDeadAlive = this.changeDeadAlive.bind(this);
+        this.genAccusations = this.genAccusations.bind(this);
     }
 
     componentDidMount() {
@@ -32,7 +37,37 @@ class ModView extends Component {
         })
     }
 
+    genAccusations() {
+        axios.get('/api/generate_accusations/'+this.props.game_id).then(response => {
+
+            this.setState({
+                roundType: response.data.roundType,
+                roundId: response.data.roundId,
+                url: response.data.url,
+                accusations_outcomes: response.data.accusations_outcomes
+            })
+        })
+    }
+
     render() {
+
+        let votingTable = <table>
+            <thead>
+                <tr>
+                    <td>Voter</td>
+                    <td>Chose</td>
+                </tr>
+            </thead>
+            <tbody>
+                {this.state.accusations_outcomes.map((result, index) =>
+                    <tr key={index}>
+                        <td>{result.voter}</td>
+                        <td>{result.chose}</td>
+                    </tr>
+                )}
+            </tbody>
+        </table>
+
         return (
             <div className="container">
                 <table>
@@ -59,6 +94,9 @@ class ModView extends Component {
                         )}
                     </tbody>
                 </table>
+                <button onClick={this.genAccusations}>Generate Accusations</button>
+                {this.state.url ? <p>Copy to Players: {this.state.url}</p> : null}
+                {!this.state.url ? null : votingTable}
             </div>
         );
     }
