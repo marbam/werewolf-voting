@@ -23,3 +23,5 @@ Route::post('/save_players', 'SetupController@savePlayers');
 Route::get('/get_players/{id}', 'ModController@getPlayers');
 Route::get('/change_alive_status/{player_id}', 'ModController@changeAliveStatus');
 Route::get('/get_accusable/{id}', 'PlayerController@getAccusable');
+
+Route::get('/generate_accusations/{game_id}', 'ModController@createAccusations');

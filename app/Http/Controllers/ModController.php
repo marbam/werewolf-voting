@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Player;
+use App\Round;
+use App\Action;
 use App\PlayerStatus;
 
 class ModController extends Controller
@@ -36,5 +38,42 @@ class ModController extends Controller
         $status->alive = $result;
         $status->save();
         return $result;
+    }
+
+    public function createAccusations($game_id) {
+        $round = Round::create([
+            'game_id' => $game_id,
+            'type' => 'Accusations',
+        ]);
+
+        $outcomes = $this->getAccusationOutcome($round->id, $game_id);
+
+        return [
+            'roundId' => $round->id,
+            'roundType' => strtolower($round->type),
+            'url' => '/game/'.$game_id.'/accusations/'.$round->id,
+            'accusations_outcomes' => $outcomes
+        ];
+    }
+
+    public function getAccusationOutcome($round_id, $game_id) {
+        $players = Player::where('game_id', $game_id)->pluck('name', 'id')->toArray();
+
+        $votes = Action::where('round_id', $round_id)
+                       ->get();
+
+        // setup votes array:
+        $outcomes = [];
+        foreach ($players as $key => $name) {
+            $outcomes[$key] = ['voter' => $name, 'chose' => 'Waiting...'];
+        }
+
+        foreach ($votes as $vote) {
+            $outcomes['voter_id']['chose'] = $players[$vote['nominee_id']];
+        }
+
+        $outcomes = array_values($outcomes);
+
+        return $outcomes;
     }
 }
