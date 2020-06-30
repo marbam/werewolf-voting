@@ -56,11 +56,11 @@ class ModController extends Controller
         ];
     }
 
-    public function getAccusationOutcome($round_id, $game_id) {
-        $players = Player::where('game_id', $game_id)->pluck('name', 'id')->toArray();
-
-        $votes = Action::where('round_id', $round_id)
-                       ->get();
+    public function getAccusationOutcome($round_id, $game_id)
+    {
+        $data = $this->getData($round_id, $game_id);
+        $players = $data[0];
+        $votes = $data[1];
 
         // setup votes array:
         $outcomes = [];
@@ -69,11 +69,108 @@ class ModController extends Controller
         }
 
         foreach ($votes as $vote) {
-            $outcomes['voter_id']['chose'] = $players[$vote['nominee_id']];
+            $outcomes[$vote->voter_id]['chose'] = $players[$vote['nominee_id']];
         }
 
         $outcomes = array_values($outcomes);
 
         return $outcomes;
+    }
+
+    protected function getData($round_id, $game_id) {
+        $players = Player::join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
+                         ->where('game_id', $game_id)
+                         ->where('player_statuses.alive', 1)
+                         ->pluck('name', 'players.id')
+                         ->toArray();
+
+        $votes = Action::where('round_id', $round_id)
+                       ->get();
+
+        return [$players, $votes];
+    }
+
+
+    // Writing this separately to start with for testing purposes but ultimately it'll make sense to
+    // combine it with the getAccusationOutcome() as they will probably both be called at the same time!
+    public function getAccusationResults($game_id, $round_id, $data=null)
+    {
+        if (!$data) {
+            $data = $this->getData($round_id, $game_id);
+        }
+
+        $players = $data[0];
+        $votes = $data[1];
+
+        if (!$votes) {
+            return "NO VOTES";
+        }
+
+        $results = [];
+        foreach ($players as $id => $name) {
+            $results[$id]['id'] = $id;
+            $results[$id]['name'] = $name;
+            $results[$id]['votes'] = 0;
+            $results[$id]['on_ballot'] = 0;
+        }
+
+
+        foreach ($votes as $action) {
+            if ($action->action_type == "VOTE") {
+                $results[$action->nominee_id]['votes']++;
+            }
+        }
+
+        // get a count of each number of votes so we can calculate the top two tiers:
+        $vote_array = [];
+        foreach ($results as $result) {
+            if (!isset($vote_array[$result['votes']])) {
+                $vote_array[$result['votes']] = 1;
+            } else {
+                $vote_array[$result['votes']]++;
+            }
+        }
+
+        // get the two highest tiers of votes.
+        $highest = $this->getHighest($vote_array);
+        // returns e.g. [2, 4] where 2 is the number of players with 4 votes.
+        unset($vote_array[$highest[1]]);
+        $second_highest = $this->getHighest($vote_array);
+        $topTiers = [$highest[1], $second_highest[1]]; // will contain the top two tiers of votes.
+
+        if($topTiers[0] == 0) {
+            unset($topTiers[0]); // anyone with 0 votes will never be on the ballot. (Guarded to come later.)
+        }
+
+        if($topTiers[1] == 0) {
+            unset($topTiers[1]); // anyone with 0 votes will never be on the ballot. (Guarded to come later.)
+        }
+
+        if (count($topTiers)) {
+            // finally go through and update any players who are in the top two tiers of votes.
+            foreach ($results as $index => $result) {
+                if (in_array($result['votes'], $topTiers)) {
+                    $results[$index]['on_ballot'] = 1;
+                }
+            }
+        }
+
+        $results = array_values($results); // reset the outer keys so it's mappable in javascript
+
+        return $results;
+    }
+
+    protected function getHighest($voting_array) {
+        $votes = 0;
+        $players = 0;
+
+        foreach($voting_array as $number_votes => $number_players) {
+            if ($number_votes > $votes) {
+                $votes = $number_votes;
+                $players = $number_players;
+            }
+        }
+        return [$players, $votes];
+
     }
 }

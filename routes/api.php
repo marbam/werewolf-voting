@@ -22,6 +22,9 @@ Route::get('/get_roles', 'SetupController@getRoles');
 Route::post('/save_players', 'SetupController@savePlayers');
 Route::get('/get_players/{id}', 'ModController@getPlayers');
 Route::get('/change_alive_status/{player_id}', 'ModController@changeAliveStatus');
-Route::get('/get_accusable/{id}', 'PlayerController@getAccusable');
+Route::get('/get_accusable/{game_id}/{vote_id}', 'PlayerController@getAccusable');
 
 Route::get('/generate_accusations/{game_id}', 'ModController@createAccusations');
+Route::get('/refresh_accusations/{round_id}/{game_id}', 'ModController@getAccusationOutcome');
+Route::post('/submit_action/{game_id}/{round_id}', 'PlayerController@submitAction');
+Route::get('/get_accusation_totals/{gameId}/{roundId}/', 'ModController@getAccusationResults');

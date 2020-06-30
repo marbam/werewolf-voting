@@ -5,9 +5,7 @@ class PlayerView extends Component {
     constructor() {
         super();
         this.state = {
-            players: [
-                {id: 1, name: 'Martin', roleId: 1},
-            ],
+            players: [],
             showInitialCheck: true,
             firstResult: null,
             showDoubleCheck: false,
@@ -17,19 +15,22 @@ class PlayerView extends Component {
             action: '',
             showVotables: false,
             choices: [],
-            showSubmit: false
+            showSubmit: false,
+            submittingText : "Submit to Mod!",
+            submitted: false,
+            disableSubmit: false
         };
         this.updateName = this.updateName.bind(this);
         this.completeDouble = this.completeDouble.bind(this);
         this.setOption = this.setOption.bind(this);
-
+        this.submitChoice = this.submitChoice.bind(this);
     }
 
     componentDidMount() {
-        let gameId = 1; // testing
-        let voteId = 1;
-        let type = 'accusations';
-        axios.get('/api/get_accusable/'+gameId+'/vote/'+voteId+'/'+type).then(response => {
+        let game_id = this.props.game_id;
+        let round_id = this.props.round_id;
+        // let type = 'accusations';
+        axios.get('/api/get_accusable/'+game_id+'/'+round_id).then(response => {
             this.setState({
               players: response.data
             })
@@ -74,12 +75,29 @@ class PlayerView extends Component {
     selectChoices(index) {
         this.setState({
             choices: [this.state.players[index]],
-            showSubmit: true
+            showSubmit: true,
         })
     }
 
     submitChoice() {
-        alert('submitted');
+
+        this.setState({
+            submittingText: "Sending..."
+        })
+
+        let payload = {
+            voter_id : this.state.firstResult.id,
+            action_type: this.state.action,
+            choices: this.state.choices
+        };
+
+        axios.post('/api/submit_action/'+this.props.game_id+'/'+this.props.round_id, payload).then(response => {
+            this.setState({
+                submitted: true,
+                submittingText: "Sent!",
+                disableSubmit: true
+            });
+        })
     }
 
     render() {
@@ -112,9 +130,15 @@ class PlayerView extends Component {
             </button>
         )
 
-        let submitButton = <button onClick={this.submitChoice}>Submit to Mod!</button>
+        let submitButton = <button
+                            onClick={this.submitChoice}
+                            disabled={this.state.disableSubmit}
+                           >
+                            {this.state.submittingText}
+                        </button>
 
         return (
+            !this.state.submitted ?
             <div className="container">
                 {this.state.showInitialCheck ? initialHeading : null}
                 {this.state.showInitialCheck ? initialCheck : null}
@@ -129,6 +153,7 @@ class PlayerView extends Component {
                 {this.state.showSubmit ? <br/> : null}
                 {this.state.showSubmit ? submitButton : null}
             </div>
+            : <p>Your feedback has been received! You can now close the window and get back to the game! </p>
         );
     }
 }
@@ -136,5 +161,7 @@ class PlayerView extends Component {
 export default PlayerView;
 
 if (document.getElementById('voting')) {
-    ReactDOM.render(<PlayerView />, document.getElementById('voting'));
+    const element = document.getElementById('voting')
+    const props = Object.assign({}, element.dataset)
+    ReactDOM.render(<PlayerView {...props}/>, document.getElementById('voting'));
 }
