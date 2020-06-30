@@ -65866,7 +65866,9 @@ var ModView = /*#__PURE__*/function (_Component) {
       roundType: 'accusations',
       roundId: null,
       url: null,
-      accusations_outcomes: []
+      accusations_outcomes: [],
+      refreshingAccusations: false,
+      refreshButtonText: 'Refresh'
     };
     _this.changeDeadAlive = _this.changeDeadAlive.bind(_assertThisInitialized(_this));
     _this.genAccusations = _this.genAccusations.bind(_assertThisInitialized(_this));
@@ -65919,9 +65921,15 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function refreshAccusations() {
       var _this5 = this;
 
+      this.setState({
+        refreshingAccusations: true,
+        refreshButtonText: 'Refreshing...'
+      });
       axios.get('/api/refresh_accusations/' + this.state.roundId + '/' + this.props.game_id).then(function (response) {
         _this5.setState({
-          accusations_outcomes: response.data
+          accusations_outcomes: response.data,
+          refreshingAccusations: false,
+          refreshButtonText: 'Refresh'
         });
       });
     }
@@ -65948,8 +65956,9 @@ var ModView = /*#__PURE__*/function (_Component) {
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.genAccusations
       }, "Generate Accusations"), this.state.url ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Copy to Players: ", this.state.url) : null, !this.state.url ? null : votingTable, !this.state.url ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        onClick: this.refreshAccusations
-      }, "Refresh"));
+        onClick: this.refreshAccusations,
+        disabled: this.state.refreshingAccusations
+      }, this.state.refreshButtonText));
     }
   }]);
 
