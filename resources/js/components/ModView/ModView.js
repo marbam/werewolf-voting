@@ -15,6 +15,7 @@ class ModView extends Component {
         };
         this.changeDeadAlive = this.changeDeadAlive.bind(this);
         this.genAccusations = this.genAccusations.bind(this);
+        this.refreshAccusations = this.refreshAccusations.bind(this);
     }
 
     componentDidMount() {
@@ -46,6 +47,14 @@ class ModView extends Component {
                 url: response.data.url,
                 accusations_outcomes: response.data.accusations_outcomes
             })
+        })
+    }
+
+    refreshAccusations() {
+        axios.get('/api/refresh_accusations/'+this.state.roundId+'/'+this.props.game_id).then(response => {
+            this.setState({
+                accusations_outcomes: response.data
+            });
         })
     }
 
@@ -97,6 +106,7 @@ class ModView extends Component {
                 <button onClick={this.genAccusations}>Generate Accusations</button>
                 {this.state.url ? <p>Copy to Players: {this.state.url}</p> : null}
                 {!this.state.url ? null : votingTable}
+                {!this.state.url ? null : <button onClick={this.refreshAccusations}>Refresh</button>}
             </div>
         );
     }

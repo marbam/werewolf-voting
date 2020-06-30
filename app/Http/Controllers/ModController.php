@@ -57,7 +57,11 @@ class ModController extends Controller
     }
 
     public function getAccusationOutcome($round_id, $game_id) {
-        $players = Player::where('game_id', $game_id)->pluck('name', 'id')->toArray();
+        $players = Player::join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
+                         ->where('game_id', $game_id)
+                         ->where('player_statuses.alive', 1)
+                         ->pluck('name', 'players.id')
+                         ->toArray();
 
         $votes = Action::where('round_id', $round_id)
                        ->get();
@@ -69,7 +73,7 @@ class ModController extends Controller
         }
 
         foreach ($votes as $vote) {
-            $outcomes['voter_id']['chose'] = $players[$vote['nominee_id']];
+            $outcomes[$vote->voter_id]['chose'] = $players[$vote['nominee_id']];
         }
 
         $outcomes = array_values($outcomes);

@@ -65870,6 +65870,7 @@ var ModView = /*#__PURE__*/function (_Component) {
     };
     _this.changeDeadAlive = _this.changeDeadAlive.bind(_assertThisInitialized(_this));
     _this.genAccusations = _this.genAccusations.bind(_assertThisInitialized(_this));
+    _this.refreshAccusations = _this.refreshAccusations.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65914,9 +65915,20 @@ var ModView = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
+    key: "refreshAccusations",
+    value: function refreshAccusations() {
+      var _this5 = this;
+
+      axios.get('/api/refresh_accusations/' + this.state.roundId + '/' + this.props.game_id).then(function (response) {
+        _this5.setState({
+          accusations_outcomes: response.data
+        });
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
-      var _this5 = this;
+      var _this6 = this;
 
       var votingTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voter"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Chose"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.accusations_outcomes.map(function (result, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
@@ -65930,12 +65942,14 @@ var ModView = /*#__PURE__*/function (_Component) {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.alive ? 'Alive' : 'Dead'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this5.changeDeadAlive(index);
+            return _this6.changeDeadAlive(index);
           }
         }, "Toggle Life!")));
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.genAccusations
-      }, "Generate Accusations"), this.state.url ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Copy to Players: ", this.state.url) : null, !this.state.url ? null : votingTable);
+      }, "Generate Accusations"), this.state.url ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Copy to Players: ", this.state.url) : null, !this.state.url ? null : votingTable, !this.state.url ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.refreshAccusations
+      }, "Refresh"));
     }
   }]);
 

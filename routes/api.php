@@ -25,3 +25,4 @@ Route::get('/change_alive_status/{player_id}', 'ModController@changeAliveStatus'
 Route::get('/get_accusable/{id}', 'PlayerController@getAccusable');
 
 Route::get('/generate_accusations/{game_id}', 'ModController@createAccusations');
+Route::get('/refresh_accusations/{round_id}/{game_id}', 'ModController@getAccusationOutcome');
