@@ -66027,7 +66027,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
     _this.state = {
       players: [{
         id: 1,
-        name: 'Martin',
+        name: 'Test Player',
         roleId: 1
       }],
       showInitialCheck: true,
@@ -66052,11 +66052,10 @@ var PlayerView = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      var gameId = 1; // testing
-
-      var voteId = 1;
+      var game_id = this.props.game_id;
+      var vote_id = this.props.vote_id;
       var type = 'accusations';
-      axios.get('/api/get_accusable/' + gameId + '/vote/' + voteId + '/' + type).then(function (response) {
+      axios.get('/api/get_accusable/' + game_id + '/' + vote_id).then(function (response) {
         _this2.setState({
           players: response.data
         });
@@ -66171,7 +66170,9 @@ var PlayerView = /*#__PURE__*/function (_Component) {
 /* harmony default export */ __webpack_exports__["default"] = (PlayerView);
 
 if (document.getElementById('voting')) {
-  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(PlayerView, null), document.getElementById('voting'));
+  var element = document.getElementById('voting');
+  var props = Object.assign({}, element.dataset);
+  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(PlayerView, props), document.getElementById('voting'));
 }
 
 /***/ }),

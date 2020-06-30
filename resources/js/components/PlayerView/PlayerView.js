@@ -6,7 +6,7 @@ class PlayerView extends Component {
         super();
         this.state = {
             players: [
-                {id: 1, name: 'Martin', roleId: 1},
+                {id: 1, name: 'Test Player', roleId: 1},
             ],
             showInitialCheck: true,
             firstResult: null,
@@ -26,10 +26,10 @@ class PlayerView extends Component {
     }
 
     componentDidMount() {
-        let gameId = 1; // testing
-        let voteId = 1;
+        let game_id = this.props.game_id;
+        let vote_id = this.props.vote_id;
         let type = 'accusations';
-        axios.get('/api/get_accusable/'+gameId+'/vote/'+voteId+'/'+type).then(response => {
+        axios.get('/api/get_accusable/'+game_id+'/'+vote_id).then(response => {
             this.setState({
               players: response.data
             })
@@ -136,5 +136,7 @@ class PlayerView extends Component {
 export default PlayerView;
 
 if (document.getElementById('voting')) {
-    ReactDOM.render(<PlayerView />, document.getElementById('voting'));
+    const element = document.getElementById('voting')
+    const props = Object.assign({}, element.dataset)
+    ReactDOM.render(<PlayerView {...props}/>, document.getElementById('voting'));
 }

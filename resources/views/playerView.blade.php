@@ -7,7 +7,7 @@
         <title>Werewolf Voting</title>
     </head>
     <body>
-        <div id="voting"></div>
+        <div id="voting" data-game_id="{{$game_id}}" data-round_id={{$round_id}}></div>
 
         <script src="{{ asset('js/app.js') }}"></script>
     </body>
