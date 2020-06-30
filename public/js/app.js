@@ -66025,11 +66025,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
 
     _this = _super.call(this);
     _this.state = {
-      players: [{
-        id: 1,
-        name: 'Test Player',
-        roleId: 1
-      }],
+      players: [{}],
       showInitialCheck: true,
       firstResult: null,
       showDoubleCheck: false,
@@ -66039,11 +66035,15 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       action: '',
       showVotables: false,
       choices: [],
-      showSubmit: false
+      showSubmit: false,
+      submittingText: "Submit to Mod!",
+      submitted: false,
+      disableSubmit: false
     };
     _this.updateName = _this.updateName.bind(_assertThisInitialized(_this));
     _this.completeDouble = _this.completeDouble.bind(_assertThisInitialized(_this));
     _this.setOption = _this.setOption.bind(_assertThisInitialized(_this));
+    _this.submitChoice = _this.submitChoice.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -66053,9 +66053,9 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       var _this2 = this;
 
       var game_id = this.props.game_id;
-      var vote_id = this.props.vote_id;
-      var type = 'accusations';
-      axios.get('/api/get_accusable/' + game_id + '/' + vote_id).then(function (response) {
+      var round_id = this.props.round_id; // let type = 'accusations';
+
+      axios.get('/api/get_accusable/' + game_id + '/' + round_id).then(function (response) {
         _this2.setState({
           players: response.data
         });
@@ -66111,19 +66111,35 @@ var PlayerView = /*#__PURE__*/function (_Component) {
   }, {
     key: "submitChoice",
     value: function submitChoice() {
-      alert('submitted');
+      var _this3 = this;
+
+      this.setState({
+        submittingText: "Sending..."
+      });
+      var payload = {
+        voter_id: this.state.firstResult.id,
+        action_type: this.state.action,
+        choices: this.state.choices
+      };
+      axios.post('/api/submit_action/' + this.props.game_id + '/' + this.props.round_id, payload).then(function (response) {
+        _this3.setState({
+          submitted: true,
+          submittingText: "Sent!",
+          disableSubmit: true
+        });
+      });
     }
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       var initialHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Who are you?");
       var initialCheck = this.state.players.map(function (player, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           key: index,
           onClick: function onClick() {
-            return _this3.completeInitial(index);
+            return _this4.completeInitial(index);
           }
         }, player.name);
       });
@@ -66139,7 +66155,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       var optionHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Hi, ", this.state.enteredName, "! What action will you take?");
       var options = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your Options:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: function onClick() {
-          return _this3.setOption('vote');
+          return _this4.setOption('vote');
         }
       }, "Vote"));
       var votingHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, " Who receives your ", this.state.action, "?");
@@ -66147,20 +66163,21 @@ var PlayerView = /*#__PURE__*/function (_Component) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           key: index,
           onClick: function onClick() {
-            return _this3.selectChoices(index);
+            return _this4.selectChoices(index);
           }
         }, player.name);
       });
       var submitButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        onClick: this.submitChoice
-      }, "Submit to Mod!");
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        onClick: this.submitChoice,
+        disabled: this.state.disableSubmit
+      }, this.state.submittingText);
+      return !this.state.submitted ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container"
       }, this.state.showInitialCheck ? initialHeading : null, this.state.showInitialCheck ? initialCheck : null, this.state.showDoubleCheck ? doubleHeading : null, this.state.showDoubleCheck ? doubleCheck : null, this.state.showDoubleCheck && this.state.enteredName.length > 2 ? nameSubmit : null, !this.state.showError ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
         style: {
           color: "red"
         }
-      }, "The name you have entered doesn't match!"), this.state.showOptions ? optionHeading : null, this.state.showOptions ? options : null, this.state.showVotables ? votingHeading : null, this.state.showVotables ? votables : null, this.state.showSubmit ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null) : null, this.state.showSubmit ? submitButton : null);
+      }, "The name you have entered doesn't match!"), this.state.showOptions ? optionHeading : null, this.state.showOptions ? options : null, this.state.showVotables ? votingHeading : null, this.state.showVotables ? votables : null, this.state.showSubmit ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null) : null, this.state.showSubmit ? submitButton : null) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your feedback has been received! You can now close the window and get back to the game! ");
     }
   }]);
 

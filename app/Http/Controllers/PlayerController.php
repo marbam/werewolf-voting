@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Player;
+use App\Action;
 
 class PlayerController extends Controller
 {
@@ -23,7 +24,6 @@ class PlayerController extends Controller
         ]);
     }
 
-
     public function getAccusable($gameId, $voteId)
     {
         return Player::where('game_id', $gameId)
@@ -35,5 +35,28 @@ class PlayerController extends Controller
                              'players.name',
                              'roles.id as roleId',
                          ]);
+    }
+
+    public function submitAction(Request $request, $game_id, $round_id)
+    {
+        $data = $request->all();
+
+        // Check we don't already have a vote for the player from this round.
+        // Could use a firstOrCreate etc but I've seen race conditions in the past.
+        $alreadySubmitted = Action::where([
+            'round_id' => $round_id,
+            'voter_id' => $data['voter_id']
+        ])->count();
+
+        if(!$alreadySubmitted) {
+            foreach($data['choices'] as $choice) {
+                Action::insert([
+                    'round_id' => $round_id,
+                    'action_type' => strtoupper($data['action_type']),
+                    'voter_id' => $data['voter_id'],
+                    'nominee_id' => $choice['id'],
+                ]);
+            }
+        }
     }
 }

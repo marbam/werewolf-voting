@@ -26,3 +26,4 @@ Route::get('/get_accusable/{game_id}/{vote_id}', 'PlayerController@getAccusable'
 
 Route::get('/generate_accusations/{game_id}', 'ModController@createAccusations');
 Route::get('/refresh_accusations/{round_id}/{game_id}', 'ModController@getAccusationOutcome');
+Route::post('/submit_action/{game_id}/{round_id}', 'PlayerController@submitAction');
