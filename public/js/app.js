@@ -65868,11 +65868,13 @@ var ModView = /*#__PURE__*/function (_Component) {
       url: null,
       accusations_outcomes: [],
       refreshingAccusations: false,
-      refreshButtonText: 'Refresh'
+      refreshButtonText: 'Refresh',
+      accusationTotals: []
     };
     _this.changeDeadAlive = _this.changeDeadAlive.bind(_assertThisInitialized(_this));
     _this.genAccusations = _this.genAccusations.bind(_assertThisInitialized(_this));
     _this.refreshAccusations = _this.refreshAccusations.bind(_assertThisInitialized(_this));
+    _this.getAccusationTotals = _this.getAccusationTotals.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65934,14 +65936,31 @@ var ModView = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
+    key: "getAccusationTotals",
+    value: function getAccusationTotals() {
+      var _this6 = this;
+
+      axios.get('/api/get_accusation_totals/' + this.props.game_id + '/' + this.state.roundId).then(function (response) {
+        _this6.setState({
+          accusationTotals: response.data
+        });
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
-      var _this6 = this;
+      var _this7 = this;
 
       var votingTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voter"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Chose"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.accusations_outcomes.map(function (result, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voter), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.chose));
+      }))); //!this.state.accusationTotals ? null :
+
+      var accusationTotalsTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Votes"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "On Ballot?"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Bob"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "45"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Yes")), this.state.accusationTotals.map(function (result, index) {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
+          key: index
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.votes), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.on_ballot ? "Yes" : "No"));
       })));
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container"
@@ -65950,7 +65969,7 @@ var ModView = /*#__PURE__*/function (_Component) {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.alive ? 'Alive' : 'Dead'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this6.changeDeadAlive(index);
+            return _this7.changeDeadAlive(index);
           }
         }, "Toggle Life!")));
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -65958,7 +65977,9 @@ var ModView = /*#__PURE__*/function (_Component) {
       }, "Generate Accusations"), this.state.url ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Copy to Players: ", this.state.url) : null, !this.state.url ? null : votingTable, !this.state.url ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.refreshAccusations,
         disabled: this.state.refreshingAccusations
-      }, this.state.refreshButtonText));
+      }, this.state.refreshButtonText), !this.state.url ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.getAccusationTotals
+      }, "Get Totals"), accusationTotalsTable);
     }
   }]);
 
@@ -66025,7 +66046,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
 
     _this = _super.call(this);
     _this.state = {
-      players: [{}],
+      players: [],
       showInitialCheck: true,
       firstResult: null,
       showDoubleCheck: false,

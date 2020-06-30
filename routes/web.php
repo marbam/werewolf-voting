@@ -23,4 +23,3 @@ Route::get('/', function () {
 
 Route::get('/game/{id}', 'ModController@showGame');
 Route::get('/game/{id}/{type}/{voteId}/', 'PlayerController@showNominees');
-Route::get('/test_ballot/{id}/{voteId}/', 'ModController@getAccusationResults');

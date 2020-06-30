@@ -13,11 +13,13 @@ class ModView extends Component {
             url: null,
             accusations_outcomes: [],
             refreshingAccusations: false,
-            refreshButtonText: 'Refresh'
+            refreshButtonText: 'Refresh',
+            accusationTotals: []
         };
         this.changeDeadAlive = this.changeDeadAlive.bind(this);
         this.genAccusations = this.genAccusations.bind(this);
         this.refreshAccusations = this.refreshAccusations.bind(this);
+        this.getAccusationTotals = this.getAccusationTotals.bind(this);
     }
 
     componentDidMount() {
@@ -53,7 +55,6 @@ class ModView extends Component {
     }
 
     refreshAccusations() {
-
         this.setState({
             refreshingAccusations: true,
             refreshButtonText: 'Refreshing...'
@@ -64,6 +65,14 @@ class ModView extends Component {
                 accusations_outcomes: response.data,
                 refreshingAccusations: false,
                 refreshButtonText: 'Refresh'
+            });
+        })
+    }
+
+    getAccusationTotals() {
+        axios.get('/api/get_accusation_totals/'+this.props.game_id+'/'+this.state.roundId).then(response => {
+            this.setState({
+                accusationTotals: response.data,
             });
         })
     }
@@ -82,6 +91,26 @@ class ModView extends Component {
                     <tr key={index}>
                         <td>{result.voter}</td>
                         <td>{result.chose}</td>
+                    </tr>
+                )}
+            </tbody>
+        </table>
+
+//!this.state.accusationTotals ? null :
+        let accusationTotalsTable = <table>
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Votes</td>
+                    <td>On Ballot?</td>
+                </tr>
+            </thead>
+            <tbody>
+                {this.state.accusationTotals.map((result, index) =>
+                    <tr key={index}>
+                        <td>{result.name}</td>
+                        <td>{result.votes}</td>
+                        <td>{result.on_ballot ? "Yes" : "No"}</td>
                     </tr>
                 )}
             </tbody>
@@ -122,6 +151,8 @@ class ModView extends Component {
                                               {this.state.refreshButtonText}
                                           </button>
                 }
+                {!this.state.url ? null : <button onClick={this.getAccusationTotals}>Get Totals</button>}
+                {accusationTotalsTable}
             </div>
         );
     }

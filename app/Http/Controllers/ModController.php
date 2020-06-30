@@ -138,16 +138,24 @@ class ModController extends Controller
         $second_highest = $this->getHighest($vote_array);
         $topTiers = [$highest[1], $second_highest[1]]; // will contain the top two tiers of votes.
 
+        if($topTiers[0] == 0) {
+            unset($topTiers[0]); // anyone with 0 votes will never be on the ballot. (Guarded to come later.)
+        }
+
         if($topTiers[1] == 0) {
             unset($topTiers[1]); // anyone with 0 votes will never be on the ballot. (Guarded to come later.)
         }
 
-        // finally go through and update any players who are in the top two tiers of votes.
-        foreach ($results as $index => $result) {
-            if (in_array($result['votes'], $topTiers)) {
-                $results[$index]['on_ballot'] = 1;
+        if (count($topTiers)) {
+            // finally go through and update any players who are in the top two tiers of votes.
+            foreach ($results as $index => $result) {
+                if (in_array($result['votes'], $topTiers)) {
+                    $results[$index]['on_ballot'] = 1;
+                }
             }
         }
+
+        $results = array_values($results); // reset the outer keys so it's mappable in javascript
 
         return $results;
     }
