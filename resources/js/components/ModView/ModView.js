@@ -16,13 +16,17 @@ class ModView extends Component {
             refreshButtonText: 'Refresh',
             accusationTotals: [],
             totalsError: null,
-            recallAccusationsText: 'Recall Previous Accusations'
+            recallAccusationsText: 'Recall Previous Accusations',
+            ballot_outcomes: [],
+            ballotRound: null,
+            ballotUrl: ''
         };
         this.changeDeadAlive = this.changeDeadAlive.bind(this);
         this.genAccusations = this.genAccusations.bind(this);
         this.refreshAccusations = this.refreshAccusations.bind(this);
         this.getAccusationTotals = this.getAccusationTotals.bind(this);
         this.grabLastAccusations = this.grabLastAccusations.bind(this);
+        this.generateBallot = this.generateBallot.bind(this);
     }
 
     componentDidMount() {
@@ -105,8 +109,22 @@ class ModView extends Component {
         })
     }
 
-    render() {
+    generateBallot() {
+        // you'll have the ballot based on the ballot totals.
+        // Submit these and generate a new round, plus nominees.
+        // Return a list of everyone, along with their ability to vote and signal and who they actioned.
+        let url = '/api/generate_ballot/'+this.props.game_id;
 
+        axios.post(url, this.state.accusationTotals).then(response => {
+            this.setState({
+                ballotRound: response.data.roundId,
+                ballot_outcomes: response.data.voters,
+                ballotUrl: response.data.url
+            })
+        })
+    }
+
+    render() {
         let votingTable = <table>
             <thead>
                 <tr>
@@ -139,6 +157,23 @@ class ModView extends Component {
                         <td>{result.name}</td>
                         <td>{result.votes}</td>
                         <td>{result.on_ballot ? "Yes" : "No"}</td>
+                    </tr>
+                )}
+            </tbody>
+        </table>
+
+        let ballotOutcomes = !this.state.ballot_outcomes.length ? null :<table>
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Voted For</td>
+                </tr>
+            </thead>
+            <tbody>
+                {this.state.ballot_outcomes.map((result, index) =>
+                    <tr key={index}>
+                        <td>{result.name}</td>
+                        <td>{result.voted_for_name}</td>
                     </tr>
                 )}
             </tbody>
@@ -183,6 +218,9 @@ class ModView extends Component {
                 {!this.state.url ? null : <button onClick={this.getAccusationTotals}>Get Totals</button>}
                 {accusationTotalsTable}
                 {this.state.totalsError ? <p>{totalsError}</p> : null}
+                <button onClick={this.generateBallot}>Generate Ballot</button>
+                {ballotOutcomes}
+                {!this.state.ballotUrl ? null : <p>Share Ballot Link with Players: {this.state.ballotUrl}</p> }
             </div>
         );
     }

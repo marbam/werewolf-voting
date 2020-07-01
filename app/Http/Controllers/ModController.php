@@ -7,6 +7,7 @@ use App\Player;
 use App\Round;
 use App\Action;
 use App\PlayerStatus;
+use App\Nominee;
 
 class ModController extends Controller
 {
@@ -40,7 +41,8 @@ class ModController extends Controller
         return $result;
     }
 
-    public function createAccusations($game_id) {
+    public function createAccusations($game_id)
+    {
         $round = Round::create([
             'game_id' => $game_id,
             'type' => 'Accusations',
@@ -193,6 +195,41 @@ class ModController extends Controller
             'roundType' => strtolower($round->type),
             'url' => '/game/'.$game_id.'/accusations/'.$round->id,
             'accusations_outcomes' => $outcomes
+        ];
+    }
+
+    public function generateBallot(Request $request, $game_id)
+    {
+        $round = Round::create([
+            'game_id' => $game_id,
+            'type' => 'Ballot',
+            ]);
+
+        $data = $request->all();
+        $voters = [];
+        foreach ($data as $player) {
+            if ($player['on_ballot']) {
+                Nominee::create([
+                    'round_id' => $round->id,
+                    'nominee_id' => $player['id']
+                ]);
+            } else {
+                $voter = [
+                    'id' => $player['id'],
+                    'name' => $player['name'],
+                    'voted_for_id' => null,
+                    'voted_for_name' => 'Awaiting...'
+                ];
+                $voters[] = $voter;
+            }
+        }
+
+        // for now we'll assume that if you're on the ballot, you can't vote, although that'll change.
+        return [
+            'roundId' => $round->id,
+            'roundType' => strtolower($round->type),
+            'voters'=> $voters,
+            'url' => '/game/'.$game_id.'/ballot/'.$round->id,
         ];
     }
 }
