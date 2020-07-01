@@ -160,7 +160,8 @@ class ModController extends Controller
         return $results;
     }
 
-    protected function getHighest($voting_array) {
+    protected function getHighest($voting_array)
+    {
         $votes = 0;
         $players = 0;
 
@@ -171,6 +172,27 @@ class ModController extends Controller
             }
         }
         return [$players, $votes];
+    }
 
+    public function recallAccusations($game_id)
+    {
+        $round = Round::where([
+            'game_id' => $game_id,
+            'type' => 'Accusations',
+        ])->orderBy('id', 'DESC')
+          ->first();
+
+        if (!$round) {
+            return "NO PREVIOUS";
+        }
+
+        $outcomes = $this->getAccusationOutcome($round->id, $game_id);
+
+        return [
+            'roundId' => $round->id,
+            'roundType' => strtolower($round->type),
+            'url' => '/game/'.$game_id.'/accusations/'.$round->id,
+            'accusations_outcomes' => $outcomes
+        ];
     }
 }

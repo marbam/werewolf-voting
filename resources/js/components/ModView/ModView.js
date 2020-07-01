@@ -14,12 +14,15 @@ class ModView extends Component {
             accusations_outcomes: [],
             refreshingAccusations: false,
             refreshButtonText: 'Refresh',
-            accusationTotals: []
+            accusationTotals: [],
+            totalsError: null,
+            recallAccusationsText: 'Recall Previous Accusations'
         };
         this.changeDeadAlive = this.changeDeadAlive.bind(this);
         this.genAccusations = this.genAccusations.bind(this);
         this.refreshAccusations = this.refreshAccusations.bind(this);
         this.getAccusationTotals = this.getAccusationTotals.bind(this);
+        this.grabLastAccusations = this.grabLastAccusations.bind(this);
     }
 
     componentDidMount() {
@@ -54,6 +57,24 @@ class ModView extends Component {
         })
     }
 
+    grabLastAccusations() {
+        axios.get('/api/recall_accusations/'+this.props.game_id).then(response => {
+            if (response.data == "NO PREVIOUS") {
+                this.setState({
+                    recallAccusationsText: "No Previous!"
+                })
+            } else {
+                this.setState({
+                    roundType: response.data.roundType,
+                    roundId: response.data.roundId,
+                    url: response.data.url,
+                    accusations_outcomes: response.data.accusations_outcomes,
+                    recallAccusationsText: 'Recall Previous Accusations'
+                })
+            }
+        })
+    }
+
     refreshAccusations() {
         this.setState({
             refreshingAccusations: true,
@@ -71,9 +92,16 @@ class ModView extends Component {
 
     getAccusationTotals() {
         axios.get('/api/get_accusation_totals/'+this.props.game_id+'/'+this.state.roundId).then(response => {
-            this.setState({
-                accusationTotals: response.data,
-            });
+            if (response.data == "NO VOTES") {
+                this.setState({
+                    totalsError: "No votes yet!"
+                })
+            } else {
+                this.setState({
+                    accusationTotals: response.data,
+                    totalsError: null
+                });
+            }
         })
     }
 
@@ -96,8 +124,8 @@ class ModView extends Component {
             </tbody>
         </table>
 
-//!this.state.accusationTotals ? null :
-        let accusationTotalsTable = <table>
+
+        let accusationTotalsTable = !this.state.accusationTotals.length ? null :<table>
             <thead>
                 <tr>
                     <td>Name</td>
@@ -143,6 +171,7 @@ class ModView extends Component {
                     </tbody>
                 </table>
                 <button onClick={this.genAccusations}>Generate Accusations</button>
+                <button onClick={this.grabLastAccusations}>{this.state.recallAccusationsText}</button>
                 {this.state.url ? <p>Copy to Players: {this.state.url}</p> : null}
                 {!this.state.url ? null : votingTable}
                 {!this.state.url ? null : <button onClick={this.refreshAccusations}
@@ -153,6 +182,7 @@ class ModView extends Component {
                 }
                 {!this.state.url ? null : <button onClick={this.getAccusationTotals}>Get Totals</button>}
                 {accusationTotalsTable}
+                {this.state.totalsError ? <p>{totalsError}</p> : null}
             </div>
         );
     }
