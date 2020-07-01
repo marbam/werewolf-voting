@@ -48,7 +48,7 @@ class PlayerController extends Controller
             'voter_id' => $data['voter_id']
         ])->count();
 
-        if(!$alreadySubmitted) {
+        if (!$alreadySubmitted) {
             foreach($data['choices'] as $choice) {
                 Action::insert([
                     'round_id' => $round_id,

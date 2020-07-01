@@ -65869,12 +65869,19 @@ var ModView = /*#__PURE__*/function (_Component) {
       accusations_outcomes: [],
       refreshingAccusations: false,
       refreshButtonText: 'Refresh',
-      accusationTotals: []
+      accusationTotals: [],
+      totalsError: null,
+      recallAccusationsText: 'Recall Previous Accusations',
+      ballot_outcomes: [],
+      ballotRound: null,
+      ballotUrl: ''
     };
     _this.changeDeadAlive = _this.changeDeadAlive.bind(_assertThisInitialized(_this));
     _this.genAccusations = _this.genAccusations.bind(_assertThisInitialized(_this));
     _this.refreshAccusations = _this.refreshAccusations.bind(_assertThisInitialized(_this));
     _this.getAccusationTotals = _this.getAccusationTotals.bind(_assertThisInitialized(_this));
+    _this.grabLastAccusations = _this.grabLastAccusations.bind(_assertThisInitialized(_this));
+    _this.generateBallot = _this.generateBallot.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65919,16 +65926,37 @@ var ModView = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
+    key: "grabLastAccusations",
+    value: function grabLastAccusations() {
+      var _this5 = this;
+
+      axios.get('/api/recall_accusations/' + this.props.game_id).then(function (response) {
+        if (response.data == "NO PREVIOUS") {
+          _this5.setState({
+            recallAccusationsText: "No Previous!"
+          });
+        } else {
+          _this5.setState({
+            roundType: response.data.roundType,
+            roundId: response.data.roundId,
+            url: response.data.url,
+            accusations_outcomes: response.data.accusations_outcomes,
+            recallAccusationsText: 'Recall Previous Accusations'
+          });
+        }
+      });
+    }
+  }, {
     key: "refreshAccusations",
     value: function refreshAccusations() {
-      var _this5 = this;
+      var _this6 = this;
 
       this.setState({
         refreshingAccusations: true,
         refreshButtonText: 'Refreshing...'
       });
       axios.get('/api/refresh_accusations/' + this.state.roundId + '/' + this.props.game_id).then(function (response) {
-        _this5.setState({
+        _this6.setState({
           accusations_outcomes: response.data,
           refreshingAccusations: false,
           refreshButtonText: 'Refresh'
@@ -65938,29 +65966,57 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "getAccusationTotals",
     value: function getAccusationTotals() {
-      var _this6 = this;
+      var _this7 = this;
 
       axios.get('/api/get_accusation_totals/' + this.props.game_id + '/' + this.state.roundId).then(function (response) {
-        _this6.setState({
-          accusationTotals: response.data
+        if (response.data == "NO VOTES") {
+          _this7.setState({
+            totalsError: "No votes yet!"
+          });
+        } else {
+          _this7.setState({
+            accusationTotals: response.data,
+            totalsError: null
+          });
+        }
+      });
+    }
+  }, {
+    key: "generateBallot",
+    value: function generateBallot() {
+      var _this8 = this;
+
+      // you'll have the ballot based on the ballot totals.
+      // Submit these and generate a new round, plus nominees.
+      // Return a list of everyone, along with their ability to vote and signal and who they actioned.
+      var url = '/api/generate_ballot/' + this.props.game_id;
+      axios.post(url, this.state.accusationTotals).then(function (response) {
+        _this8.setState({
+          ballotRound: response.data.roundId,
+          ballot_outcomes: response.data.voters,
+          ballotUrl: response.data.url
         });
       });
     }
   }, {
     key: "render",
     value: function render() {
-      var _this7 = this;
+      var _this9 = this;
 
       var votingTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voter"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Chose"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.accusations_outcomes.map(function (result, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voter), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.chose));
-      }))); //!this.state.accusationTotals ? null :
-
-      var accusationTotalsTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Votes"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "On Ballot?"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Bob"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "45"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Yes")), this.state.accusationTotals.map(function (result, index) {
+      })));
+      var accusationTotalsTable = !this.state.accusationTotals.length ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Votes"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "On Ballot?"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.accusationTotals.map(function (result, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.votes), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.on_ballot ? "Yes" : "No"));
+      })));
+      var ballotOutcomes = !this.state.ballot_outcomes.length ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voted For"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.ballot_outcomes.map(function (result, index) {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
+          key: index
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voted_for_name));
       })));
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container"
@@ -65969,17 +66025,21 @@ var ModView = /*#__PURE__*/function (_Component) {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.alive ? 'Alive' : 'Dead'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this7.changeDeadAlive(index);
+            return _this9.changeDeadAlive(index);
           }
         }, "Toggle Life!")));
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.genAccusations
-      }, "Generate Accusations"), this.state.url ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Copy to Players: ", this.state.url) : null, !this.state.url ? null : votingTable, !this.state.url ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Generate Accusations"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.grabLastAccusations
+      }, this.state.recallAccusationsText), this.state.url ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Copy to Players: ", this.state.url) : null, !this.state.url ? null : votingTable, !this.state.url ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.refreshAccusations,
         disabled: this.state.refreshingAccusations
       }, this.state.refreshButtonText), !this.state.url ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.getAccusationTotals
-      }, "Get Totals"), accusationTotalsTable);
+      }, "Get Totals"), accusationTotalsTable, this.state.totalsError ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, totalsError) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.generateBallot
+      }, "Generate Ballot"), ballotOutcomes, !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl));
     }
   }]);
 
