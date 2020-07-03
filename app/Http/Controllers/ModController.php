@@ -214,7 +214,7 @@ class ModController extends Controller
         $accusations_round = Round::where([
             'game_id' => $game_id,
             'type' => 'Accusations'
-            ])->first()->id;
+        ])->orderBy('id', 'DESC')->first()->id;
 
         $outcomes = $this->getAccusationResults($game_id, $accusations_round);
 
@@ -224,7 +224,12 @@ class ModController extends Controller
 
     public function refreshVoteCounts($game_id, $round_id)
     {
-        $outcomes = $this->getAccusationResults($game_id, $round_id);
+        $accusations_round = Round::where([
+            'game_id' => $game_id,
+            'type' => 'Accusations'
+        ])->orderBy('id', 'DESC')->first()->id;
+
+        $outcomes = $this->getAccusationResults($game_id, $accusations_round);
         $addedData = ['type' => 'existing', 'round_id' => $round_id, 'accusation_votes' => $outcomes];
         return $this->getBallot($game_id, $addedData);
     }
@@ -248,8 +253,6 @@ class ModController extends Controller
                     ]);
                 }
             }
-
-
         } else {
             $round_id = $addedData['round_id'];
             $data = $addedData['accusation_votes'];
