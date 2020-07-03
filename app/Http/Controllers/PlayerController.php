@@ -54,7 +54,7 @@ class PlayerController extends Controller
             return $players;
         } else if ($round->type == "Ballot") {
 
-            $nominees = Nominee::where('round_id', $round->id)->pluck('nominee_id')->toArray();
+            $nominees = Nominee::where('round_id', $round->id)->pluck('player_id')->toArray();
             foreach ($players as $player) {
                 // for now we'll assume that if you're on the ballot, you can't vote. This will change later.
                 if (in_array($player->id, $nominees)) {

@@ -65872,9 +65872,10 @@ var ModView = /*#__PURE__*/function (_Component) {
       accusationTotals: [],
       totalsError: null,
       recallAccusationsText: 'Recall Previous Accusations',
-      ballot_outcomes: [],
+      ballotActions: [],
       ballotRound: null,
-      ballotUrl: ''
+      ballotUrl: '',
+      ballotFeedback: null
     };
     _this.changeDeadAlive = _this.changeDeadAlive.bind(_assertThisInitialized(_this));
     _this.genAccusations = _this.genAccusations.bind(_assertThisInitialized(_this));
@@ -65884,6 +65885,7 @@ var ModView = /*#__PURE__*/function (_Component) {
     _this.generateBallot = _this.generateBallot.bind(_assertThisInitialized(_this));
     _this.refreshBallot = _this.refreshBallot.bind(_assertThisInitialized(_this));
     _this.recallLastBallot = _this.recallLastBallot.bind(_assertThisInitialized(_this));
+    _this.showBallotOutcome = _this.showBallotOutcome.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65995,7 +65997,7 @@ var ModView = /*#__PURE__*/function (_Component) {
       axios.post(url, this.state.accusationTotals).then(function (response) {
         _this8.setState({
           ballotRound: response.data.roundId,
-          ballot_outcomes: response.data.voters,
+          ballotActions: response.data.voters,
           ballotUrl: response.data.url
         });
       });
@@ -66009,7 +66011,7 @@ var ModView = /*#__PURE__*/function (_Component) {
       axios.get(url).then(function (response) {
         _this9.setState({
           ballotRound: response.data.roundId,
-          ballot_outcomes: response.data.voters,
+          ballotActions: response.data.voters,
           ballotUrl: response.data.url
         });
       });
@@ -66023,15 +66025,33 @@ var ModView = /*#__PURE__*/function (_Component) {
       axios.get(url).then(function (response) {
         _this10.setState({
           ballotRound: response.data.roundId,
-          ballot_outcomes: response.data.voters,
+          ballotActions: response.data.voters,
           ballotUrl: response.data.url
+        });
+      });
+    }
+  }, {
+    key: "showBallotOutcome",
+    value: function showBallotOutcome() {
+      var _this11 = this;
+
+      var url = '/api/who_burns/' + this.props.game_id + '/' + this.state.ballotRound;
+      axios.get(url).then(function (response) {
+        if (response.data == "DRAW") {
+          feedback = draw;
+        } else {
+          feedback = "Burning today on the bonfire is " + response.data[1].name + " with " + response.data[0] + "votes";
+        }
+
+        _this11.setState({
+          ballotFeedback: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, feedback)
         });
       });
     }
   }, {
     key: "render",
     value: function render() {
-      var _this11 = this;
+      var _this12 = this;
 
       var votingTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voter"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Chose"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.accusations_outcomes.map(function (result, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
@@ -66043,7 +66063,7 @@ var ModView = /*#__PURE__*/function (_Component) {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.votes), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.on_ballot ? "Yes" : "No"));
       })));
-      var ballotOutcomes = !this.state.ballot_outcomes.length ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voted For"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.ballot_outcomes.map(function (result, index) {
+      var ballotOutcomes = !this.state.ballotActions.length ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voted For"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.ballotActions.map(function (result, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voted_for_name));
@@ -66055,7 +66075,7 @@ var ModView = /*#__PURE__*/function (_Component) {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.alive ? 'Alive' : 'Dead'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this11.changeDeadAlive(index);
+            return _this12.changeDeadAlive(index);
           }
         }, "Toggle Life!")));
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66073,7 +66093,9 @@ var ModView = /*#__PURE__*/function (_Component) {
         onClick: this.recallLastBallot
       }, "Recall last Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.refreshBallot
-      }, "Refresh Ballot"));
+      }, "Refresh Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.showBallotOutcome
+      }, "Show Outcome"), ballotFeedback);
     }
   }]);
 

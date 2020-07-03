@@ -33,3 +33,4 @@ Route::get('/recall_accusations/{gameId}', 'ModController@recallAccusations');
 Route::post('/generate_ballot/{gameId}', 'ModController@getNewBallot');
 Route::get('/refresh_ballot/{gameId}/{roundId}', 'ModController@refreshVoteCounts');
 Route::get('/recall_last_ballot/{gameId}', 'ModController@recallLastBallot');
+Route::get('/who_burns/{gameId}/{roundId}', 'ModController@getBurn');

@@ -249,7 +249,7 @@ class ModController extends Controller
                 if ($player['on_ballot']) {
                     Nominee::create([
                         'round_id' => $round_id,
-                        'nominee_id' => $player['id']
+                        'player_id' => $player['id']
                     ]);
                 }
             }
@@ -296,5 +296,38 @@ class ModController extends Controller
             'voters'=> $voters,
             'url' => URL('/game/'.$game_id.'/ballot/'.$round_id),
         ];
+    }
+
+    public function getBurn($game_id, $roundId)
+    {
+        // Signals and whatnot can come later. For now we'll just figure out who has the most votes!
+        $actions = Action::where('round_id', $roundId)->get();
+        $totals = [];
+        foreach ($actions as $action) {
+            if (!isset($totals[$action->player_id])) {
+                $totals[$action->player_id] = 0;
+            }
+            $totals[$action->player_id]++;
+        }
+
+        $highest = max($totals);
+        $burning_ids = [];
+
+        foreach($totals as $player_id => $total) {
+            if ($total == $highest) {
+                $burning_ids[] = $player_id;
+            }
+        }
+
+        if (count($burning_ids) > 1) {
+            return "DRAW";
+        } else {
+            // get players and then return the relevant names;
+            $player = Player::find($burning_ids);
+            return [$highest, $player];
+        }
+
+
+
     }
 }

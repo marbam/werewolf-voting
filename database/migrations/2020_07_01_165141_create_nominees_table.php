@@ -17,8 +17,8 @@ class CreateNomineesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('round_id');
             $table->foreign('round_id')->references('id')->on('rounds');
-            $table->unsignedBigInteger('nominee_id');
-            $table->foreign('nominee_id')->references('id')->on('players');
+            $table->unsignedBigInteger('player_id');
+            $table->foreign('player_id')->references('id')->on('players');
             $table->timestamps();
         });
     }
