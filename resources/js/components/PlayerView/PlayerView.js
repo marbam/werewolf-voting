@@ -10,7 +10,8 @@ class PlayerView extends Component {
             firstResult: null,
             showDoubleCheck: false,
             enteredName: '',
-            showError: false,
+            showSelectError: false,
+            showIneligibleScreen: false,
             showOptions: false,
             action: '',
             showVotables: false,
@@ -29,7 +30,6 @@ class PlayerView extends Component {
     componentDidMount() {
         let game_id = this.props.game_id;
         let round_id = this.props.round_id;
-        // let type = 'accusations';
         axios.get('/api/get_accusable/'+game_id+'/'+round_id).then(response => {
             this.setState({
               players: response.data
@@ -52,15 +52,22 @@ class PlayerView extends Component {
 
     completeDouble() {
         if (this.state.firstResult.name == this.state.enteredName) {
-            this.setState({
-                showError: false,
-                showInitialCheck: false,
-                showDoubleCheck: false,
-                showOptions:true
-            });
+            if (this.state.firstResult.canVote) {
+                this.setState({
+                    showSelectError: false,
+                    showInitialCheck: false,
+                    showDoubleCheck: false,
+                    showOptions:true
+                });
+            } else {
+                this.setState({
+                    showIneligibleScreen: true
+                });
+            }
+
         } else {
             this.setState({
-                showError : true
+                showSelectError : true
             })
         }
     }
@@ -72,9 +79,9 @@ class PlayerView extends Component {
         });
     }
 
-    selectChoices(index) {
+    selectChoices(player) {
         this.setState({
-            choices: [this.state.players[index]],
+            choices: [player],
             showSubmit: true,
         })
     }
@@ -124,8 +131,11 @@ class PlayerView extends Component {
         </p>;
 
         let votingHeading = <h4> Who receives your {this.state.action}?</h4>
-        let votables = this.state.players.map((player, index) =>
-            <button key={index} onClick={() => this.selectChoices(index)}>
+
+        let nominees = this.state.players.filter(player => {return player.isNominee});
+
+        let votables = nominees.map((player, index) =>
+            <button key={index} onClick={() => this.selectChoices(player)}>
                 {player.name}
             </button>
         )
@@ -137,15 +147,22 @@ class PlayerView extends Component {
                             {this.state.submittingText}
                         </button>
 
+        if (this.state.showIneligibleScreen) {
+            return <p>Thanks for selecting, you can't vote/signal in this round! </p>
+        }
+
+        if (this.state.submitted) {
+            return <p>Your feedback has been received! You can now close the window and get back to the game! </p>
+        }
+
         return (
-            !this.state.submitted ?
             <div className="container">
                 {this.state.showInitialCheck ? initialHeading : null}
                 {this.state.showInitialCheck ? initialCheck : null}
                 {this.state.showDoubleCheck ? doubleHeading : null}
                 {this.state.showDoubleCheck ? doubleCheck : null}
                 {this.state.showDoubleCheck && this.state.enteredName.length > 2 ? nameSubmit : null}
-                {!this.state.showError ? null : <p style={{color:"red"}}>The name you have entered doesn't match!</p> }
+                {!this.state.showSelectError ? null : <p style={{color:"red"}}>The name you have entered doesn't match!</p> }
                 {this.state.showOptions ? optionHeading : null}
                 {this.state.showOptions ? options : null}
                 {this.state.showVotables ? votingHeading : null}
@@ -153,7 +170,6 @@ class PlayerView extends Component {
                 {this.state.showSubmit ? <br/> : null}
                 {this.state.showSubmit ? submitButton : null}
             </div>
-            : <p>Your feedback has been received! You can now close the window and get back to the game! </p>
         );
     }
 }

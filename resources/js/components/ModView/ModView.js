@@ -245,8 +245,8 @@ class ModView extends Component {
                 {this.state.totalsError ? <p>{totalsError}</p> : null}
                 <button onClick={this.generateBallot}>Generate Ballot</button>
                 <button onClick={this.recallLastBallot}>Recall last Ballot</button>
-                {ballotOutcomes}
                 {!this.state.ballotUrl ? null : <p>Share Ballot Link with Players: {this.state.ballotUrl}</p> }
+                {ballotOutcomes}
                 <button onClick={this.refreshBallot}>Refresh Ballot</button>
             </div>
         );
