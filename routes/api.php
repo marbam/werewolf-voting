@@ -30,4 +30,6 @@ Route::post('/submit_action/{game_id}/{round_id}', 'PlayerController@submitActio
 Route::get('/get_accusation_totals/{gameId}/{roundId}/', 'ModController@getAccusationResults');
 
 Route::get('/recall_accusations/{gameId}', 'ModController@recallAccusations');
-Route::post('/generate_ballot/{gameId}', 'ModController@generateBallot');
+Route::post('/generate_ballot/{gameId}', 'ModController@getNewBallot');
+Route::get('/refresh_ballot/{gameId}/{roundId}', 'ModController@refreshVoteCounts');
+Route::get('/recall_last_ballot/{gameId}', 'ModController@recallLastBallot');

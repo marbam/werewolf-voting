@@ -198,38 +198,100 @@ class ModController extends Controller
         ];
     }
 
-    public function generateBallot(Request $request, $game_id)
+    public function getNewBallot(Request $request, $game_id)
     {
-        $round = Round::create([
+        $addedData = ['type' => 'new', 'request' => $request];
+        return $this->getBallot($game_id, $addedData);
+    }
+
+    public function recallLastBallot($game_id)
+    {
+        $round_id = Round::where([
             'game_id' => $game_id,
             'type' => 'Ballot',
-            ]);
+        ])->orderBy('id', 'DESC')->first()->id;
 
-        $data = $request->all();
+        $accusations_round = Round::where([
+            'game_id' => $game_id,
+            'type' => 'Accusations'
+            ])->first()->id;
+
+        $outcomes = $this->getAccusationResults($game_id, $accusations_round);
+
+        $addedData = ['type' => 'existing', 'round_id' => $round_id, 'accusation_votes' => $outcomes];
+        return $this->getBallot($game_id, $addedData);
+    }
+
+    public function refreshVoteCounts($game_id, $round_id)
+    {
+        $outcomes = $this->getAccusationResults($game_id, $round_id);
+        $addedData = ['type' => 'existing', 'round_id' => $round_id, 'accusation_votes' => $outcomes];
+        return $this->getBallot($game_id, $addedData);
+    }
+
+
+    public function getBallot($game_id, $addedData)
+    {
+        if ($addedData['type'] == 'new') {
+            $round = Round::create([
+                'game_id' => $game_id,
+                'type' => 'Ballot',
+            ]);
+            $round_id = $round->id;
+            $data = $addedData['request']->all();
+
+            foreach ($data as $player) {
+                if ($player['on_ballot']) {
+                    Nominee::create([
+                        'round_id' => $round_id,
+                        'nominee_id' => $player['id']
+                    ]);
+                }
+            }
+
+
+        } else {
+            $round_id = $addedData['round_id'];
+            $data = $addedData['accusation_votes'];
+        }
+
         $voters = [];
         foreach ($data as $player) {
-            if ($player['on_ballot']) {
-                Nominee::create([
-                    'round_id' => $round->id,
-                    'nominee_id' => $player['id']
-                ]);
-            } else {
+            if (!$player['on_ballot']) {
                 $voter = [
                     'id' => $player['id'],
                     'name' => $player['name'],
                     'voted_for_id' => null,
                     'voted_for_name' => 'Awaiting...'
                 ];
-                $voters[] = $voter;
+                $voters[$player['id']] = $voter;
             }
         }
 
+        if ($addedData['type'] != 'new') {
+            $votes = Action::where('round_id', $round_id)
+                           ->get();
+
+            $players = Player::join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
+                ->where('game_id', $game_id)
+                ->where('player_statuses.alive', 1)
+                ->pluck('name', 'players.id')
+                ->toArray();
+
+            foreach ($votes as $vote) {
+                $voters[$vote->voter_id]['voted_for_id'] = $vote->nominee_id;
+                $voters[$vote->voter_id]['voted_for_name'] = $players[$vote->nominee_id];
+            }
+        }
+
+        $voters = array_values($voters); // reset the outer keys so it's mappable in javascript
+
         // for now we'll assume that if you're on the ballot, you can't vote, although that'll change.
         return [
-            'roundId' => $round->id,
-            'roundType' => strtolower($round->type),
+            'roundId' => $round_id,
+            'roundType' => 'ballot',
             'voters'=> $voters,
-            'url' => '/game/'.$game_id.'/ballot/'.$round->id,
+            'url' => '/game/'.$game_id.'/ballot/'.$round_id,
         ];
     }
 }

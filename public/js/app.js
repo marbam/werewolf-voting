@@ -65882,6 +65882,8 @@ var ModView = /*#__PURE__*/function (_Component) {
     _this.getAccusationTotals = _this.getAccusationTotals.bind(_assertThisInitialized(_this));
     _this.grabLastAccusations = _this.grabLastAccusations.bind(_assertThisInitialized(_this));
     _this.generateBallot = _this.generateBallot.bind(_assertThisInitialized(_this));
+    _this.refreshBallot = _this.refreshBallot.bind(_assertThisInitialized(_this));
+    _this.recallLastBallot = _this.recallLastBallot.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65986,7 +65988,7 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function generateBallot() {
       var _this8 = this;
 
-      // you'll have the ballot based on the ballot totals.
+      // you'll have the ballot based on the accusation totals.
       // Submit these and generate a new round, plus nominees.
       // Return a list of everyone, along with their ability to vote and signal and who they actioned.
       var url = '/api/generate_ballot/' + this.props.game_id;
@@ -65999,9 +66001,37 @@ var ModView = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
+    key: "refreshBallot",
+    value: function refreshBallot() {
+      var _this9 = this;
+
+      var url = '/api/refresh_ballot/' + this.props.game_id + '/' + this.state.ballotRound;
+      axios.get(url).then(function (response) {
+        _this9.setState({
+          ballotRound: response.data.roundId,
+          ballot_outcomes: response.data.voters,
+          ballotUrl: response.data.url
+        });
+      });
+    }
+  }, {
+    key: "recallLastBallot",
+    value: function recallLastBallot() {
+      var _this10 = this;
+
+      var url = '/api/recall_last_ballot/' + this.props.game_id;
+      axios.get(url).then(function (response) {
+        _this10.setState({
+          ballotRound: response.data.roundId,
+          ballot_outcomes: response.data.voters,
+          ballotUrl: response.data.url
+        });
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
-      var _this9 = this;
+      var _this11 = this;
 
       var votingTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voter"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Chose"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.accusations_outcomes.map(function (result, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
@@ -66025,7 +66055,7 @@ var ModView = /*#__PURE__*/function (_Component) {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.alive ? 'Alive' : 'Dead'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this9.changeDeadAlive(index);
+            return _this11.changeDeadAlive(index);
           }
         }, "Toggle Life!")));
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66039,7 +66069,11 @@ var ModView = /*#__PURE__*/function (_Component) {
         onClick: this.getAccusationTotals
       }, "Get Totals"), accusationTotalsTable, this.state.totalsError ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, totalsError) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.generateBallot
-      }, "Generate Ballot"), ballotOutcomes, !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl));
+      }, "Generate Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.recallLastBallot
+      }, "Recall last Ballot"), ballotOutcomes, !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.refreshBallot
+      }, "Refresh Ballot"));
     }
   }]);
 
