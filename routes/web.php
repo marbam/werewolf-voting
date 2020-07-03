@@ -22,4 +22,4 @@ Route::get('/', function () {
 });
 
 Route::get('/game/{id}', 'ModController@showGame');
-Route::get('/game/{id}/{type}/{voteId}/', 'PlayerController@showNominees');
+Route::get('/game/{game}/{type}/{round}/', 'PlayerController@showNominees');

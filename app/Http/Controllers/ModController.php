@@ -53,7 +53,7 @@ class ModController extends Controller
         return [
             'roundId' => $round->id,
             'roundType' => strtolower($round->type),
-            'url' => '/game/'.$game_id.'/accusations/'.$round->id,
+            'url' => URL('/game/'.$game_id.'/accusations/'.$round->id),
             'accusations_outcomes' => $outcomes
         ];
     }
@@ -193,43 +193,141 @@ class ModController extends Controller
         return [
             'roundId' => $round->id,
             'roundType' => strtolower($round->type),
-            'url' => '/game/'.$game_id.'/accusations/'.$round->id,
+            'url' => URL('/game/'.$game_id.'/accusations/'.$round->id),
             'accusations_outcomes' => $outcomes
         ];
     }
 
-    public function generateBallot(Request $request, $game_id)
+    public function getNewBallot(Request $request, $game_id)
     {
-        $round = Round::create([
+        $addedData = ['type' => 'new', 'request' => $request];
+        return $this->getBallot($game_id, $addedData);
+    }
+
+    public function recallLastBallot($game_id)
+    {
+        $round_id = Round::where([
             'game_id' => $game_id,
             'type' => 'Ballot',
-            ]);
+        ])->orderBy('id', 'DESC')->first()->id;
 
-        $data = $request->all();
+        $accusations_round = Round::where([
+            'game_id' => $game_id,
+            'type' => 'Accusations'
+        ])->orderBy('id', 'DESC')->first()->id;
+
+        $outcomes = $this->getAccusationResults($game_id, $accusations_round);
+
+        $addedData = ['type' => 'existing', 'round_id' => $round_id, 'accusation_votes' => $outcomes];
+        return $this->getBallot($game_id, $addedData);
+    }
+
+    public function refreshVoteCounts($game_id, $round_id)
+    {
+        $accusations_round = Round::where([
+            'game_id' => $game_id,
+            'type' => 'Accusations'
+        ])->orderBy('id', 'DESC')->first()->id;
+
+        $outcomes = $this->getAccusationResults($game_id, $accusations_round);
+        $addedData = ['type' => 'existing', 'round_id' => $round_id, 'accusation_votes' => $outcomes];
+        return $this->getBallot($game_id, $addedData);
+    }
+
+
+    public function getBallot($game_id, $addedData)
+    {
+        if ($addedData['type'] == 'new') {
+            $round = Round::create([
+                'game_id' => $game_id,
+                'type' => 'Ballot',
+            ]);
+            $round_id = $round->id;
+            $data = $addedData['request']->all();
+
+            foreach ($data as $player) {
+                if ($player['on_ballot']) {
+                    Nominee::create([
+                        'round_id' => $round_id,
+                        'player_id' => $player['id']
+                    ]);
+                }
+            }
+        } else {
+            $round_id = $addedData['round_id'];
+            $data = $addedData['accusation_votes'];
+        }
+
         $voters = [];
         foreach ($data as $player) {
-            if ($player['on_ballot']) {
-                Nominee::create([
-                    'round_id' => $round->id,
-                    'nominee_id' => $player['id']
-                ]);
-            } else {
+            if (!$player['on_ballot']) {
                 $voter = [
                     'id' => $player['id'],
                     'name' => $player['name'],
                     'voted_for_id' => null,
                     'voted_for_name' => 'Awaiting...'
                 ];
-                $voters[] = $voter;
+                $voters[$player['id']] = $voter;
             }
         }
 
+        if ($addedData['type'] != 'new') {
+            $votes = Action::where('round_id', $round_id)
+                           ->get();
+
+            $players = Player::join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
+                ->where('game_id', $game_id)
+                ->where('player_statuses.alive', 1)
+                ->pluck('name', 'players.id')
+                ->toArray();
+
+            foreach ($votes as $vote) {
+                $voters[$vote->voter_id]['voted_for_id'] = $vote->nominee_id;
+                $voters[$vote->voter_id]['voted_for_name'] = $players[$vote->nominee_id];
+            }
+        }
+
+        $voters = array_values($voters); // reset the outer keys so it's mappable in javascript
+
         // for now we'll assume that if you're on the ballot, you can't vote, although that'll change.
         return [
-            'roundId' => $round->id,
-            'roundType' => strtolower($round->type),
+            'roundId' => $round_id,
+            'roundType' => 'ballot',
             'voters'=> $voters,
-            'url' => '/game/'.$game_id.'/ballot/'.$round->id,
+            'url' => URL('/game/'.$game_id.'/ballot/'.$round_id),
         ];
+    }
+
+    public function getBurn($game_id, $roundId)
+    {
+        // Signals and whatnot can come later. For now we'll just figure out who has the most votes!
+        $actions = Action::where('round_id', $roundId)->get();
+        $totals = [];
+        foreach ($actions as $action) {
+            if (!isset($totals[$action->player_id])) {
+                $totals[$action->player_id] = 0;
+            }
+            $totals[$action->player_id]++;
+        }
+
+        $highest = max($totals);
+        $burning_ids = [];
+
+        foreach($totals as $player_id => $total) {
+            if ($total == $highest) {
+                $burning_ids[] = $player_id;
+            }
+        }
+
+        if (count($burning_ids) > 1) {
+            return "DRAW";
+        } else {
+            // get players and then return the relevant names;
+            $player = Player::find($burning_ids);
+            return [$highest, $player];
+        }
+
+
+
     }
 }

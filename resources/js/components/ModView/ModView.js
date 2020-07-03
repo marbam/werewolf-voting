@@ -17,9 +17,10 @@ class ModView extends Component {
             accusationTotals: [],
             totalsError: null,
             recallAccusationsText: 'Recall Previous Accusations',
-            ballot_outcomes: [],
+            ballotActions: [],
             ballotRound: null,
-            ballotUrl: ''
+            ballotUrl: '',
+            ballotFeedback: null
         };
         this.changeDeadAlive = this.changeDeadAlive.bind(this);
         this.genAccusations = this.genAccusations.bind(this);
@@ -27,6 +28,9 @@ class ModView extends Component {
         this.getAccusationTotals = this.getAccusationTotals.bind(this);
         this.grabLastAccusations = this.grabLastAccusations.bind(this);
         this.generateBallot = this.generateBallot.bind(this);
+        this.refreshBallot = this.refreshBallot.bind(this);
+        this.recallLastBallot = this.recallLastBallot.bind(this);
+        this.showBallotOutcome = this.showBallotOutcome.bind(this);
     }
 
     componentDidMount() {
@@ -110,7 +114,7 @@ class ModView extends Component {
     }
 
     generateBallot() {
-        // you'll have the ballot based on the ballot totals.
+        // you'll have the ballot based on the accusation totals.
         // Submit these and generate a new round, plus nominees.
         // Return a list of everyone, along with their ability to vote and signal and who they actioned.
         let url = '/api/generate_ballot/'+this.props.game_id;
@@ -118,8 +122,44 @@ class ModView extends Component {
         axios.post(url, this.state.accusationTotals).then(response => {
             this.setState({
                 ballotRound: response.data.roundId,
-                ballot_outcomes: response.data.voters,
+                ballotActions: response.data.voters,
                 ballotUrl: response.data.url
+            })
+        })
+    }
+
+    refreshBallot() {
+        let url = '/api/refresh_ballot/'+this.props.game_id+'/'+this.state.ballotRound;
+        axios.get(url).then(response => {
+            this.setState({
+                ballotRound: response.data.roundId,
+                ballotActions: response.data.voters,
+                ballotUrl: response.data.url
+            })
+        })
+    }
+
+    recallLastBallot() {
+        let url = '/api/recall_last_ballot/'+this.props.game_id;
+        axios.get(url).then(response => {
+            this.setState({
+                ballotRound: response.data.roundId,
+                ballotActions: response.data.voters,
+                ballotUrl: response.data.url
+            })
+        })
+    }
+
+    showBallotOutcome() {
+        let url = '/api/who_burns/'+this.props.game_id+'/'+this.state.ballotRound;
+        axios.get(url).then(response => {
+            if (response.data == "DRAW") {
+                feedback = draw;
+            } else {
+                feedback = "Burning today on the bonfire is "+response.data[1].name+" with "+response.data[0]+"votes";
+            }
+            this.setState({
+                ballotFeedback:<p>{feedback}</p>
             })
         })
     }
@@ -162,7 +202,7 @@ class ModView extends Component {
             </tbody>
         </table>
 
-        let ballotOutcomes = !this.state.ballot_outcomes.length ? null :<table>
+        let ballotOutcomes = !this.state.ballotActions.length ? null :<table>
             <thead>
                 <tr>
                     <td>Name</td>
@@ -170,7 +210,7 @@ class ModView extends Component {
                 </tr>
             </thead>
             <tbody>
-                {this.state.ballot_outcomes.map((result, index) =>
+                {this.state.ballotActions.map((result, index) =>
                     <tr key={index}>
                         <td>{result.name}</td>
                         <td>{result.voted_for_name}</td>
@@ -219,8 +259,12 @@ class ModView extends Component {
                 {accusationTotalsTable}
                 {this.state.totalsError ? <p>{totalsError}</p> : null}
                 <button onClick={this.generateBallot}>Generate Ballot</button>
-                {ballotOutcomes}
+                <button onClick={this.recallLastBallot}>Recall last Ballot</button>
                 {!this.state.ballotUrl ? null : <p>Share Ballot Link with Players: {this.state.ballotUrl}</p> }
+                {ballotOutcomes}
+                <button onClick={this.refreshBallot}>Refresh Ballot</button>
+                <button onClick={this.showBallotOutcome}>Show Outcome</button>
+                {ballotFeedback}
             </div>
         );
     }
