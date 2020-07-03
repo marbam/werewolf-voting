@@ -53,7 +53,7 @@ class ModController extends Controller
         return [
             'roundId' => $round->id,
             'roundType' => strtolower($round->type),
-            'url' => '/game/'.$game_id.'/accusations/'.$round->id,
+            'url' => URL('/game/'.$game_id.'/accusations/'.$round->id),
             'accusations_outcomes' => $outcomes
         ];
     }
@@ -193,7 +193,7 @@ class ModController extends Controller
         return [
             'roundId' => $round->id,
             'roundType' => strtolower($round->type),
-            'url' => '/game/'.$game_id.'/accusations/'.$round->id,
+            'url' => URL('/game/'.$game_id.'/accusations/'.$round->id),
             'accusations_outcomes' => $outcomes
         ];
     }
@@ -294,7 +294,7 @@ class ModController extends Controller
             'roundId' => $round_id,
             'roundType' => 'ballot',
             'voters'=> $voters,
-            'url' => '/game/'.$game_id.'/ballot/'.$round_id,
+            'url' => URL('/game/'.$game_id.'/ballot/'.$round_id),
         ];
     }
 }
