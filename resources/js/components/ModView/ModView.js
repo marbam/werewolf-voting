@@ -15,7 +15,6 @@ class ModView extends Component {
             refreshingAccusations: false,
             refreshButtonText: 'Refresh',
             accusationTotals: [],
-            totalsError: null,
             recallAccusationsText: 'Recall Previous Accusations',
             ballotActions: [],
             ballotRound: null,
@@ -23,9 +22,8 @@ class ModView extends Component {
             ballotFeedback: null
         };
         this.changeDeadAlive = this.changeDeadAlive.bind(this);
-        this.genAccusations = this.genAccusations.bind(this);
+        this.newAccusations = this.newAccusations.bind(this);
         this.refreshAccusations = this.refreshAccusations.bind(this);
-        this.getAccusationTotals = this.getAccusationTotals.bind(this);
         this.grabLastAccusations = this.grabLastAccusations.bind(this);
         this.generateBallot = this.generateBallot.bind(this);
         this.refreshBallot = this.refreshBallot.bind(this);
@@ -53,15 +51,31 @@ class ModView extends Component {
         })
     }
 
-    genAccusations() {
-        axios.get('/api/generate_accusations/'+this.props.game_id).then(response => {
-
+    newAccusations() {
+        axios.get('/api/new_accusations/'+this.props.game_id).then(response => {
             this.setState({
-                roundType: response.data.roundType,
-                roundId: response.data.roundId,
-                url: response.data.url,
-                accusations_outcomes: response.data.accusations_outcomes
-            })
+                roundType: response.data.general.roundType,
+                roundId: response.data.general.roundId,
+                url: response.data.general.url,
+                accusations_outcomes: response.data.byVoter,
+                accusationTotals: response.data.byNominee,
+            });
+        })
+    }
+
+    refreshAccusations() {
+        this.setState({
+            refreshingAccusations: true,
+            refreshButtonText: 'Refreshing...'
+        })
+
+        axios.get('/api/refresh_accusations/'+this.props.game_id+'/'+this.state.roundId).then(response => {
+            this.setState({
+                accusations_outcomes: response.data.byVoter,
+                accusationTotals: response.data.byNominee,
+                refreshingAccusations: false,
+                refreshButtonText: 'Refresh'
+            });
         })
     }
 
@@ -73,42 +87,13 @@ class ModView extends Component {
                 })
             } else {
                 this.setState({
-                    roundType: response.data.roundType,
-                    roundId: response.data.roundId,
-                    url: response.data.url,
-                    accusations_outcomes: response.data.accusations_outcomes,
+                    roundType: response.data.general.roundType,
+                    roundId: response.data.general.roundId,
+                    url: response.data.general.url,
+                    accusations_outcomes: response.data.byVoter,
+                    accusationTotals: response.data.byNominee,
                     recallAccusationsText: 'Recall Previous Accusations'
                 })
-            }
-        })
-    }
-
-    refreshAccusations() {
-        this.setState({
-            refreshingAccusations: true,
-            refreshButtonText: 'Refreshing...'
-        })
-
-        axios.get('/api/refresh_accusations/'+this.state.roundId+'/'+this.props.game_id).then(response => {
-            this.setState({
-                accusations_outcomes: response.data,
-                refreshingAccusations: false,
-                refreshButtonText: 'Refresh'
-            });
-        })
-    }
-
-    getAccusationTotals() {
-        axios.get('/api/get_accusation_totals/'+this.props.game_id+'/'+this.state.roundId).then(response => {
-            if (response.data == "NO VOTES") {
-                this.setState({
-                    totalsError: "No votes yet!"
-                })
-            } else {
-                this.setState({
-                    accusationTotals: response.data,
-                    totalsError: null
-                });
             }
         })
     }
@@ -247,19 +232,17 @@ class ModView extends Component {
                         )}
                     </tbody>
                 </table>
-                <button onClick={this.genAccusations}>Generate Accusations</button>
+                <button onClick={this.newAccusations}>New Accusations</button>
                 <button onClick={this.grabLastAccusations}>{this.state.recallAccusationsText}</button>
                 {this.state.url ? <p>Copy to Players: {this.state.url}</p> : null}
-                {!this.state.url ? null : votingTable}
                 {!this.state.url ? null : <button onClick={this.refreshAccusations}
                                                   disabled={this.state.refreshingAccusations}
                                           >
                                               {this.state.refreshButtonText}
                                           </button>
                 }
-                {!this.state.url ? null : <button onClick={this.getAccusationTotals}>Get Totals</button>}
+                {!this.state.url ? null : votingTable}
                 {accusationTotalsTable}
-                {this.state.totalsError ? <p>{totalsError}</p> : null}
                 <button onClick={this.generateBallot}>Generate Ballot</button>
                 <button onClick={this.recallLastBallot}>Recall last Ballot</button>
                 {!this.state.ballotUrl ? null : <p>Share Ballot Link with Players: {this.state.ballotUrl}</p> }

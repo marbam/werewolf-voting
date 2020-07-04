@@ -41,24 +41,7 @@ class ModController extends Controller
         return $result;
     }
 
-    public function createAccusations($game_id)
-    {
-        $round = Round::create([
-            'game_id' => $game_id,
-            'type' => 'Accusations',
-        ]);
-
-        $outcomes = $this->getAccusationOutcome($round->id, $game_id);
-
-        return [
-            'roundId' => $round->id,
-            'roundType' => strtolower($round->type),
-            'url' => URL('/game/'.$game_id.'/accusations/'.$round->id),
-            'accusations_outcomes' => $outcomes
-        ];
-    }
-
-    public function getAccusationOutcome($round_id, $game_id)
+    public function getAccusationByVoter($round_id, $game_id)
     {
         $data = $this->getData($round_id, $game_id);
         $players = $data[0];
@@ -94,7 +77,7 @@ class ModController extends Controller
 
 
     // Writing this separately to start with for testing purposes but ultimately it'll make sense to
-    // combine it with the getAccusationOutcome() as they will probably both be called at the same time!
+    // combine it with the getAccusationByVoter() as they will probably both be called at the same time!
     public function getAccusationResults($game_id, $round_id, $data=null)
     {
         if (!$data) {
@@ -162,18 +145,14 @@ class ModController extends Controller
         return $results;
     }
 
-    protected function getHighest($voting_array)
+    public function newAccusations($game_id)
     {
-        $votes = 0;
-        $players = 0;
+        return $this->combinedAccusations($game_id, ['new' => 1]);
+    }
 
-        foreach($voting_array as $number_votes => $number_players) {
-            if ($number_votes > $votes) {
-                $votes = $number_votes;
-                $players = $number_players;
-            }
-        }
-        return [$players, $votes];
+    public function refreshAccusations($game_id, Round $round)
+    {
+        return $this->combinedAccusations($game_id, ['round' => $round]);
     }
 
     public function recallAccusations($game_id)
@@ -188,14 +167,48 @@ class ModController extends Controller
             return "NO PREVIOUS";
         }
 
-        $outcomes = $this->getAccusationOutcome($round->id, $game_id);
+        return $this->combinedAccusations($game_id, ['recall' => 1, 'round' => $round]);
+    }
 
-        return [
-            'roundId' => $round->id,
-            'roundType' => strtolower($round->type),
-            'url' => URL('/game/'.$game_id.'/accusations/'.$round->id),
-            'accusations_outcomes' => $outcomes
-        ];
+    public function combinedAccusations($game_id, $extraData = [])
+    {
+        // so the idea behind this one is that it will return both sets of Accusation tables in one fell swoop.
+        // Ideally there's no need for this to be two function calls - Refresh should update both tables.
+
+        if (isset($extraData['new'])) {
+            $round = Round::create([
+                'game_id' => $game_id,
+                'type' => 'Accusations',
+            ]);
+        } else {
+            $round = $extraData['round'];
+        }
+
+        if (isset($extraData['new']) || isset($extraData['recall'])) {
+            $data['general'] = [
+                'roundId' => $round->id,
+                'roundType' => strtolower($round->type),
+                'url' => URL('/game/'.$game_id.'/accusations/'.$round->id),
+            ];
+        }
+
+        $data['byVoter'] = $this->getAccusationByVoter($round->id, $game_id);
+        $data['byNominee'] = $this->getAccusationResults($game_id, $round->id);
+        return $data;
+    }
+
+    protected function getHighest($voting_array)
+    {
+        $votes = 0;
+        $players = 0;
+
+        foreach($voting_array as $number_votes => $number_players) {
+            if ($number_votes > $votes) {
+                $votes = $number_votes;
+                $players = $number_players;
+            }
+        }
+        return [$players, $votes];
     }
 
     public function getNewBallot(Request $request, $game_id)
