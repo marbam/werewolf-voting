@@ -10,12 +10,13 @@ class ModView extends Component {
             ],
             roundType: 'accusations',
             roundId: null,
-            url: null,
+            accusationsUrl: null,
             accusations_outcomes: [],
             refreshingAccusations: false,
             refreshButtonText: 'Refresh',
             accusationTotals: [],
-            recallAccusationsText: 'Recall Previous Accusations',
+            recallAccusationsText: 'Recall Most Recent Accusations',
+            accusationsComplete: false,
             ballotActions: [],
             ballotRound: null,
             ballotUrl: '',
@@ -29,6 +30,7 @@ class ModView extends Component {
         this.refreshBallot = this.refreshBallot.bind(this);
         this.recallLastBallot = this.recallLastBallot.bind(this);
         this.showBallotOutcome = this.showBallotOutcome.bind(this);
+        this.checkAccusationsDone = this.checkAccusationsDone.bind(this);
     }
 
     componentDidMount() {
@@ -56,7 +58,7 @@ class ModView extends Component {
             this.setState({
                 roundType: response.data.general.roundType,
                 roundId: response.data.general.roundId,
-                url: response.data.general.url,
+                accusationsUrl: response.data.general.url,
                 accusations_outcomes: response.data.byVoter,
                 accusationTotals: response.data.byNominee,
             });
@@ -75,8 +77,10 @@ class ModView extends Component {
                 accusationTotals: response.data.byNominee,
                 refreshingAccusations: false,
                 refreshButtonText: 'Refresh'
-            });
-        })
+            })
+        }).then(check => {
+            this.checkAccusationsDone();
+        });
     }
 
     grabLastAccusations() {
@@ -89,12 +93,27 @@ class ModView extends Component {
                 this.setState({
                     roundType: response.data.general.roundType,
                     roundId: response.data.general.roundId,
-                    url: response.data.general.url,
+                    accusationsUrl: response.data.general.url,
                     accusations_outcomes: response.data.byVoter,
                     accusationTotals: response.data.byNominee,
-                    recallAccusationsText: 'Recall Previous Accusations'
+                    recallAccusationsText: 'Recall Most Recent Accusations'
                 })
             }
+        }).then(check => {
+            this.checkAccusationsDone();
+        })
+    }
+
+    checkAccusationsDone() {
+        let done = true;
+        let actions = this.state.accusations_outcomes;
+        for (let i = 0; i < actions.length; i++) {
+            if (actions[i].chose == "Waiting...") {
+                done = false;
+            }
+        }
+        this.setState({
+            accusationsComplete: done
         })
     }
 
@@ -142,7 +161,6 @@ class ModView extends Component {
             if (response.data == "DRAW") {
                 feedback = "The village is undecided";
             } else {
-                console.log(response.data);
                 feedback = "Burning today on the bonfire is "+response.data[1].name+" with "+response.data[0]+" votes";
             }
             this.setState({
@@ -234,22 +252,27 @@ class ModView extends Component {
                 </table>
                 <button onClick={this.newAccusations}>New Accusations</button>
                 <button onClick={this.grabLastAccusations}>{this.state.recallAccusationsText}</button>
-                {this.state.url ? <p>Copy to Players: {this.state.url}</p> : null}
-                {!this.state.url ? null : <button onClick={this.refreshAccusations}
+                {this.state.accusationsUrl ? <p>Share This Accusations Link with Players: {this.state.accusationsUrl}</p> : null}
+                {!this.state.accusationsUrl ? null : <button onClick={this.refreshAccusations}
                                                   disabled={this.state.refreshingAccusations}
                                           >
                                               {this.state.refreshButtonText}
                                           </button>
                 }
-                {!this.state.url ? null : votingTable}
+                {!this.state.accusationsUrl ? null : votingTable}
                 {accusationTotalsTable}
-                <button onClick={this.generateBallot}>Generate Ballot</button>
-                <button onClick={this.recallLastBallot}>Recall last Ballot</button>
-                {!this.state.ballotUrl ? null : <p>Share Ballot Link with Players: {this.state.ballotUrl}</p> }
-                {ballotOutcomes}
-                <button onClick={this.refreshBallot}>Refresh Ballot</button>
-                <button onClick={this.showBallotOutcome}>Show Outcome</button>
-                {this.state.ballotFeedback}
+                {!this.state.accusationsComplete ? null :
+                    <div>
+                        <button onClick={this.generateBallot}>Generate Ballot</button>
+                        <button onClick={this.recallLastBallot}>Recall Most Recent Ballot</button>
+                        {!this.state.ballotUrl ? null : <p>Share Ballot Link with Players: {this.state.ballotUrl}</p> }
+                        {ballotOutcomes}
+                        <button onClick={this.refreshBallot}>Refresh Ballot</button>
+                        <button onClick={this.showBallotOutcome}>Show Outcome</button>
+                        {!this.state.ballotFeedback ? null : <p>Outcome is guidance only and doesn't take Jesters etc into account!</p>}
+                        {this.state.ballotFeedback}
+                    </div>
+                }
             </div>
         );
     }

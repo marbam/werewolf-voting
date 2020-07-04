@@ -65865,12 +65865,13 @@ var ModView = /*#__PURE__*/function (_Component) {
       }],
       roundType: 'accusations',
       roundId: null,
-      url: null,
+      accusationsUrl: null,
       accusations_outcomes: [],
       refreshingAccusations: false,
       refreshButtonText: 'Refresh',
       accusationTotals: [],
-      recallAccusationsText: 'Recall Previous Accusations',
+      recallAccusationsText: 'Recall Most Recent Accusations',
+      accusationsComplete: false,
       ballotActions: [],
       ballotRound: null,
       ballotUrl: '',
@@ -65884,6 +65885,7 @@ var ModView = /*#__PURE__*/function (_Component) {
     _this.refreshBallot = _this.refreshBallot.bind(_assertThisInitialized(_this));
     _this.recallLastBallot = _this.recallLastBallot.bind(_assertThisInitialized(_this));
     _this.showBallotOutcome = _this.showBallotOutcome.bind(_assertThisInitialized(_this));
+    _this.checkAccusationsDone = _this.checkAccusationsDone.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65922,7 +65924,7 @@ var ModView = /*#__PURE__*/function (_Component) {
         _this4.setState({
           roundType: response.data.general.roundType,
           roundId: response.data.general.roundId,
-          url: response.data.general.url,
+          accusationsUrl: response.data.general.url,
           accusations_outcomes: response.data.byVoter,
           accusationTotals: response.data.byNominee
         });
@@ -65944,6 +65946,8 @@ var ModView = /*#__PURE__*/function (_Component) {
           refreshingAccusations: false,
           refreshButtonText: 'Refresh'
         });
+      }).then(function (check) {
+        _this5.checkAccusationsDone();
       });
     }
   }, {
@@ -65960,12 +65964,30 @@ var ModView = /*#__PURE__*/function (_Component) {
           _this6.setState({
             roundType: response.data.general.roundType,
             roundId: response.data.general.roundId,
-            url: response.data.general.url,
+            accusationsUrl: response.data.general.url,
             accusations_outcomes: response.data.byVoter,
             accusationTotals: response.data.byNominee,
-            recallAccusationsText: 'Recall Previous Accusations'
+            recallAccusationsText: 'Recall Most Recent Accusations'
           });
         }
+      }).then(function (check) {
+        _this6.checkAccusationsDone();
+      });
+    }
+  }, {
+    key: "checkAccusationsDone",
+    value: function checkAccusationsDone() {
+      var done = true;
+      var actions = this.state.accusations_outcomes;
+
+      for (var i = 0; i < actions.length; i++) {
+        if (actions[i].chose == "Waiting...") {
+          done = false;
+        }
+      }
+
+      this.setState({
+        accusationsComplete: done
       });
     }
   }, {
@@ -66025,7 +66047,6 @@ var ModView = /*#__PURE__*/function (_Component) {
         if (response.data == "DRAW") {
           feedback = "The village is undecided";
         } else {
-          console.log(response.data);
           feedback = "Burning today on the bonfire is " + response.data[1].name + " with " + response.data[0] + " votes";
         }
 
@@ -66068,18 +66089,18 @@ var ModView = /*#__PURE__*/function (_Component) {
         onClick: this.newAccusations
       }, "New Accusations"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.grabLastAccusations
-      }, this.state.recallAccusationsText), this.state.url ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Copy to Players: ", this.state.url) : null, !this.state.url ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, this.state.recallAccusationsText), this.state.accusationsUrl ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share This Accusations Link with Players: ", this.state.accusationsUrl) : null, !this.state.accusationsUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.refreshAccusations,
         disabled: this.state.refreshingAccusations
-      }, this.state.refreshButtonText), !this.state.url ? null : votingTable, accusationTotalsTable, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, this.state.refreshButtonText), !this.state.accusationsUrl ? null : votingTable, accusationTotalsTable, !this.state.accusationsComplete ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.generateBallot
       }, "Generate Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.recallLastBallot
-      }, "Recall last Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.refreshBallot
       }, "Refresh Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.showBallotOutcome
-      }, "Show Outcome"), this.state.ballotFeedback);
+      }, "Show Outcome"), !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Outcome is guidance only and doesn't take Jesters etc into account!"), this.state.ballotFeedback));
     }
   }]);
 
