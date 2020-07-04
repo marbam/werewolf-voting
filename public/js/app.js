@@ -65865,27 +65865,27 @@ var ModView = /*#__PURE__*/function (_Component) {
       }],
       roundType: 'accusations',
       roundId: null,
-      url: null,
+      accusationsUrl: null,
       accusations_outcomes: [],
       refreshingAccusations: false,
       refreshButtonText: 'Refresh',
       accusationTotals: [],
-      totalsError: null,
-      recallAccusationsText: 'Recall Previous Accusations',
+      recallAccusationsText: 'Recall Most Recent Accusations',
+      accusationsComplete: false,
       ballotActions: [],
       ballotRound: null,
       ballotUrl: '',
       ballotFeedback: null
     };
     _this.changeDeadAlive = _this.changeDeadAlive.bind(_assertThisInitialized(_this));
-    _this.genAccusations = _this.genAccusations.bind(_assertThisInitialized(_this));
+    _this.newAccusations = _this.newAccusations.bind(_assertThisInitialized(_this));
     _this.refreshAccusations = _this.refreshAccusations.bind(_assertThisInitialized(_this));
-    _this.getAccusationTotals = _this.getAccusationTotals.bind(_assertThisInitialized(_this));
     _this.grabLastAccusations = _this.grabLastAccusations.bind(_assertThisInitialized(_this));
     _this.generateBallot = _this.generateBallot.bind(_assertThisInitialized(_this));
     _this.refreshBallot = _this.refreshBallot.bind(_assertThisInitialized(_this));
     _this.recallLastBallot = _this.recallLastBallot.bind(_assertThisInitialized(_this));
     _this.showBallotOutcome = _this.showBallotOutcome.bind(_assertThisInitialized(_this));
+    _this.checkAccusationsDone = _this.checkAccusationsDone.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65916,86 +65916,91 @@ var ModView = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
-    key: "genAccusations",
-    value: function genAccusations() {
+    key: "newAccusations",
+    value: function newAccusations() {
       var _this4 = this;
 
-      axios.get('/api/generate_accusations/' + this.props.game_id).then(function (response) {
+      axios.get('/api/new_accusations/' + this.props.game_id).then(function (response) {
         _this4.setState({
-          roundType: response.data.roundType,
-          roundId: response.data.roundId,
-          url: response.data.url,
-          accusations_outcomes: response.data.accusations_outcomes
+          roundType: response.data.general.roundType,
+          roundId: response.data.general.roundId,
+          accusationsUrl: response.data.general.url,
+          accusations_outcomes: response.data.byVoter,
+          accusationTotals: response.data.byNominee
         });
-      });
-    }
-  }, {
-    key: "grabLastAccusations",
-    value: function grabLastAccusations() {
-      var _this5 = this;
-
-      axios.get('/api/recall_accusations/' + this.props.game_id).then(function (response) {
-        if (response.data == "NO PREVIOUS") {
-          _this5.setState({
-            recallAccusationsText: "No Previous!"
-          });
-        } else {
-          _this5.setState({
-            roundType: response.data.roundType,
-            roundId: response.data.roundId,
-            url: response.data.url,
-            accusations_outcomes: response.data.accusations_outcomes,
-            recallAccusationsText: 'Recall Previous Accusations'
-          });
-        }
       });
     }
   }, {
     key: "refreshAccusations",
     value: function refreshAccusations() {
-      var _this6 = this;
+      var _this5 = this;
 
       this.setState({
         refreshingAccusations: true,
         refreshButtonText: 'Refreshing...'
       });
-      axios.get('/api/refresh_accusations/' + this.state.roundId + '/' + this.props.game_id).then(function (response) {
-        _this6.setState({
-          accusations_outcomes: response.data,
+      axios.get('/api/refresh_accusations/' + this.props.game_id + '/' + this.state.roundId).then(function (response) {
+        _this5.setState({
+          accusations_outcomes: response.data.byVoter,
+          accusationTotals: response.data.byNominee,
           refreshingAccusations: false,
           refreshButtonText: 'Refresh'
         });
+      }).then(function (check) {
+        _this5.checkAccusationsDone();
       });
     }
   }, {
-    key: "getAccusationTotals",
-    value: function getAccusationTotals() {
-      var _this7 = this;
+    key: "grabLastAccusations",
+    value: function grabLastAccusations() {
+      var _this6 = this;
 
-      axios.get('/api/get_accusation_totals/' + this.props.game_id + '/' + this.state.roundId).then(function (response) {
-        if (response.data == "NO VOTES") {
-          _this7.setState({
-            totalsError: "No votes yet!"
+      axios.get('/api/recall_accusations/' + this.props.game_id).then(function (response) {
+        if (response.data == "NO PREVIOUS") {
+          _this6.setState({
+            recallAccusationsText: "No Previous!"
           });
         } else {
-          _this7.setState({
-            accusationTotals: response.data,
-            totalsError: null
+          _this6.setState({
+            roundType: response.data.general.roundType,
+            roundId: response.data.general.roundId,
+            accusationsUrl: response.data.general.url,
+            accusations_outcomes: response.data.byVoter,
+            accusationTotals: response.data.byNominee,
+            recallAccusationsText: 'Recall Most Recent Accusations'
           });
         }
+      }).then(function (check) {
+        _this6.checkAccusationsDone();
+      });
+    }
+  }, {
+    key: "checkAccusationsDone",
+    value: function checkAccusationsDone() {
+      var done = true;
+      var actions = this.state.accusations_outcomes;
+
+      for (var i = 0; i < actions.length; i++) {
+        if (actions[i].chose == "Waiting...") {
+          done = false;
+        }
+      }
+
+      this.setState({
+        accusationsComplete: done
       });
     }
   }, {
     key: "generateBallot",
     value: function generateBallot() {
-      var _this8 = this;
+      var _this7 = this;
 
       // you'll have the ballot based on the accusation totals.
       // Submit these and generate a new round, plus nominees.
       // Return a list of everyone, along with their ability to vote and signal and who they actioned.
       var url = '/api/generate_ballot/' + this.props.game_id;
       axios.post(url, this.state.accusationTotals).then(function (response) {
-        _this8.setState({
+        _this7.setState({
           ballotRound: response.data.roundId,
           ballotActions: response.data.voters,
           ballotUrl: response.data.url
@@ -66005,11 +66010,11 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "refreshBallot",
     value: function refreshBallot() {
-      var _this9 = this;
+      var _this8 = this;
 
       var url = '/api/refresh_ballot/' + this.props.game_id + '/' + this.state.ballotRound;
       axios.get(url).then(function (response) {
-        _this9.setState({
+        _this8.setState({
           ballotRound: response.data.roundId,
           ballotActions: response.data.voters,
           ballotUrl: response.data.url
@@ -66019,11 +66024,11 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "recallLastBallot",
     value: function recallLastBallot() {
-      var _this10 = this;
+      var _this9 = this;
 
       var url = '/api/recall_last_ballot/' + this.props.game_id;
       axios.get(url).then(function (response) {
-        _this10.setState({
+        _this9.setState({
           ballotRound: response.data.roundId,
           ballotActions: response.data.voters,
           ballotUrl: response.data.url
@@ -66033,17 +66038,19 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "showBallotOutcome",
     value: function showBallotOutcome() {
-      var _this11 = this;
+      var _this10 = this;
 
       var url = '/api/who_burns/' + this.props.game_id + '/' + this.state.ballotRound;
       axios.get(url).then(function (response) {
+        var feedback = 'test';
+
         if (response.data == "DRAW") {
-          feedback = draw;
+          feedback = "The village is undecided";
         } else {
-          feedback = "Burning today on the bonfire is " + response.data[1].name + " with " + response.data[0] + "votes";
+          feedback = "Burning today on the bonfire is " + response.data[1].name + " with " + response.data[0] + " votes";
         }
 
-        _this11.setState({
+        _this10.setState({
           ballotFeedback: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, feedback)
         });
       });
@@ -66051,7 +66058,7 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this12 = this;
+      var _this11 = this;
 
       var votingTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voter"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Chose"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.accusations_outcomes.map(function (result, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
@@ -66075,27 +66082,25 @@ var ModView = /*#__PURE__*/function (_Component) {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.alive ? 'Alive' : 'Dead'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this12.changeDeadAlive(index);
+            return _this11.changeDeadAlive(index);
           }
         }, "Toggle Life!")));
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        onClick: this.genAccusations
-      }, "Generate Accusations"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.newAccusations
+      }, "New Accusations"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.grabLastAccusations
-      }, this.state.recallAccusationsText), this.state.url ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Copy to Players: ", this.state.url) : null, !this.state.url ? null : votingTable, !this.state.url ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, this.state.recallAccusationsText), this.state.accusationsUrl ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share This Accusations Link with Players: ", this.state.accusationsUrl) : null, !this.state.accusationsUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.refreshAccusations,
         disabled: this.state.refreshingAccusations
-      }, this.state.refreshButtonText), !this.state.url ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        onClick: this.getAccusationTotals
-      }, "Get Totals"), accusationTotalsTable, this.state.totalsError ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, totalsError) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, this.state.refreshButtonText), !this.state.accusationsUrl ? null : votingTable, accusationTotalsTable, !this.state.accusationsComplete ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.generateBallot
       }, "Generate Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.recallLastBallot
-      }, "Recall last Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.refreshBallot
       }, "Refresh Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.showBallotOutcome
-      }, "Show Outcome"), ballotFeedback);
+      }, "Show Outcome"), !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Outcome is guidance only and doesn't take Jesters etc into account!"), this.state.ballotFeedback));
     }
   }]);
 
