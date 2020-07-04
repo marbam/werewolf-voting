@@ -66037,10 +66037,13 @@ var ModView = /*#__PURE__*/function (_Component) {
 
       var url = '/api/who_burns/' + this.props.game_id + '/' + this.state.ballotRound;
       axios.get(url).then(function (response) {
+        var feedback = 'test';
+
         if (response.data == "DRAW") {
-          feedback = draw;
+          feedback = "The village is undecided";
         } else {
-          feedback = "Burning today on the bonfire is " + response.data[1].name + " with " + response.data[0] + "votes";
+          console.log(response.data);
+          feedback = "Burning today on the bonfire is " + response.data[1].name + " with " + response.data[0] + " votes";
         }
 
         _this11.setState({
@@ -66095,7 +66098,7 @@ var ModView = /*#__PURE__*/function (_Component) {
         onClick: this.refreshBallot
       }, "Refresh Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.showBallotOutcome
-      }, "Show Outcome"), ballotFeedback);
+      }, "Show Outcome"), this.state.ballotFeedback);
     }
   }]);
 

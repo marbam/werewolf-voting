@@ -8,6 +8,6 @@ class Nominee extends Model
 {
     protected $fillable = [
         'round_id',
-        'nominee_id'
+        'player_id'
     ];
 }

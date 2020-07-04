@@ -304,10 +304,10 @@ class ModController extends Controller
         $actions = Action::where('round_id', $roundId)->get();
         $totals = [];
         foreach ($actions as $action) {
-            if (!isset($totals[$action->player_id])) {
-                $totals[$action->player_id] = 0;
+            if (!isset($totals[$action->nominee_id])) {
+                $totals[$action->nominee_id] = 0;
             }
-            $totals[$action->player_id]++;
+            $totals[$action->nominee_id]++;
         }
 
         $highest = max($totals);
@@ -323,7 +323,7 @@ class ModController extends Controller
             return "DRAW";
         } else {
             // get players and then return the relevant names;
-            $player = Player::find($burning_ids);
+            $player = Player::find($burning_ids)->first();
             return [$highest, $player];
         }
 

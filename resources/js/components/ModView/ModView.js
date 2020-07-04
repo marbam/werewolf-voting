@@ -153,10 +153,12 @@ class ModView extends Component {
     showBallotOutcome() {
         let url = '/api/who_burns/'+this.props.game_id+'/'+this.state.ballotRound;
         axios.get(url).then(response => {
+            let feedback = 'test';
             if (response.data == "DRAW") {
-                feedback = draw;
+                feedback = "The village is undecided";
             } else {
-                feedback = "Burning today on the bonfire is "+response.data[1].name+" with "+response.data[0]+"votes";
+                console.log(response.data);
+                feedback = "Burning today on the bonfire is "+response.data[1].name+" with "+response.data[0]+" votes";
             }
             this.setState({
                 ballotFeedback:<p>{feedback}</p>
@@ -264,7 +266,7 @@ class ModView extends Component {
                 {ballotOutcomes}
                 <button onClick={this.refreshBallot}>Refresh Ballot</button>
                 <button onClick={this.showBallotOutcome}>Show Outcome</button>
-                {ballotFeedback}
+                {this.state.ballotFeedback}
             </div>
         );
     }
