@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Player;
+use App\Game;
 use App\Round;
 use App\Action;
-use App\PlayerStatus;
+use App\Player;
 use App\Nominee;
+use App\PlayerStatus;
 
 class ModController extends Controller
 {
-    public function showGame($id) {
-        return view('modView', ['game_id' => $id]);
+    public function showGame(Game $game) {
+        return view('modView', ['game_id' => $game->id]);
     }
 
     public function getPlayers($gameId)
@@ -26,7 +27,10 @@ class ModController extends Controller
                              'roles.name as role',
                              'roles.id as roleId',
                              'player_statuses.alive',
-                             'player_statuses.guarded'
+                             'player_statuses.guarded',
+                             'player_statuses.cursed_farmer',
+                             'player_statuses.cursed_necromancer',
+                             'player_statuses.cursed_hag',
                          ]);
     }
 
@@ -79,6 +83,17 @@ class ModController extends Controller
     }
 
 
+    // Commenting the voting logic from the OraKyle:
+    // There is a specific order used to determine who is on the ballot each day:
+    //     1) Votes are cast and added up.
+    //     2) Curses are then applied.
+    //     3) Vote number modifiers are then applied (Seducer and Merchant).
+    //     4) The ballot is determined at this point from the top 2 ranks of votes.
+    //     5) At this stage, OTHER factors are taken into account:
+    //     - The Guardian Angel takes the place of the Guarded
+    //     - A Mystic is forced onto the ballot if Signalled by the Inquisitor
+    //     - A player Signalled by the Lawyer is forced on or zeroed (and therefore forced off) as appropriate.
+
     // Writing this separately to start with for testing purposes but ultimately it'll make sense to
     // combine it with the getAccusationByVoter() as they will probably both be called at the same time!
     public function getAccusationResults($game_id, $round_id, $data=null)
@@ -107,6 +122,20 @@ class ModController extends Controller
             if ($action->action_type == "VOTE") {
                 $results[$action->nominee_id]['votes']++;
             }
+        }
+
+        // bolt on the additional vote from curses:
+        $cursed_player_ids = Player::where('game_id', $game_id)
+                                   ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
+                                   ->where('player_statuses.alive', 1)
+                                   ->where(function($curses) {
+                                       $curses->where('player_statuses.cursed_farmer', 1)
+                                              ->orWhere('player_statuses.cursed_necromancer', 1)
+                                              ->orWhere('player_statuses.cursed_hag', 1);
+                                   })->pluck('players.id')->toArray();
+
+        foreach ($cursed_player_ids as $id) {
+            $results[$id]['votes']++;
         }
 
         // get a count of each number of votes so we can calculate the top two tiers:
