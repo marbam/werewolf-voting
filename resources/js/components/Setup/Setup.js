@@ -220,7 +220,7 @@ class Setup extends Component {
                     <button type="button" key={index} onClick={() => this.selectRole(index)}>{role.name}</button>
                     )}
                 <br/>
-                <h4>Selected Roles</h4>
+                <h4>Selected Roles {this.state.selectedRoles.length ? '('+this.state.selectedRoles.length+')' : null}</h4>
                 <table>
                     <tbody>
                         {this.state.selectedRoles.map((role, index) =>

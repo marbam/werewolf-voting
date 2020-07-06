@@ -236,8 +236,13 @@ class ModView extends Component {
                         <tr>
                             <th>Name</th>
                             <th>Role</th>
+                            <th>M</th>
+                            <th>C</th>
                             <th>Alive</th>
                             <th>Guarded</th>
+                            <th>Farmer Curse</th>
+                            <th>Necromancer Curse</th>
+                            <th>Hag Curse</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -245,6 +250,10 @@ class ModView extends Component {
                             <tr key={index}>
                                 <td>{player.name}</td>
                                 <td>{player.role}</td>
+                                <td>{player.mystic ? "✓" : null}</td>
+                                <td>{(player.corrupt || player.cursed_farmer || player.cursed_necromancer || player.cursed_hag)
+                                    ? "✓" : null}
+                                </td>
                                 <td>
                                     <button onClick={() => this.changeStatus(index, 'alive')}>
                                         {player.alive ? 'Alive' : 'Dead'}
@@ -252,10 +261,24 @@ class ModView extends Component {
                                 </td>
                                 <td>
                                     <button onClick={() => this.changeStatus(index, 'guarded')}>
-                                        {player.guarded ? 'Guarded' : '-'}
+                                        {player.guarded ? 'Guarded' : 'x'}
                                     </button>
                                 </td>
-
+                                <td>
+                                    <button onClick={() => this.changeStatus(index, 'cursed_farmer')}>
+                                        {player.cursed_farmer ? 'Monster Curse' : 'x'}
+                                    </button>
+                                </td>
+                                <td>
+                                    <button onClick={() => this.changeStatus(index, 'cursed_necromancer')}>
+                                        {player.cursed_necromancer ? 'Necromancer Curse' : 'x'}
+                                    </button>
+                                </td>
+                                <td>
+                                    <button onClick={() => this.changeStatus(index, 'cursed_hag')}>
+                                        {player.cursed_hag ? 'Bewitched' : 'x'}
+                                    </button>
+                                </td>
                             </tr>
                         )}
                     </tbody>

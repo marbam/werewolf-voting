@@ -65879,7 +65879,6 @@ var ModView = /*#__PURE__*/function (_Component) {
       ballotUrl: '',
       ballotFeedback: null
     };
-    _this.changeDeadAlive = _this.changeDeadAlive.bind(_assertThisInitialized(_this));
     _this.changeStatus = _this.changeStatus.bind(_assertThisInitialized(_this));
     _this.newAccusations = _this.newAccusations.bind(_assertThisInitialized(_this));
     _this.refreshAccusations = _this.refreshAccusations.bind(_assertThisInitialized(_this));
@@ -65904,24 +65903,9 @@ var ModView = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
-    key: "changeDeadAlive",
-    value: function changeDeadAlive(index) {
-      var _this3 = this;
-
-      var updatedPlayers = this.state.players;
-      var playerId = updatedPlayers[index].id;
-      axios.get('/api/change_alive_status/' + playerId).then(function (response) {
-        updatedPlayers[index].alive = response.data;
-
-        _this3.setState({
-          players: updatedPlayers
-        });
-      });
-    }
-  }, {
     key: "changeStatus",
     value: function changeStatus(index, status) {
-      var _this4 = this;
+      var _this3 = this;
 
       var updatedPlayers = this.state.players;
       var playerId = updatedPlayers[index].id;
@@ -65932,7 +65916,7 @@ var ModView = /*#__PURE__*/function (_Component) {
       axios.post('/api/change_player_status/', payload).then(function (response) {
         updatedPlayers[index][status] = response.data;
 
-        _this4.setState({
+        _this3.setState({
           players: updatedPlayers
         });
       });
@@ -65940,10 +65924,10 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "newAccusations",
     value: function newAccusations() {
-      var _this5 = this;
+      var _this4 = this;
 
       axios.get('/api/new_accusations/' + this.props.game_id).then(function (response) {
-        _this5.setState({
+        _this4.setState({
           roundType: response.data.general.roundType,
           roundId: response.data.general.roundId,
           accusationsUrl: response.data.general.url,
@@ -65955,35 +65939,35 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "refreshAccusations",
     value: function refreshAccusations() {
-      var _this6 = this;
+      var _this5 = this;
 
       this.setState({
         refreshingAccusations: true,
         refreshButtonText: 'Refreshing...'
       });
       axios.get('/api/refresh_accusations/' + this.props.game_id + '/' + this.state.roundId).then(function (response) {
-        _this6.setState({
+        _this5.setState({
           accusations_outcomes: response.data.byVoter,
           accusationTotals: response.data.byNominee,
           refreshingAccusations: false,
           refreshButtonText: 'Refresh'
         });
       }).then(function (check) {
-        _this6.checkAccusationsDone();
+        _this5.checkAccusationsDone();
       });
     }
   }, {
     key: "grabLastAccusations",
     value: function grabLastAccusations() {
-      var _this7 = this;
+      var _this6 = this;
 
       axios.get('/api/recall_accusations/' + this.props.game_id).then(function (response) {
         if (response.data == "NO PREVIOUS") {
-          _this7.setState({
+          _this6.setState({
             recallAccusationsText: "No Previous!"
           });
         } else {
-          _this7.setState({
+          _this6.setState({
             roundType: response.data.general.roundType,
             roundId: response.data.general.roundId,
             accusationsUrl: response.data.general.url,
@@ -65993,7 +65977,7 @@ var ModView = /*#__PURE__*/function (_Component) {
           });
         }
       }).then(function (check) {
-        _this7.checkAccusationsDone();
+        _this6.checkAccusationsDone();
       });
     }
   }, {
@@ -66015,14 +65999,14 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "generateBallot",
     value: function generateBallot() {
-      var _this8 = this;
+      var _this7 = this;
 
       // you'll have the ballot based on the accusation totals.
       // Submit these and generate a new round, plus nominees.
       // Return a list of everyone, along with their ability to vote and signal and who they actioned.
       var url = '/api/generate_ballot/' + this.props.game_id;
       axios.post(url, this.state.accusationTotals).then(function (response) {
-        _this8.setState({
+        _this7.setState({
           ballotRound: response.data.roundId,
           ballotActions: response.data.voters,
           ballotUrl: response.data.url
@@ -66032,11 +66016,11 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "refreshBallot",
     value: function refreshBallot() {
-      var _this9 = this;
+      var _this8 = this;
 
       var url = '/api/refresh_ballot/' + this.props.game_id + '/' + this.state.ballotRound;
       axios.get(url).then(function (response) {
-        _this9.setState({
+        _this8.setState({
           ballotRound: response.data.roundId,
           ballotActions: response.data.voters,
           ballotUrl: response.data.url
@@ -66046,11 +66030,11 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "recallLastBallot",
     value: function recallLastBallot() {
-      var _this10 = this;
+      var _this9 = this;
 
       var url = '/api/recall_last_ballot/' + this.props.game_id;
       axios.get(url).then(function (response) {
-        _this10.setState({
+        _this9.setState({
           ballotRound: response.data.roundId,
           ballotActions: response.data.voters,
           ballotUrl: response.data.url
@@ -66060,7 +66044,7 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "showBallotOutcome",
     value: function showBallotOutcome() {
-      var _this11 = this;
+      var _this10 = this;
 
       var url = '/api/who_burns/' + this.props.game_id + '/' + this.state.ballotRound;
       axios.get(url).then(function (response) {
@@ -66072,7 +66056,7 @@ var ModView = /*#__PURE__*/function (_Component) {
           feedback = "Burning today on the bonfire is " + response.data[1].name + " with " + response.data[0] + " votes";
         }
 
-        _this11.setState({
+        _this10.setState({
           ballotFeedback: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, feedback)
         });
       });
@@ -66080,7 +66064,7 @@ var ModView = /*#__PURE__*/function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this12 = this;
+      var _this11 = this;
 
       var votingTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voter"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Chose"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.accusations_outcomes.map(function (result, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
@@ -66099,18 +66083,30 @@ var ModView = /*#__PURE__*/function (_Component) {
       })));
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container"
-      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Role"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Alive"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Guarded"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, index) {
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Role"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "M"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "C"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Alive"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Guarded"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Farmer Curse"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Necromancer Curse"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Hag Curse"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: index
-        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.mystic ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.corrupt || player.cursed_farmer || player.cursed_necromancer || player.cursed_hag ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this12.changeStatus(index, 'alive');
+            return _this11.changeStatus(index, 'alive');
           }
         }, player.alive ? 'Alive' : 'Dead')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           onClick: function onClick() {
-            return _this12.changeStatus(index, 'guarded');
+            return _this11.changeStatus(index, 'guarded');
           }
-        }, player.guarded ? 'Guarded' : '-')));
+        }, player.guarded ? 'Guarded' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          onClick: function onClick() {
+            return _this11.changeStatus(index, 'cursed_farmer');
+          }
+        }, player.cursed_farmer ? 'Monster Curse' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          onClick: function onClick() {
+            return _this11.changeStatus(index, 'cursed_necromancer');
+          }
+        }, player.cursed_necromancer ? 'Necromancer Curse' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          onClick: function onClick() {
+            return _this11.changeStatus(index, 'cursed_hag');
+          }
+        }, player.cursed_hag ? 'Bewitched' : 'x')));
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.newAccusations
       }, "New Accusations"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66848,7 +66844,7 @@ var Setup = /*#__PURE__*/function (_Component) {
             return _this3.selectRole(index);
           }
         }, role.name);
-      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Selected Roles"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.selectedRoles.map(function (role, index) {
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Selected Roles ", this.state.selectedRoles.length ? '(' + this.state.selectedRoles.length + ')' : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.selectedRoles.map(function (role, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: index
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, role.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
