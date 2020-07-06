@@ -15,6 +15,7 @@ class SetupController extends Controller
     {
         return Role::join('factions', 'roles.faction_id', '=', 'factions.id')
                    ->where('factions.moons', 1)
+                   ->orWhereIn('alias', ['juliet', 'angel'])
                    ->get(['roles.id', 'roles.name'])->toArray();
     }
 

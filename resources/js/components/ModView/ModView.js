@@ -22,7 +22,7 @@ class ModView extends Component {
             ballotUrl: '',
             ballotFeedback: null
         };
-        this.changeDeadAlive = this.changeDeadAlive.bind(this);
+        this.changeStatus = this.changeStatus.bind(this);
         this.newAccusations = this.newAccusations.bind(this);
         this.refreshAccusations = this.refreshAccusations.bind(this);
         this.grabLastAccusations = this.grabLastAccusations.bind(this);
@@ -41,12 +41,17 @@ class ModView extends Component {
         })
     }
 
-    changeDeadAlive(index) {
+    changeStatus(index, status) {
         let updatedPlayers = this.state.players;
         let playerId = updatedPlayers[index].id;
 
-        axios.get('/api/change_alive_status/'+playerId).then(response => {
-            updatedPlayers[index].alive = response.data;
+        let payload = {
+            player_id: playerId,
+            status: status
+        }
+
+        axios.post('/api/change_player_status/', payload).then(response => {
+            updatedPlayers[index][status] = response.data;
             this.setState({
               players: updatedPlayers
             })
@@ -232,7 +237,7 @@ class ModView extends Component {
                             <th>Name</th>
                             <th>Role</th>
                             <th>Alive</th>
-                            <th>Actions</th>
+                            <th>Guarded</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -240,12 +245,17 @@ class ModView extends Component {
                             <tr key={index}>
                                 <td>{player.name}</td>
                                 <td>{player.role}</td>
-                                <td>{player.alive ? 'Alive' : 'Dead'}</td>
                                 <td>
-                                    <button onClick={() => this.changeDeadAlive(index)}>
-                                        Toggle Life!
+                                    <button onClick={() => this.changeStatus(index, 'alive')}>
+                                        {player.alive ? 'Alive' : 'Dead'}
                                     </button>
                                 </td>
+                                <td>
+                                    <button onClick={() => this.changeStatus(index, 'guarded')}>
+                                        {player.guarded ? 'Guarded' : '-'}
+                                    </button>
+                                </td>
+
                             </tr>
                         )}
                     </tbody>

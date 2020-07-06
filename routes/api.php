@@ -24,7 +24,7 @@ Route::post('/save_players', 'SetupController@savePlayers');
 
 // Routes for Moderator View
 Route::get('/get_players/{id}', 'ModController@getPlayers');
-Route::get('/change_alive_status/{player_id}', 'ModController@changeAliveStatus');
+Route::post('/change_player_status', 'ModController@updatePlayerStatus');
 Route::get('/new_accusations/{game_id}', 'ModController@newAccusations');
 Route::get('/refresh_accusations/{game_id}/{round}', 'ModController@refreshAccusations');
 Route::get('/recall_accusations/{gameId}', 'ModController@recallAccusations');
