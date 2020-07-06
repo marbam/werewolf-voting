@@ -25,18 +25,21 @@ class ModController extends Controller
                              'players.name',
                              'roles.name as role',
                              'roles.id as roleId',
-                             'player_statuses.alive'
+                             'player_statuses.alive',
+                             'player_statuses.guarded'
                          ]);
     }
 
-    public function changeAliveStatus($player_id)
+    public function updatePlayerStatus(Request $request)
     {
-        $status = PlayerStatus::where('player_id', $player_id)->first();
+        $data = $request->all();
+        $statusToUpdate = $data['status'];
+        $status = PlayerStatus::where('player_id', $data['player_id'])->first();
         $result = 0;
-        if ($status->alive == 0) {
+        if ($status[$statusToUpdate] == 0) {
             $result = 1;
         }
-        $status->alive = $result;
+        $status[$statusToUpdate] = $result;
         $status->save();
         return $result;
     }
@@ -138,6 +141,26 @@ class ModController extends Controller
                     $results[$index]['on_ballot'] = 1;
                 }
             }
+        }
+
+        // adding in Guardian logic separately for now, can rejig it a bit later once there's more functionality going on.
+
+        $guardedPlayer = Player::where('game_id', $game_id)
+                               ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
+                               ->where('player_statuses.guarded', 1)
+                               ->first(['players.id']);
+
+        if ($guardedPlayer && $results[$guardedPlayer->id]['on_ballot']) {
+            // remove the guarded from the ballot, find and add the guardian to it.
+            $guardian = Player::where('game_id', $game_id)
+                                 ->join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                                 ->where('roles.alias', 'angel')
+                                 ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
+                                 ->where('player_statuses.alive', 1)
+                                 ->first(['players.id']);
+
+            $results[$guardedPlayer->id]['on_ballot'] = 0;
+            $results[$guardian->id]['on_ballot'] = 1;
         }
 
         $results = array_values($results); // reset the outer keys so it's mappable in javascript
