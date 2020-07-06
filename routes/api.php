@@ -37,3 +37,6 @@ Route::get('/who_burns/{gameId}/{roundId}', 'ModController@getBurn');
 // Routes for Player View
 Route::get('/get_accusable/{game}/{round}', 'PlayerController@getAccusable');
 Route::post('/submit_action/{game_id}/{round_id}', 'PlayerController@submitAction');
+
+// Role-call Route
+Route::get('/role_call/{game_id}', 'PlayerController@getRoleCall');

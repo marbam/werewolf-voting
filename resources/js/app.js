@@ -15,4 +15,6 @@ require('./bootstrap');
 require('./components/Setup/Setup');
 require('./components/ModView/ModView');
 require('./components/PlayerView/PlayerView');
+require('./components/RoleCall/RoleCall');
+
 

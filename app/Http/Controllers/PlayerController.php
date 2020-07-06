@@ -92,4 +92,19 @@ class PlayerController extends Controller
             }
         }
     }
+
+    public function showRoleCall(Game $game)
+    {
+        return view('roleCall',
+        [
+            'game_id' => $game->id,
+        ]);
+    }
+
+    public function getRoleCall($game_id)
+    {
+        return Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                         ->where('players.game_id', $game_id)
+                         ->get(['players.name', 'roles.name as role'])->toArray();
+    }
 }
