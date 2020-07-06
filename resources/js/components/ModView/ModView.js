@@ -250,8 +250,10 @@ class ModView extends Component {
                             <tr key={index}>
                                 <td>{player.name}</td>
                                 <td>{player.role}</td>
-                                <td>M</td>
-                                <td>C</td>
+                                <td>{player.mystic ? "✓" : null}</td>
+                                <td>{(player.corrupt || player.cursed_farmer || player.cursed_necromancer || player.cursed_hag)
+                                    ? "✓" : null}
+                                </td>
                                 <td>
                                     <button onClick={() => this.changeStatus(index, 'alive')}>
                                         {player.alive ? 'Alive' : 'Dead'}

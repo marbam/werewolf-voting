@@ -24,8 +24,10 @@ class ModController extends Controller
                          ->get([
                              'players.id',
                              'players.name',
-                             'roles.name as role',
                              'roles.id as roleId',
+                             'roles.name as role',
+                             'roles.mystic',
+                             'roles.corrupt',
                              'player_statuses.alive',
                              'player_statuses.guarded',
                              'player_statuses.cursed_farmer',
