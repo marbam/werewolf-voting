@@ -24,6 +24,3 @@ Route::get('/', function () {
 Route::get('/game/{game}', 'ModController@showGame');
 Route::get('/game/{game}/{type}/{round}/', 'PlayerController@showNominees');
 Route::get('/game/{game}/role_call', 'PlayerController@showRoleCall');
-
-// Route::get('/test', 'PlayerController@getActionOptions');
-Route::get('/test', 'PlayerController@testActionOptions');

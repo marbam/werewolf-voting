@@ -66196,6 +66196,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       enteredName: '',
       showSelectError: false,
       showIneligibleScreen: false,
+      myActionOptions: [],
       showOptions: false,
       action: '',
       showVotables: false,
@@ -66243,19 +66244,32 @@ var PlayerView = /*#__PURE__*/function (_Component) {
   }, {
     key: "completeDouble",
     value: function completeDouble() {
+      var _this3 = this;
+
       if (this.state.firstResult.name == this.state.enteredName) {
-        if (this.state.firstResult.canVote) {
-          this.setState({
-            showSelectError: false,
-            showInitialCheck: false,
-            showDoubleCheck: false,
-            showOptions: true
+        var payload = {
+          player_id: this.state.firstResult.id,
+          round_id: this.props.round_id,
+          role_id: this.state.firstResult.roleId
+        };
+        axios.post('/api/get_actions/', payload).then(function (response) {
+          _this3.setState({
+            myActionOptions: response.data
           });
-        } else {
-          this.setState({
-            showIneligibleScreen: true
-          });
-        }
+        }).then(function (eh) {
+          if (_this3.state.myActionOptions.length) {
+            _this3.setState({
+              showSelectError: false,
+              showInitialCheck: false,
+              showDoubleCheck: false,
+              showOptions: true
+            });
+          } else {
+            _this3.setState({
+              showIneligibleScreen: true
+            });
+          }
+        });
       } else {
         this.setState({
           showSelectError: true
@@ -66264,9 +66278,9 @@ var PlayerView = /*#__PURE__*/function (_Component) {
     }
   }, {
     key: "setOption",
-    value: function setOption(type) {
+    value: function setOption(action) {
       this.setState({
-        action: type,
+        action: action,
         showVotables: true
       });
     }
@@ -66281,18 +66295,18 @@ var PlayerView = /*#__PURE__*/function (_Component) {
   }, {
     key: "submitChoice",
     value: function submitChoice() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.setState({
         submittingText: "Sending..."
       });
       var payload = {
         voter_id: this.state.firstResult.id,
-        action_type: this.state.action,
+        action_type: this.state.action.alias,
         choices: this.state.choices
       };
       axios.post('/api/submit_action/' + this.props.game_id + '/' + this.props.round_id, payload).then(function (response) {
-        _this3.setState({
+        _this4.setState({
           submitted: true,
           submittingText: "Sent!",
           disableSubmit: true
@@ -66302,14 +66316,14 @@ var PlayerView = /*#__PURE__*/function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this4 = this;
+      var _this5 = this;
 
       var initialHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Who are you?");
       var initialCheck = this.state.players.map(function (player, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           key: index,
           onClick: function onClick() {
-            return _this4.completeInitial(index);
+            return _this5.completeInitial(index);
           }
         }, player.name);
       });
@@ -66323,12 +66337,14 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       }, "Confirm!"); // We'll populate this further when we get to the two moon stuff!
 
       var optionHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Hi, ", this.state.enteredName, "! What action will you take?");
-      var options = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your Options:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        onClick: function onClick() {
-          return _this4.setOption('vote');
-        }
-      }, "Vote"));
-      var votingHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, " Who receives your ", this.state.action, "?");
+      var options = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your Options:", this.state.myActionOptions.map(function (option) {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          onClick: function onClick() {
+            return _this5.setOption(option);
+          }
+        }, option.description);
+      }));
+      var votingHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, " Who receives your ", this.state.action.description, "?");
       var nominees = this.state.players.filter(function (player) {
         return player.isNominee;
       });
@@ -66336,7 +66352,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           key: index,
           onClick: function onClick() {
-            return _this4.selectChoices(player);
+            return _this5.selectChoices(player);
           }
         }, player.name);
       });
