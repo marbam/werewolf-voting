@@ -16,7 +16,7 @@ class ActionTypeSeeder extends Seeder
         DB::table('action_types')->insert([
             'round_type' => 'accusations',
             'all_roles' => 1,
-            'alias' => 'ACCUSATION_VOTE',
+            'alias' => 'VOTE',
             'description' => 'Standard Vote',
         ]);
 
@@ -24,7 +24,7 @@ class ActionTypeSeeder extends Seeder
         DB::table('action_types')->insert([
             'round_type' => 'ballot',
             'all_roles' => 1,
-            'alias' => 'BALLOT_VOTE',
+            'alias' => 'VOTE',
             'description' => 'Standard Vote',
         ]);
 

@@ -12,6 +12,7 @@ class PlayerView extends Component {
             enteredName: '',
             showSelectError: false,
             showIneligibleScreen: false,
+            myActionOptions: [],
             showOptions: false,
             action: '',
             showVotables: false,
@@ -52,19 +53,30 @@ class PlayerView extends Component {
 
     completeDouble() {
         if (this.state.firstResult.name == this.state.enteredName) {
-            if (this.state.firstResult.canVote) {
-                this.setState({
-                    showSelectError: false,
-                    showInitialCheck: false,
-                    showDoubleCheck: false,
-                    showOptions:true
-                });
-            } else {
-                this.setState({
-                    showIneligibleScreen: true
-                });
-            }
+            let payload = {
+                player_id: this.state.firstResult.id,
+                round_id: this.props.round_id,
+                role_id: this.state.firstResult.roleId
+            };
 
+            axios.post('/api/get_actions/', payload).then(response => {
+                this.setState({
+                    myActionOptions: response.data
+                });
+            }).then(eh => {
+                if (this.state.myActionOptions.length) {
+                    this.setState({
+                        showSelectError: false,
+                        showInitialCheck: false,
+                        showDoubleCheck: false,
+                        showOptions: true
+                    });
+                } else {
+                    this.setState({
+                        showIneligibleScreen: true
+                    });
+                }
+            })
         } else {
             this.setState({
                 showSelectError : true
@@ -72,9 +84,9 @@ class PlayerView extends Component {
         }
     }
 
-    setOption(type) {
+    setOption(action) {
         this.setState({
-            action: type,
+            action: action,
             showVotables: true
         });
     }
@@ -94,7 +106,7 @@ class PlayerView extends Component {
 
         let payload = {
             voter_id : this.state.firstResult.id,
-            action_type: this.state.action,
+            action_type: this.state.action.alias,
             choices: this.state.choices
         };
 
@@ -123,14 +135,14 @@ class PlayerView extends Component {
         // We'll populate this further when we get to the two moon stuff!
         let optionHeading = <h4>Hi, {this.state.enteredName}! What action will you take?</h4>
         let options = <p>Your Options:
-            <button
-                onClick={() => this.setOption('vote')}
-            >
-                Vote
-            </button>
+            {this.state.myActionOptions.map((option) =>
+                <button onClick={() => this.setOption(option)}>
+                    {option.description}
+                </button>
+            )}
         </p>;
 
-        let votingHeading = <h4> Who receives your {this.state.action}?</h4>
+        let votingHeading = <h4> Who receives your {this.state.action.description}?</h4>
 
         let nominees = this.state.players.filter(player => {return player.isNominee});
 

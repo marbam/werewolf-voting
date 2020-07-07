@@ -51,7 +51,6 @@ class PlayerController extends Controller
         if ($round->type == "Accusations") {
             foreach ($players as $player) {
                 $player->isNominee = 1;
-                $player->canVote = 1;
             }
             return $players;
         } else if ($round->type == "Ballot") {
@@ -61,10 +60,8 @@ class PlayerController extends Controller
                 // for now we'll assume that if you're on the ballot, you can't vote. This will change later.
                 if (in_array($player->id, $nominees)) {
                     $player->isNominee = 1;
-                    $player->canVote = 0;
                 } else {
                     $player->isNominee = 0;
-                    $player->canVote = 1;
                 }
             }
             return $players;
@@ -72,35 +69,31 @@ class PlayerController extends Controller
         return abort(404);
     }
 
-    public function testActionOptions()
+    public function getActionOptions(Request $request)
     {
-        $roles = Role::get(['id', 'name']);
-        $actions = [];
-        foreach ($roles as $role) {
-            $actions[$role->name]['A'] = $this->getActionOptions(['role_id' => $role->id, 'round_type' => 'accusations']);
-            $actions[$role->name]['B'] = $this->getActionOptions(['role_id' => $role->id, 'round_type' => 'ballot']);
+        $data = $request->all();
+        $round = Round::find($data['round_id']);
+        $data['round_type'] = strtolower($round->type);
+
+        if ($data['round_type'] == "ballot") {
+            $nominees = Nominee::where('round_id', $round->id)->pluck('player_id', 'id')->toArray();
+            $on_ballot = false;
+            if (in_array($data['player_id'], $nominees)) {
+                $on_ballot = true;
+            }
         }
-        dd($actions);
-    }
-
-
-
-    public function getActionOptions($data)
-    // public function getActionOptions(Request $request)
-    {
-        // $data = ['role_id' => 1, 'round_type' => 'accusations'];
 
         $actions = ActionType::where('round_type', $data['round_type'])
                          ->leftJoin('role_action_types', 'role_action_types.action_type_id', '=', 'action_types.id')
-                        //  ->when($data['round_type'] == "ballot", function($query) {
-                        //      $query->where('usable_on_ballot', 1);
-                        //  })
+                         ->when($data['round_type'] == "ballot" && $on_ballot, function($query) {
+                             $query->where('usable_on_ballot', 1);
+                         })
                          ->where(function($sub) use ($data) {
                             $sub->where('all_roles', 1)
                                 ->orWhere(function($specifics) use ($data) {
                                     $specifics->where('role_action_types.role_id', $data['role_id']);
                                 });
-                         })->get(['action_types.alias'])->toArray();
+                         })->get(['action_types.alias', 'action_types.description'])->toArray();
 
         return $actions;
     }
