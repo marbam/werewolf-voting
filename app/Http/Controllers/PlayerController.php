@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Role;
 use App\Game;
 use App\Round;
 use App\Player;
 use App\Action;
 use App\Nominee;
+use App\ActionType;
 
 class PlayerController extends Controller
 {
@@ -68,6 +70,39 @@ class PlayerController extends Controller
             return $players;
         }
         return abort(404);
+    }
+
+    public function testActionOptions()
+    {
+        $roles = Role::get(['id', 'name']);
+        $actions = [];
+        foreach ($roles as $role) {
+            $actions[$role->name]['A'] = $this->getActionOptions(['role_id' => $role->id, 'round_type' => 'accusations']);
+            $actions[$role->name]['B'] = $this->getActionOptions(['role_id' => $role->id, 'round_type' => 'ballot']);
+        }
+        dd($actions);
+    }
+
+
+
+    public function getActionOptions($data)
+    // public function getActionOptions(Request $request)
+    {
+        // $data = ['role_id' => 1, 'round_type' => 'accusations'];
+
+        $actions = ActionType::where('round_type', $data['round_type'])
+                         ->leftJoin('role_action_types', 'role_action_types.action_type_id', '=', 'action_types.id')
+                        //  ->when($data['round_type'] == "ballot", function($query) {
+                        //      $query->where('usable_on_ballot', 1);
+                        //  })
+                         ->where(function($sub) use ($data) {
+                            $sub->where('all_roles', 1)
+                                ->orWhere(function($specifics) use ($data) {
+                                    $specifics->where('role_action_types.role_id', $data['role_id']);
+                                });
+                         })->get(['action_types.alias'])->toArray();
+
+        return $actions;
     }
 
     public function submitAction(Request $request, $game_id, $round_id)

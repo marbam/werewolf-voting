@@ -31,6 +31,7 @@ class ActionTypeSeeder extends Seeder
         $city_ballot_id = DB::table('action_types')->insertGetId([
             'round_type' => 'ballot',
             'alias' => 'CITY_BALLOT_VOTE',
+            'usable_on_ballot' => 1,
             'description' => 'Standard Vote',
         ]);
 
@@ -57,6 +58,7 @@ class ActionTypeSeeder extends Seeder
         $mayor_signal_id = DB::table('action_types')->insertGetId([
             'round_type' => 'ballot',
             'alias' => 'MAYOR_SIGNAL',
+            'usable_on_ballot' => 1,
             'description' => 'Signal',
         ]);
 
@@ -69,6 +71,7 @@ class ActionTypeSeeder extends Seeder
             'round_type' => 'accusations',
             'alias' => 'MERCHANT_VOTES',
             'description' => 'Multiple Votes',
+            'usable_on_ballot' => 1,
             'multi_select' => 1,
         ]);
 
