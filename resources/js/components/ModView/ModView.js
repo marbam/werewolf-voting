@@ -241,6 +241,7 @@ class ModView extends Component {
                             <th>M</th>
                             <th>C</th>
                             <th>Alive</th>
+                            <th>Minion</th>
                             <th>Criminalized</th>
                             <th>Guarded</th>
                             <th>Farmer Curse</th>
@@ -260,6 +261,11 @@ class ModView extends Component {
                                 <td>
                                     <button onClick={() => this.changeStatus(index, 'alive')}>
                                         {player.alive ? 'Alive' : 'Dead'}
+                                    </button>
+                                </td>
+                                <td>
+                                    <button onClick={() => this.changeStatus(index, 'minion')}>
+                                        {player.minion ? 'Minion' : 'x'}
                                     </button>
                                 </td>
                                 <td>

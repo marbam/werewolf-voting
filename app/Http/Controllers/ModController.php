@@ -29,6 +29,7 @@ class ModController extends Controller
                              'roles.mystic',
                              'roles.corrupt',
                              'player_statuses.alive',
+                             'player_statuses.minion',
                              'player_statuses.guarded',
                              'player_statuses.criminalized',
                              'player_statuses.cursed_farmer',

@@ -9,6 +9,7 @@ class PlayerStatus extends Model
     protected $fillable = [
         'player_id',
         'alive',
+        'minion',
         'guarded',
         'cursed_farmer',
         'cursed_necromancer',

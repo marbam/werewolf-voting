@@ -10,6 +10,7 @@ use App\Player;
 use App\Action;
 use App\Nominee;
 use App\ActionType;
+use App\PlayerStatus;
 
 class PlayerController extends Controller
 {
@@ -83,6 +84,9 @@ class PlayerController extends Controller
             }
         }
 
+        $minionQuery = PlayerStatus::where('player_id', $data['player_id'])->get(['minion'])->first()->toArray();
+        $data['isMinion'] = $minionQuery['minion'];
+
         $actions = ActionType::where('round_type', $data['round_type'])
                          ->leftJoin('role_action_types', 'role_action_types.action_type_id', '=', 'action_types.id')
                          ->when($data['round_type'] == "ballot" && $on_ballot, function($query) {
@@ -91,7 +95,9 @@ class PlayerController extends Controller
                          ->where(function($sub) use ($data) {
                             $sub->where('all_roles', 1)
                                 ->orWhere(function($specifics) use ($data) {
-                                    $specifics->where('role_action_types.role_id', $data['role_id']);
+                                    $specifics->when(!$data['isMinion'], function($minion) use ($data) {
+                                        $minion->where('role_action_types.role_id', $data['role_id']);
+                                    });
                                 });
                          })->get(['action_types.alias', 'action_types.description', 'action_types.multi_select'])->toArray();
 
