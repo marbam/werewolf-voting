@@ -247,6 +247,19 @@ class ModController extends Controller
             }
         }
 
+        // If the Inquisitor has signalled a mystic, add them to the ballot, regardless of votes.
+        $inquisitor_signal = $actions->where('action_type', "INQUISITOR_SIGNAL")->first();
+        if ($inquisitor_signal) {
+            $target = Player::where('players.id', $inquisitor_signal->nominee_id)
+                ->join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                ->get(['players.id', 'roles.mystic'])
+                ->first();
+
+            if ($target->mystic) {
+                $results[$target->id]['on_ballot'] = 1;
+            }
+        }
+
         $results = array_values($results); // reset the outer keys so it's mappable in javascript
 
         return $results;
