@@ -22,6 +22,7 @@ class CreatePlayerStatusTable extends Migration
             $table->boolean('cursed_farmer')->default(0);
             $table->boolean('cursed_necromancer')->default(0);
             $table->boolean('cursed_hag')->default(0);
+            $table->boolean('criminalized')->default(0);
             $table->timestamps();
         });
     }

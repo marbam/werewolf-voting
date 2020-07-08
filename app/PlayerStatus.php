@@ -10,7 +10,9 @@ class PlayerStatus extends Model
         'player_id',
         'alive',
         'guarded',
+        'cursed_farmer',
         'cursed_necromancer',
-        'cursed_hag'
+        'cursed_hag',
+        'criminalized'
     ];
 }

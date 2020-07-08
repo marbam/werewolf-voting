@@ -180,6 +180,7 @@ class ModView extends Component {
                 <tr>
                     <td>Voter</td>
                     <td>Chose</td>
+                    <td>Type</td>
                 </tr>
             </thead>
             <tbody>
@@ -187,6 +188,7 @@ class ModView extends Component {
                     <tr key={index}>
                         <td>{result.voter}</td>
                         <td>{result.chose}</td>
+                        <td>{result.type}</td>
                     </tr>
                 )}
             </tbody>
@@ -239,6 +241,7 @@ class ModView extends Component {
                             <th>M</th>
                             <th>C</th>
                             <th>Alive</th>
+                            <th>Criminalized</th>
                             <th>Guarded</th>
                             <th>Farmer Curse</th>
                             <th>Necromancer Curse</th>
@@ -257,6 +260,11 @@ class ModView extends Component {
                                 <td>
                                     <button onClick={() => this.changeStatus(index, 'alive')}>
                                         {player.alive ? 'Alive' : 'Dead'}
+                                    </button>
+                                </td>
+                                <td>
+                                    <button onClick={() => this.changeStatus(index, 'criminalized')}>
+                                        {player.criminalized ? 'Criminalized' : 'x'}
                                     </button>
                                 </td>
                                 <td>

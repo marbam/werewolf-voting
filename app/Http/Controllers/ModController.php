@@ -30,6 +30,7 @@ class ModController extends Controller
                              'roles.corrupt',
                              'player_statuses.alive',
                              'player_statuses.guarded',
+                             'player_statuses.criminalized',
                              'player_statuses.cursed_farmer',
                              'player_statuses.cursed_necromancer',
                              'player_statuses.cursed_hag',
@@ -54,16 +55,17 @@ class ModController extends Controller
     {
         $data = $this->getData($round_id, $game_id);
         $players = $data[0];
-        $votes = $data[1];
+        $actions = $data[1];
 
         // setup votes array:
         $outcomes = [];
         foreach ($players as $key => $name) {
-            $outcomes[$key] = ['voter' => $name, 'chose' => 'Waiting...'];
+            $outcomes[$key] = ['voter' => $name, 'chose' => 'Waiting...', 'type' => ''];
         }
 
-        foreach ($votes as $vote) {
-            $outcomes[$vote->voter_id]['chose'] = $players[$vote['nominee_id']];
+        foreach ($actions as $action) {
+            $outcomes[$action->voter_id]['chose'] = $players[$action['nominee_id']];
+            $outcomes[$action->voter_id]['type'] = $action['action_type'];
         }
 
         $outcomes = array_values($outcomes);
@@ -105,9 +107,9 @@ class ModController extends Controller
         }
 
         $players = $data[0];
-        $votes = $data[1];
+        $actions = $data[1];
 
-        if (!$votes) {
+        if (!$actions) {
             return "NO VOTES";
         }
 
@@ -120,8 +122,8 @@ class ModController extends Controller
         }
 
 
-        foreach ($votes as $action) {
-            if ($action->action_type == "VOTE") {
+        foreach ($actions as $action) {
+            if (strpos($action->action_type, "VOTE") !== false) {
                 $results[$action->nominee_id]['votes']++;
             }
         }
@@ -192,6 +194,23 @@ class ModController extends Controller
 
             $results[$guardedPlayer->id]['on_ballot'] = 0;
             $results[$guardian->id]['on_ballot'] = 1;
+        }
+
+        // find out if one of the votes is of type "LAYWER_SIGNAL", if so, check if the target is a City or Criminal.
+        // if so, remove them from the Ballot.
+
+        $lawyer_signal = $actions->where('action_type', "LAWYER_SIGNAL")->first();
+        if ($lawyer_signal) {
+            $target = Player::where('players.id', $lawyer_signal->nominee_id)
+                            ->join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                            ->join('factions', 'roles.faction_id', '=', 'factions.id')
+                            ->join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
+                            ->get(['players.id', 'factions.name', 'player_statuses.criminalized'])
+                            ->first();
+
+            if (in_array($target->name, ['Criminals', 'City']) || $target->criminalized ) {
+                $results[$target->id]['on_ballot'] = 0;
+            }
         }
 
         $results = array_values($results); // reset the outer keys so it's mappable in javascript

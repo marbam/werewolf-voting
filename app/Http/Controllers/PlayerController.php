@@ -93,7 +93,7 @@ class PlayerController extends Controller
                                 ->orWhere(function($specifics) use ($data) {
                                     $specifics->where('role_action_types.role_id', $data['role_id']);
                                 });
-                         })->get(['action_types.alias', 'action_types.description'])->toArray();
+                         })->get(['action_types.alias', 'action_types.description', 'action_types.multi_select'])->toArray();
 
         return $actions;
     }

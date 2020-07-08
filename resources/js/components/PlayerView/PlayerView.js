@@ -92,14 +92,43 @@ class PlayerView extends Component {
     }
 
     selectChoices(player) {
-        this.setState({
-            choices: [player],
-            showSubmit: true,
-        })
+        if (!this.state.action.multi_select || !this.state.choices.length) {
+            this.setState({
+                choices: [player],
+                showSubmit: true,
+            })
+        } else {
+            let choices = this.state.choices;
+            let showSubmit = false;
+            if (choices.length) {
+                // check if the player's already exists in the choices array, if so, remove it.
+                let found_index = null;
+                for (let i = 0; i < choices.length; i++) {
+                    if (choices[i].id === player.id) {
+                        found_index = i;
+                    }
+                }
+                if (found_index !== null) {
+                    choices.splice(found_index, 1);
+                } else { // add it
+                    choices.push(player);
+                }
+
+                if (choices.length) {
+                    showSubmit = true;
+                }
+
+                this.setState({
+                    choices: choices,
+                    showSubmit: showSubmit,
+                })
+            }
+        }
+
+
     }
 
     submitChoice() {
-
         this.setState({
             submittingText: "Sending..."
         })
