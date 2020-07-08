@@ -46,7 +46,7 @@ class ActionTypeSeeder extends Seeder
 
         $lawyer_signal_id = DB::table('action_types')->insertGetId([
             'round_type' => 'accusations',
-            'alias' => 'LAYWER_SIGNAL',
+            'alias' => 'LAWYER_SIGNAL',
             'description' => 'Signal',
         ]);
 
@@ -121,7 +121,7 @@ class ActionTypeSeeder extends Seeder
 
         $inq_signal_id = DB::table('action_types')->insertGetId([
             'round_type' => 'accusations',
-            'alias' => 'INQUISITIOR_SIGNAL',
+            'alias' => 'INQUISITOR_SIGNAL',
             'description' => 'Signal',
         ]);
 

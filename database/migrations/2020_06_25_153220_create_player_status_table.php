@@ -18,10 +18,12 @@ class CreatePlayerStatusTable extends Migration
             $table->unsignedBigInteger('player_id');
             $table->foreign('player_id')->references('id')->on('players');
             $table->boolean('alive')->default(1);
+            $table->boolean('minion')->default(0);
             $table->boolean('guarded')->default(0);
             $table->boolean('cursed_farmer')->default(0);
             $table->boolean('cursed_necromancer')->default(0);
             $table->boolean('cursed_hag')->default(0);
+            $table->boolean('criminalized')->default(0);
             $table->timestamps();
         });
     }

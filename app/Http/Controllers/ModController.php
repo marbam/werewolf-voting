@@ -29,7 +29,9 @@ class ModController extends Controller
                              'roles.mystic',
                              'roles.corrupt',
                              'player_statuses.alive',
+                             'player_statuses.minion',
                              'player_statuses.guarded',
+                             'player_statuses.criminalized',
                              'player_statuses.cursed_farmer',
                              'player_statuses.cursed_necromancer',
                              'player_statuses.cursed_hag',
@@ -54,16 +56,20 @@ class ModController extends Controller
     {
         $data = $this->getData($round_id, $game_id);
         $players = $data[0];
-        $votes = $data[1];
+        $actions = $data[1];
 
         // setup votes array:
         $outcomes = [];
         foreach ($players as $key => $name) {
-            $outcomes[$key] = ['voter' => $name, 'chose' => 'Waiting...'];
+            $outcomes[$key] = ['voter' => $name, 'chose' => 'Waiting...', 'type' => ''];
         }
 
-        foreach ($votes as $vote) {
-            $outcomes[$vote->voter_id]['chose'] = $players[$vote['nominee_id']];
+        foreach ($actions as $action) {
+            if ($outcomes[$action->voter_id]['chose'] == 'Waiting...') {
+                $outcomes[$action->voter_id]['chose'] = '';
+            }
+            $outcomes[$action->voter_id]['chose'] .= $players[$action['nominee_id']]." ";
+            $outcomes[$action->voter_id]['type'] = $action['action_type'];
         }
 
         $outcomes = array_values($outcomes);
@@ -105,9 +111,9 @@ class ModController extends Controller
         }
 
         $players = $data[0];
-        $votes = $data[1];
+        $actions = $data[1];
 
-        if (!$votes) {
+        if (!$actions) {
             return "NO VOTES";
         }
 
@@ -119,9 +125,8 @@ class ModController extends Controller
             $results[$id]['on_ballot'] = 0;
         }
 
-
-        foreach ($votes as $action) {
-            if ($action->action_type == "VOTE") {
+        foreach ($actions as $action) {
+            if (strpos($action->action_type, "VOTE") !== false) {
                 $results[$action->nominee_id]['votes']++;
             }
         }
@@ -148,6 +153,37 @@ class ModController extends Controller
             } else {
                 $vote_array[$result['votes']]++;
             }
+        }
+
+        // get the city roles in the game!
+        $city = Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                      ->join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
+                      ->where('player_statuses.alive', 1)
+                      ->where('player_statuses.minion', 0)
+                      ->where('players.game_id', $game_id)
+                      ->whereIn('roles.alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'seducer'])
+                      ->get(['roles.alias', 'players.id']);
+
+
+        // The seducer's votes are halved and then rounded up on both rounds of voting.
+        $seducer = $city->where('alias', 'seducer')->first();
+        if ($seducer) {
+            $number_of_votes = $results[$seducer->id]['votes'];
+            $halve_it = $number_of_votes / 2;
+            $rounded_up = ceil($halve_it);
+            $results[$seducer->id]['votes'] = $rounded_up;
+        }
+
+        // The merchant receives one fewer vote for every other city player alive on both rounds of voting.
+        $merchant = $city->where('alias', 'merchant')->first();
+        if ($merchant) {
+            $subtract_votes = $city->where('alias', '!=', 'merchant')->count();
+            $number_of_votes = $results[$merchant->id]['votes'];
+            $number_of_votes =- $subtract_votes;
+            if ($number_of_votes < 0) {
+                $number_of_votes = 0;
+            }
+            $results[$merchant->id]['votes'] = $number_of_votes;
         }
 
         // get the two highest tiers of votes.
@@ -192,6 +228,36 @@ class ModController extends Controller
 
             $results[$guardedPlayer->id]['on_ballot'] = 0;
             $results[$guardian->id]['on_ballot'] = 1;
+        }
+
+        // find out if one of the votes is of type "LAYWER_SIGNAL", if so, check if the target is a City or Criminal.
+        // if so, remove them from the Ballot.
+
+        $lawyer_signal = $actions->where('action_type', "LAWYER_SIGNAL")->first();
+        if ($lawyer_signal) {
+            $target = Player::where('players.id', $lawyer_signal->nominee_id)
+                            ->join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                            ->join('factions', 'roles.faction_id', '=', 'factions.id')
+                            ->join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
+                            ->get(['players.id', 'factions.name', 'player_statuses.criminalized'])
+                            ->first();
+
+            if (in_array($target->name, ['Criminals', 'City']) || $target->criminalized ) {
+                $results[$target->id]['on_ballot'] = 0;
+            }
+        }
+
+        // If the Inquisitor has signalled a mystic, add them to the ballot, regardless of votes.
+        $inquisitor_signal = $actions->where('action_type', "INQUISITOR_SIGNAL")->first();
+        if ($inquisitor_signal) {
+            $target = Player::where('players.id', $inquisitor_signal->nominee_id)
+                ->join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                ->get(['players.id', 'roles.mystic'])
+                ->first();
+
+            if ($target->mystic) {
+                $results[$target->id]['on_ballot'] = 1;
+            }
         }
 
         $results = array_values($results); // reset the outer keys so it's mappable in javascript
