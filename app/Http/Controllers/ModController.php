@@ -65,7 +65,10 @@ class ModController extends Controller
         }
 
         foreach ($actions as $action) {
-            $outcomes[$action->voter_id]['chose'] = $players[$action['nominee_id']];
+            if ($outcomes[$action->voter_id]['chose'] == 'Waiting...') {
+                $outcomes[$action->voter_id]['chose'] = '';
+            }
+            $outcomes[$action->voter_id]['chose'] .= $players[$action['nominee_id']]." ";
             $outcomes[$action->voter_id]['type'] = $action['action_type'];
         }
 
@@ -122,7 +125,6 @@ class ModController extends Controller
             $results[$id]['on_ballot'] = 0;
         }
 
-
         foreach ($actions as $action) {
             if (strpos($action->action_type, "VOTE") !== false) {
                 $results[$action->nominee_id]['votes']++;
@@ -151,6 +153,37 @@ class ModController extends Controller
             } else {
                 $vote_array[$result['votes']]++;
             }
+        }
+
+        // get the city roles in the game!
+        $city = Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                      ->join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
+                      ->where('player_statuses.alive', 1)
+                      ->where('player_statuses.minion', 0)
+                      ->where('players.game_id', $game_id)
+                      ->whereIn('roles.alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'seducer'])
+                      ->get(['roles.alias', 'players.id']);
+
+
+        // The seducer's votes are halved and then rounded up on both rounds of voting.
+        $seducer = $city->where('alias', 'seducer')->first();
+        if ($seducer) {
+            $number_of_votes = $results[$seducer->id]['votes'];
+            $halve_it = $number_of_votes / 2;
+            $rounded_up = ceil($halve_it);
+            $results[$seducer->id]['votes'] = $rounded_up;
+        }
+
+        // The merchant receives one fewer vote for every other city player alive on both rounds of voting.
+        $merchant = $city->where('alias', 'merchant')->first();
+        if ($merchant) {
+            $subtract_votes = $city->where('alias', '!=', 'merchant')->count();
+            $number_of_votes = $results[$merchant->id]['votes'];
+            $number_of_votes =- $subtract_votes;
+            if ($number_of_votes < 0) {
+                $number_of_votes = 0;
+            }
+            $results[$merchant->id]['votes'] = $number_of_votes;
         }
 
         // get the two highest tiers of votes.
