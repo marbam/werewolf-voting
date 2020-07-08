@@ -13,10 +13,7 @@ class SetupController extends Controller
 {
     public function getRoles()
     {
-        return Role::join('factions', 'roles.faction_id', '=', 'factions.id')
-                   ->where('factions.moons', 1)
-                   ->orWhereIn('alias', ['juliet', 'angel'])
-                   ->get(['roles.id', 'roles.name'])->toArray();
+        return Role::get(['roles.id', 'roles.name'])->toArray();
     }
 
     public function savePlayers(Request $request)
