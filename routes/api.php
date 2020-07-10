@@ -38,6 +38,7 @@ Route::get('/who_burns/{gameId}/{roundId}', 'ModController@getBurn');
 Route::get('/get_accusable/{game}/{round}', 'PlayerController@getAccusable');
 Route::post('/get_actions', 'PlayerController@getActionOptions');
 Route::post('/submit_action/{game_id}/{round_id}', 'PlayerController@submitAction');
+Route::post('/get_spy_data', 'PlayerController@getSpyTable');
 
 // Role-call Route
 Route::get('/role_call/{game_id}', 'PlayerController@getRoleCall');

@@ -66212,12 +66212,16 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       showSubmit: false,
       submittingText: "Submit to Mod!",
       submitted: false,
-      disableSubmit: false
+      submittedText: "Your feedback has been received! You can now close the window and get back to the game!",
+      disableSubmit: false,
+      spyData: [],
+      showSpyData: false
     };
     _this.updateName = _this.updateName.bind(_assertThisInitialized(_this));
     _this.completeDouble = _this.completeDouble.bind(_assertThisInitialized(_this));
     _this.setOption = _this.setOption.bind(_assertThisInitialized(_this));
     _this.submitChoice = _this.submitChoice.bind(_assertThisInitialized(_this));
+    _this.doSpyStuff = _this.doSpyStuff.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -66287,10 +66291,19 @@ var PlayerView = /*#__PURE__*/function (_Component) {
   }, {
     key: "setOption",
     value: function setOption(action) {
-      this.setState({
-        action: action,
-        showVotables: true
-      });
+      if (action.alias == "SPY_SIGNAL") {
+        this.setState({
+          players: [this.state.firstResult],
+          action: action,
+          showVotables: true,
+          submittedText: "Thank you! See the votes/actions below!"
+        });
+      } else {
+        this.setState({
+          action: action,
+          showVotables: true
+        });
+      }
     }
   }, {
     key: "selectChoices",
@@ -66352,18 +66365,40 @@ var PlayerView = /*#__PURE__*/function (_Component) {
           disableSubmit: true
         });
       });
+
+      if (this.state.action.alias == "SPY_SIGNAL") {
+        this.doSpyStuff();
+      }
+    }
+  }, {
+    key: "doSpyStuff",
+    value: function doSpyStuff() {
+      var _this5 = this;
+
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.props.round_id,
+        voter: this.state.firstResult
+      };
+      axios.post('/api/get_spy_data/', payload).then(function (response) {
+        _this5.setState({
+          showSpyData: true,
+          submittedText: "Thanks for the signal, Accusation actions are below. Sparing hit Refresh to update!",
+          spyData: response.data
+        });
+      });
     }
   }, {
     key: "render",
     value: function render() {
-      var _this5 = this;
+      var _this6 = this;
 
       var initialHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Who are you?");
       var initialCheck = this.state.players.map(function (player, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           key: index,
           onClick: function onClick() {
-            return _this5.completeInitial(index);
+            return _this6.completeInitial(index);
           }
         }, player.name);
       });
@@ -66377,10 +66412,11 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       }, "Confirm!"); // We'll populate this further when we get to the two moon stuff!
 
       var optionHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Hi, ", this.state.enteredName, "! What action will you take?");
-      var options = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your Options:", this.state.myActionOptions.map(function (option) {
+      var options = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your Options:", this.state.myActionOptions.map(function (option, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          key: index,
           onClick: function onClick() {
-            return _this5.setOption(option);
+            return _this6.setOption(option);
           }
         }, option.description);
       }));
@@ -66392,7 +66428,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           key: index,
           onClick: function onClick() {
-            return _this5.selectChoices(player);
+            return _this6.selectChoices(player);
           }
         }, player.name);
       });
@@ -66400,13 +66436,25 @@ var PlayerView = /*#__PURE__*/function (_Component) {
         onClick: this.submitChoice,
         disabled: this.state.disableSubmit
       }, this.state.submittingText);
+      var spyTable = null;
+
+      if (this.state.spyData.length) {
+        console.log(this.state.spyData);
+        spyTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Player"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Chose"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Type"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.spyData.map(function (result, index) {
+          return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
+            key: index
+          }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voter), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.chose), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.type));
+        })));
+      }
 
       if (this.state.showIneligibleScreen) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Thanks for selecting, you can't vote/signal in this round! ");
       }
 
       if (this.state.submitted) {
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your feedback has been received! You can now close the window and get back to the game! ");
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, this.state.submittedText), !this.state.showSpyData ? null : spyTable, !this.state.showSpyData ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          onClick: this.doSpyStuff
+        }, "Refresh"));
       }
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {

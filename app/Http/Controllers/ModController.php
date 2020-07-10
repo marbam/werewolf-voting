@@ -52,9 +52,11 @@ class ModController extends Controller
         return $result;
     }
 
-    public function getAccusationByVoter($round_id, $game_id)
+    public function getAccusationByVoter($round_id, $game_id, $data=null)
     {
-        $data = $this->getData($round_id, $game_id);
+        if (!$data) {
+            $data = $this->getData($round_id, $game_id);
+        }
         $players = $data[0];
         $actions = $data[1];
 
@@ -69,7 +71,21 @@ class ModController extends Controller
                 $outcomes[$action->voter_id]['chose'] = '';
             }
             $outcomes[$action->voter_id]['chose'] .= $players[$action['nominee_id']]." ";
-            $outcomes[$action->voter_id]['type'] = $action['action_type'];
+            $action_type = strtolower($action['action_type']);
+            $action_type = str_replace("_", " ", $action_type);
+            $action_type = ucwords($action_type);
+            $outcomes[$action->voter_id]['type'] = $action_type;
+        }
+
+        // If we're returning the data for a spy, trim it down so you can't see who is doing what.
+        if (isset($data['spy'])) {
+            foreach ($outcomes as $player_id => $outcome) {
+                if (strpos($outcome['type'], "Vote") !== false) {
+                    $outcomes[$player_id]['type'] = "Vote";
+                } else if (strpos($outcome['type'], "Signal") !== false) {
+                    $outcomes[$player_id]['type'] = "Signal";
+                }
+            }
         }
 
         $outcomes = array_values($outcomes);
@@ -77,7 +93,7 @@ class ModController extends Controller
         return $outcomes;
     }
 
-    protected function getData($round_id, $game_id) {
+    public function getData($round_id, $game_id) {
         $players = Player::join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
                          ->where('game_id', $game_id)
                          ->where('player_statuses.alive', 1)

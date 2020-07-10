@@ -20,12 +20,16 @@ class PlayerView extends Component {
             showSubmit: false,
             submittingText : "Submit to Mod!",
             submitted: false,
-            disableSubmit: false
+            submittedText: "Your feedback has been received! You can now close the window and get back to the game!",
+            disableSubmit: false,
+            spyData: [],
+            showSpyData: false
         };
         this.updateName = this.updateName.bind(this);
         this.completeDouble = this.completeDouble.bind(this);
         this.setOption = this.setOption.bind(this);
         this.submitChoice = this.submitChoice.bind(this);
+        this.doSpyStuff = this.doSpyStuff.bind(this);
     }
 
     componentDidMount() {
@@ -85,10 +89,19 @@ class PlayerView extends Component {
     }
 
     setOption(action) {
-        this.setState({
-            action: action,
-            showVotables: true
-        });
+        if (action.alias == "SPY_SIGNAL") {
+            this.setState({
+                players: [this.state.firstResult],
+                action: action,
+                showVotables: true,
+                submittedText: "Thank you! See the votes/actions below!"
+            })
+        } else {
+            this.setState({
+                action: action,
+                showVotables: true
+            });
+        }
     }
 
     selectChoices(player) {
@@ -124,8 +137,6 @@ class PlayerView extends Component {
                 })
             }
         }
-
-
     }
 
     submitChoice() {
@@ -146,6 +157,26 @@ class PlayerView extends Component {
                 disableSubmit: true
             });
         })
+
+        if (this.state.action.alias == "SPY_SIGNAL") {
+            this.doSpyStuff();
+        }
+    }
+
+    doSpyStuff() {
+        let payload = {
+            game_id: this.props.game_id,
+            round_id: this.props.round_id,
+            voter : this.state.firstResult,
+        }
+
+        axios.post('/api/get_spy_data/', payload).then(response => {
+            this.setState({
+                showSpyData: true,
+                submittedText: "Thanks for the signal, All accusation actions are below. Sparing hit the Refresh Button to update!",
+                spyData: response.data
+            })
+        })
     }
 
     render() {
@@ -164,8 +195,8 @@ class PlayerView extends Component {
         // We'll populate this further when we get to the two moon stuff!
         let optionHeading = <h4>Hi, {this.state.enteredName}! What action will you take?</h4>
         let options = <p>Your Options:
-            {this.state.myActionOptions.map((option) =>
-                <button onClick={() => this.setOption(option)}>
+            {this.state.myActionOptions.map((option, index) =>
+                <button key={index} onClick={() => this.setOption(option)}>
                     {option.description}
                 </button>
             )}
@@ -188,12 +219,42 @@ class PlayerView extends Component {
                             {this.state.submittingText}
                         </button>
 
+        let spyTable = null;
+        if (this.state.spyData.length) {
+            spyTable = <table>
+                <thead>
+                    <tr>
+                        <td>Player</td>
+                        <td>Chose</td>
+                        <td>Type</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {this.state.spyData.map((result, index) =>
+                        <tr key={index}>
+                            <td>{result.voter}</td>
+                            <td>{result.chose}</td>
+                            <td>{result.type}</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        }
+
         if (this.state.showIneligibleScreen) {
             return <p>Thanks for selecting, you can't vote/signal in this round! </p>
         }
 
         if (this.state.submitted) {
-            return <p>Your feedback has been received! You can now close the window and get back to the game! </p>
+            return <div>
+                <p>{this.state.submittedText}</p>
+                {!this.state.showSpyData ? null :
+                    spyTable
+                }
+                {!this.state.showSpyData ? null :
+                    <button onClick={this.doSpyStuff}>Refresh</button>
+                }
+            </div>
         }
 
         return (

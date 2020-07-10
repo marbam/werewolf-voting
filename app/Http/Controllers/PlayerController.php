@@ -141,4 +141,12 @@ class PlayerController extends Controller
                          ->where('players.game_id', $game_id)
                          ->get(['players.name', 'roles.name as role'])->toArray();
     }
+
+    public function getSpyTable(Request $request)
+    {
+        $r = $request->all();
+        $data = app(ModController::class)->getData($r['round_id'], $r['game_id']);
+        $data['spy'] = true;
+        return app(ModController::class)->getAccusationByVoter($r['round_id'], $r['game_id'], $data);
+    }
 }
