@@ -434,7 +434,11 @@ class ModController extends Controller
 
             foreach ($votes as $vote) {
                 $voters[$vote->voter_id]['voted_for_id'] = $vote->nominee_id;
-                $voters[$vote->voter_id]['voted_for_name'] = $players[$vote->nominee_id];
+                if ($voters[$vote->voter_id]['voted_for_name'] == "Awaiting...") {
+                    $voters[$vote->voter_id]['voted_for_name'] = $players[$vote->nominee_id]." ";
+                } else {
+                    $voters[$vote->voter_id]['voted_for_name'] .= $players[$vote->nominee_id]." ";
+                }
             }
         }
 
@@ -452,9 +456,9 @@ class ModController extends Controller
     public function getBurn($game_id, $round_id)
     {
         $players = Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
-                         ->join('player_statuses', 'player_statuses.player_id', '=', 'player.id')
+                         ->join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
                          ->where('players.game_id', $game_id)
-                         ->where('player_status.alive', 1)
+                         ->where('player_statuses.alive', 1)
                          ->get([
                              'players.id',
                              'roles.alias',
@@ -472,14 +476,14 @@ class ModController extends Controller
         $actions = Action::where('round_id', $round_id)->get();
 
         foreach ($actions as $action) {
-            if (strpos($action->action_type, "VOTE")) {
+            if (strpos($action->action_type, "VOTE") !== false) {
                 $totals[$action->nominee_id]++;
             } else if ($action->action_type == "MAYOR_SIGNAL") {
                 // mayor's signal target gets an extra vote for OTHER every city player alive PLUS ONE.
-                $number_votes = $players->whereIn('alias', ['lawyer', 'merchant', 'preacher', 'seducer'])
+                $number_of_votes = $players->whereIn('alias', ['lawyer', 'merchant', 'preacher', 'seducer'])
                                         ->where('minion', 0)
                                         ->count();
-                $number_votes++;
+                $number_of_votes++;
                 $totals[$action->nominee_id] += $number_of_votes;
             }
         }
@@ -500,8 +504,8 @@ class ModController extends Controller
         }
 
         // Seducer's votes are always halved and rounded up.
-        $seducer = $players::where('alias', 'seducer')->first();
-        if ($seducer) {
+        $seducer = $players->where('alias', 'seducer')->first();
+        if ($seducer && isset($totals[$seducer->id])) {
             $id = $seducer->id;
             $number_of_votes = $totals[$id];
             $halve_it = $number_of_votes / 2;
@@ -511,7 +515,7 @@ class ModController extends Controller
 
         // The merchant receives one fewer vote for every other city player alive on both rounds of voting.
         $merchant = $players->where('alias', 'merchant')->first();
-        if ($merchant) {
+        if ($merchant && isset($totals[$merchant->id])) {
             $subtract_votes = $players->whereIn('alias', ['lawyer', 'mayor', 'preacher', 'seducer'])
                                       ->where('minion', 0)
                                       ->count();
@@ -523,8 +527,6 @@ class ModController extends Controller
             }
             $results[$merchant->id] = $number_of_votes;
         }
-
-        // TODO - Add possessed logic.
 
         // Executioner check
         $executioner_signal = $actions->where('action_type', 'EXECUTIONER_SIGNAL')->first();
@@ -556,7 +558,7 @@ class ModController extends Controller
 
             // preacher checks
             // if the preacher is alive and the person to be burned is city, return a tie.
-            $city_ids = $players::whereIn('alias', ['Lawyer', 'Mayor', 'Merchant', 'Preacher', 'Seducer'])->pluck('id');
+            $city_ids = $players->whereIn('alias', ['Lawyer', 'Mayor', 'Merchant', 'Preacher', 'Seducer'])->pluck('id')->toArray();
             if (in_array($burning_ids, $city_ids)) {
                 return "DRAW";
             }

@@ -75,6 +75,7 @@ class PlayerController extends Controller
         $data = $request->all();
         $round = Round::find($data['round_id']);
         $data['round_type'] = strtolower($round->type);
+        $city_role_ids = null;
 
         if ($data['round_type'] == "ballot") {
             $nominees = Nominee::where('round_id', $round->id)->pluck('player_id', 'id')->toArray();
@@ -82,6 +83,8 @@ class PlayerController extends Controller
             if (in_array($data['player_id'], $nominees)) {
                 $on_ballot = true;
             }
+            $city_role_ids = Role::whereIn('alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'seducer'])
+                                 ->pluck('id')->toArray();
         }
 
         $minionQuery = PlayerStatus::where('player_id', $data['player_id'])->get(['minion'])->first()->toArray();
@@ -91,6 +94,9 @@ class PlayerController extends Controller
                          ->leftJoin('role_action_types', 'role_action_types.action_type_id', '=', 'action_types.id')
                          ->when($data['round_type'] == "ballot" && $on_ballot, function($query) {
                              $query->where('usable_on_ballot', 1);
+                         })
+                         ->when($city_role_ids && in_array($data['role_id'], $city_role_ids) && !$data['isMinion'], function($query) {
+                             $query->where('alias', '!=', 'VOTE');
                          })
                          ->where(function($sub) use ($data) {
                             $sub->where('all_roles', 1)
