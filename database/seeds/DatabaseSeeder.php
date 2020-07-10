@@ -14,5 +14,6 @@ class DatabaseSeeder extends Seeder
         $this->call(FactionRoleSeeder::class);
         $this->call(RoleAliasSeeder::class);
         $this->call(ActionTypeSeeder::class);
+        $this->call(ShadowSeeder::class);
     }
 }

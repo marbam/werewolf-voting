@@ -142,7 +142,7 @@ class ModController extends Controller
         }
 
         foreach ($actions as $action) {
-            if (strpos($action->action_type, "VOTE") !== false) {
+            if (strpos($action->action_type, "VOTE") !== false || $action->action_type == "SPY_SIGNAL") {
                 $results[$action->nominee_id]['votes']++;
             }
         }
@@ -179,7 +179,6 @@ class ModController extends Controller
                       ->where('players.game_id', $game_id)
                       ->whereIn('roles.alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'seducer'])
                       ->get(['roles.alias', 'players.id']);
-
 
         // The seducer's votes are halved and then rounded up on both rounds of voting.
         $seducer = $city->where('alias', 'seducer')->first();
@@ -260,6 +259,8 @@ class ModController extends Controller
 
             if (in_array($target->name, ['Criminals', 'City']) || $target->criminalized ) {
                 $results[$target->id]['on_ballot'] = 0;
+            } else {
+                $results[$target->id]['on_ballot'] = 1; // always on ballot if they're not criminal or city
             }
         }
 
@@ -447,16 +448,96 @@ class ModController extends Controller
         ];
     }
 
-    public function getBurn($game_id, $roundId)
+    public function getBurn($game_id, $round_id)
     {
-        // Signals and whatnot can come later. For now we'll just figure out who has the most votes!
-        $actions = Action::where('round_id', $roundId)->get();
+        $players = Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                         ->join('player_statuses', 'player_statuses.player_id', '=', 'player.id')
+                         ->where('players.game_id', $game_id)
+                         ->where('player_status.alive', 1)
+                         ->get([
+                             'players.id',
+                             'roles.alias',
+                             'roles.mystic',
+                             'player_statuses.minion',
+                             'roles.shadow'
+                         ]);
+
+        $nominees = Nominee::where('round_id', $round_id)->get();
         $totals = [];
+        foreach ($nominees as $nominee) {
+            $totals[$nominee->player_id] = 0;
+        }
+
+        $actions = Action::where('round_id', $round_id)->get();
+
         foreach ($actions as $action) {
-            if (!isset($totals[$action->nominee_id])) {
-                $totals[$action->nominee_id] = 0;
+            if (strpos($action->action_type, "VOTE")) {
+                $totals[$action->nominee_id]++;
+            } else if ($action->action_type == "MAYOR_SIGNAL") {
+                // mayor's signal target gets an extra vote for OTHER every city player alive PLUS ONE.
+                $number_votes = $players->whereIn('alias', ['lawyer', 'merchant', 'preacher', 'seducer'])
+                                        ->where('minion', 0)
+                                        ->count();
+                $number_votes++;
+                $totals[$action->nominee_id] += $number_of_votes;
             }
-            $totals[$action->nominee_id]++;
+        }
+
+        $cursed_player_ids = Player::where('game_id', $game_id)
+                                   ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
+                                   ->where('player_statuses.alive', 1)
+                                   ->where(function($curses) {
+                                       $curses->where('player_statuses.cursed_farmer', 1)
+                                              ->orWhere('player_statuses.cursed_necromancer', 1)
+                                              ->orWhere('player_statuses.cursed_hag', 1);
+                                   })->pluck('players.id')->toArray();
+
+        foreach ($cursed_player_ids as $player_id) {
+            if (isset($totals[$player_id])) {
+                $totals[$player_id]++; // singular extra vote for cursed players
+            }
+        }
+
+        // Seducer's votes are always halved and rounded up.
+        $seducer = $players::where('alias', 'seducer')->first();
+        if ($seducer) {
+            $id = $seducer->id;
+            $number_of_votes = $totals[$id];
+            $halve_it = $number_of_votes / 2;
+            $rounded_up = ceil($halve_it);
+            $totals[$id] = $rounded_up;
+        }
+
+        // The merchant receives one fewer vote for every other city player alive on both rounds of voting.
+        $merchant = $players->where('alias', 'merchant')->first();
+        if ($merchant) {
+            $subtract_votes = $players->whereIn('alias', ['lawyer', 'mayor', 'preacher', 'seducer'])
+                                      ->where('minion', 0)
+                                      ->count();
+
+            $number_of_votes = $totals[$merchant->id];
+            $number_of_votes =- $subtract_votes;
+            if ($number_of_votes < 0) {
+                $number_of_votes = 0;
+            }
+            $results[$merchant->id] = $number_of_votes;
+        }
+
+        // TODO - Add possessed logic.
+
+        // Executioner check
+        $executioner_signal = $actions->where('action_type', 'EXECUTIONER_SIGNAL')->first();
+        if ($executioner_signal) {
+            $target_id = $executioner_signal->nominee_id;
+            // check to see if the target player is a mystic or a shadow (including minion)
+            $target = $players->where('id', $target_id)->first();
+            if ($target->mystic || $target->shadow || $target->minion /* || $target->possessed */) {
+                foreach($totals as $key => $count) {
+                    if ($key != $target_id) {
+                        $totals[$id] = 0;
+                    }
+                }
+            }
         }
 
         $highest = max($totals);
@@ -471,7 +552,24 @@ class ModController extends Controller
         if (count($burning_ids) > 1) {
             return "DRAW";
         } else {
-            // get players and then return the relevant names;
+
+            // preacher checks
+            // if the preacher is alive and the person to be burned is city, return a tie.
+            $city_ids = $players::whereIn('alias', ['Lawyer', 'Mayor', 'Merchant', 'Preacher', 'Seducer'])->pluck('id');
+            if (in_array($burning_ids, $city_ids)) {
+                return "DRAW";
+            }
+
+            // if the preacher has signalled the highest player, return a tie
+            $preacher_success = $actions->where('action_type', 'PREACHER_SIGNALS')
+                              ->where('nominee_id', $burning_ids)
+                              ->count();
+
+            if ($preacher_success) {
+                return "DRAW";
+            }
+
+            // otherwise, get players and then return the relevant names;
             $player = Player::find($burning_ids)->first();
             return [$highest, $player];
         }
