@@ -35,6 +35,7 @@ class ModController extends Controller
                              'player_statuses.cursed_farmer',
                              'player_statuses.cursed_necromancer',
                              'player_statuses.cursed_hag',
+                             'player_statuses.possessed',
                          ]);
     }
 
@@ -529,9 +530,9 @@ class ModController extends Controller
         $executioner_signal = $actions->where('action_type', 'EXECUTIONER_SIGNAL')->first();
         if ($executioner_signal) {
             $target_id = $executioner_signal->nominee_id;
-            // check to see if the target player is a mystic or a shadow (including minion)
+            // check to see if the target player is a mystic or a shadow (including minion and possessed)
             $target = $players->where('id', $target_id)->first();
-            if ($target->mystic || $target->shadow || $target->minion /* || $target->possessed */) {
+            if ($target->mystic || $target->shadow || $target->minion || $target->possessed) {
                 foreach($totals as $key => $count) {
                     if ($key != $target_id) {
                         $totals[$id] = 0;

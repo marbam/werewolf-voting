@@ -247,6 +247,7 @@ class ModView extends Component {
                             <th>Farmer Curse</th>
                             <th>Necromancer Curse</th>
                             <th>Hag Curse</th>
+                            <th>Possessed</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -291,6 +292,11 @@ class ModView extends Component {
                                 <td>
                                     <button onClick={() => this.changeStatus(index, 'cursed_hag')}>
                                         {player.cursed_hag ? 'Bewitched' : 'x'}
+                                    </button>
+                                </td>
+                                <td>
+                                    <button onClick={() => this.changeStatus(index, 'possessed')}>
+                                        {player.possessed ? 'Possessed' : 'x'}
                                     </button>
                                 </td>
                             </tr>

@@ -14,6 +14,7 @@ class PlayerStatus extends Model
         'cursed_farmer',
         'cursed_necromancer',
         'cursed_hag',
-        'criminalized'
+        'criminalized',
+        'possessed'
     ];
 }
