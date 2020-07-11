@@ -95,12 +95,16 @@ class PlayerView extends Component {
                 players: [this.state.firstResult],
                 action: action,
                 showVotables: true,
-                submittedText: "Thank you! See the votes/actions below!"
+                submittedText: "Thank you! See the votes/actions below!",
+                choices: [],
+                showSubmit: false
             })
         } else {
             this.setState({
                 action: action,
-                showVotables: true
+                showVotables: true,
+                choices: [],
+                showSubmit: false
             });
         }
     }
