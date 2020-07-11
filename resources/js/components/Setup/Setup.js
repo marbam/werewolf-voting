@@ -234,21 +234,25 @@ class Setup extends Component {
                 </div>
                 <br/>
                 <div className="row">
-                    <h4>Selected Roles {this.state.selectedRoles.length ? '('+this.state.selectedRoles.length+')' : null}</h4>
-                    <table>
-                        <tbody>
-                            {this.state.selectedRoles.map((role, index) =>
-                                <tr key={index}>
-                                    <td>{role.name}</td>
-                                    <td><button type="button" onClick={() => this.removeSelected(index)}>Remove</button></td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                    <br/>
-                    {this.state.selectedRoles.length <= 7 ? null :
-                        <button type="button" onClick={this.assignRoles}>Assign Roles to Players</button>
-                    }
+                    <div className="col-md-12">
+                        <h4>Selected Roles {this.state.selectedRoles.length ? '('+this.state.selectedRoles.length+')' : null}</h4>
+                    </div>
+                    <div className="col-md-12">
+                        <table>
+                            <tbody>
+                                {this.state.selectedRoles.map((role, index) =>
+                                    <tr key={index}>
+                                        <td>{role.name}</td>
+                                        <td><button type="button" onClick={() => this.removeSelected(index)}>Remove</button></td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                        <br/>
+                        {this.state.selectedRoles.length <= 7 ? null :
+                            <button type="button" onClick={this.assignRoles}>Assign Roles to Players</button>
+                        }
+                    </div>
                 </div>
             </div>
         );

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import './ModView.css';
 
 class ModView extends Component {
     constructor() {
@@ -175,7 +176,7 @@ class ModView extends Component {
     }
 
     render() {
-        let votingTable = <table>
+        let votingTable = <table className="table">
             <thead>
                 <tr>
                     <td>Voter</td>
@@ -195,7 +196,8 @@ class ModView extends Component {
         </table>
 
 
-        let accusationTotalsTable = !this.state.accusationTotals.length ? null :<table>
+        let accusationTotalsTable = !this.state.accusationTotals.length ? null :
+        <table className="table">
             <thead>
                 <tr>
                     <td>Name</td>
@@ -214,7 +216,8 @@ class ModView extends Component {
             </tbody>
         </table>
 
-        let ballotOutcomes = !this.state.ballotActions.length ? null :<table>
+        let ballotOutcomes = !this.state.ballotActions.length ? null :
+        <table className="table">
             <thead>
                 <tr>
                     <td>Name</td>
@@ -233,21 +236,21 @@ class ModView extends Component {
 
         return (
             <div className="container">
-                <table>
+                <table className="table">
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Role</th>
                             <th>M</th>
                             <th>C</th>
-                            <th>Alive</th>
-                            <th>Minion</th>
-                            <th>Criminalized</th>
-                            <th>Guarded</th>
-                            <th>Farmer Curse</th>
-                            <th>Necromancer Curse</th>
-                            <th>Hag Curse</th>
-                            <th>Possessed</th>
+                            <th className="centre-text">Alive</th>
+                            <th className="centre-text">Minion</th>
+                            <th className="centre-text">Criminalized</th>
+                            <th className="centre-text">Guarded</th>
+                            <th className="centre-text">Farmer Curse</th>
+                            <th className="centre-text">Necromancer Curse</th>
+                            <th className="centre-text">Hag Curse</th>
+                            <th className="centre-text">Possessed</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -260,42 +263,58 @@ class ModView extends Component {
                                     ? "✓" : null}
                                 </td>
                                 <td>
-                                    <button onClick={() => this.changeStatus(index, 'alive')}>
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={() => this.changeStatus(index, 'alive')}>
                                         {player.alive ? 'Alive' : 'Dead'}
                                     </button>
                                 </td>
                                 <td>
-                                    <button onClick={() => this.changeStatus(index, 'minion')}>
+                                    <button
+                                        className="btn btn-secondary centre-td"
+                                        onClick={() => this.changeStatus(index, 'minion')}>
                                         {player.minion ? 'Minion' : 'x'}
                                     </button>
                                 </td>
                                 <td>
-                                    <button onClick={() => this.changeStatus(index, 'criminalized')}>
+                                    <button
+                                        className="btn btn-secondary centre-td"
+                                        onClick={() => this.changeStatus(index, 'criminalized')}>
                                         {player.criminalized ? 'Criminalized' : 'x'}
                                     </button>
                                 </td>
                                 <td>
-                                    <button onClick={() => this.changeStatus(index, 'guarded')}>
+                                    <button
+                                        className="btn btn-secondary centre-td"
+                                        onClick={() => this.changeStatus(index, 'guarded')}>
                                         {player.guarded ? 'Guarded' : 'x'}
                                     </button>
                                 </td>
                                 <td>
-                                    <button onClick={() => this.changeStatus(index, 'cursed_farmer')}>
+                                    <button
+                                        className="btn btn-secondary centre-td"
+                                        onClick={() => this.changeStatus(index, 'cursed_farmer')}>
                                         {player.cursed_farmer ? 'Monster Curse' : 'x'}
                                     </button>
                                 </td>
                                 <td>
-                                    <button onClick={() => this.changeStatus(index, 'cursed_necromancer')}>
+                                    <button
+                                        className="btn btn-secondary centre-td"
+                                        onClick={() => this.changeStatus(index, 'cursed_necromancer')}>
                                         {player.cursed_necromancer ? 'Necromancer Curse' : 'x'}
                                     </button>
                                 </td>
                                 <td>
-                                    <button onClick={() => this.changeStatus(index, 'cursed_hag')}>
+                                    <button
+                                        className="btn btn-secondary centre-td"
+                                        onClick={() => this.changeStatus(index, 'cursed_hag')}>
                                         {player.cursed_hag ? 'Bewitched' : 'x'}
                                     </button>
                                 </td>
                                 <td>
-                                    <button onClick={() => this.changeStatus(index, 'possessed')}>
+                                    <button
+                                        className="btn btn-secondary centre-td"
+                                        onClick={() => this.changeStatus(index, 'possessed')}>
                                         {player.possessed ? 'Possessed' : 'x'}
                                     </button>
                                 </td>
@@ -303,16 +322,30 @@ class ModView extends Component {
                         )}
                     </tbody>
                 </table>
-                <button onClick={this.newAccusations}>New Accusations</button>
-                <button onClick={this.grabLastAccusations}>{this.state.recallAccusationsText}</button>
-                {this.state.accusationsUrl ? <p>Share This Accusations Link with Players: {this.state.accusationsUrl}</p> : null}
-                {!this.state.accusationsUrl ? null : <button onClick={this.refreshAccusations}
-                                                  disabled={this.state.refreshingAccusations}
-                                          >
-                                              {this.state.refreshButtonText}
-                                          </button>
+                <button
+                    className="btn btn-primary right-marg"
+                    onClick={this.newAccusations}
+                >
+                    New Accusations
+                </button>
+                <button
+                    className="btn btn-primary"
+                    onClick={this.grabLastAccusations}
+                >
+                    {this.state.recallAccusationsText}
+                </button>
+                {this.state.accusationsUrl ? <p>Share This Accusations Link with Players: <strong>{this.state.accusationsUrl}</strong></p> : null}
+                {!this.state.accusationsUrl ? null : <button
+                                                        className="btn btn-primary"
+                                                        onClick={this.refreshAccusations}
+                                                        disabled={this.state.refreshingAccusations}
+                                                    >
+                                                        {this.state.refreshButtonText}
+                                                    </button>
                 }
+                {!this.state.accusationsUrl ? null : <h4>Listing of who is voting for who:</h4>}
                 {!this.state.accusationsUrl ? null : votingTable}
+                {accusationTotalsTable ? <h4>Listing of votes by target:</h4> : null}
                 {accusationTotalsTable}
                 {!this.state.accusationsComplete ? null :
                     <div>

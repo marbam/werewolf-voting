@@ -394,9 +394,9 @@ class ModController extends Controller
                 'type' => 'Ballot',
             ]);
             $round_id = $round->id;
-            $data = $addedData['request']->all();
+            $voteData = $addedData['request']->all();
 
-            foreach ($data as $player) {
+            foreach ($voteData as $player) {
                 if ($player['on_ballot']) {
                     Nominee::create([
                         'round_id' => $round_id,
@@ -406,12 +406,17 @@ class ModController extends Controller
             }
         } else {
             $round_id = $addedData['round_id'];
-            $data = $addedData['accusation_votes'];
+            $voteData = $addedData['accusation_votes']['byNominee'];
         }
 
+        $cityInGame = Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                            ->where('game_id', $game_id)
+                            ->whereIn('alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'merchant'])
+                            ->pluck('players.id')->toArray();
+
         $voters = [];
-        foreach ($data as $player) {
-            if (!$player['on_ballot']) {
+        foreach ($voteData as $player) {
+            if (!$player['on_ballot'] || in_array($player['id'], $cityInGame)) {
                 $voter = [
                     'id' => $player['id'],
                     'name' => $player['name'],
@@ -424,7 +429,7 @@ class ModController extends Controller
 
         if ($addedData['type'] != 'new') {
             $votes = Action::where('round_id', $round_id)
-                           ->get();
+            ->get();
 
             $players = Player::join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
                 ->where('game_id', $game_id)
@@ -559,13 +564,13 @@ class ModController extends Controller
             // preacher checks
             // if the preacher is alive and the person to be burned is city, return a tie.
             $city_ids = $players->whereIn('alias', ['Lawyer', 'Mayor', 'Merchant', 'Preacher', 'Seducer'])->pluck('id')->toArray();
-            if (in_array($burning_ids, $city_ids)) {
+            if (in_array($burning_ids[0], $city_ids)) {
                 return "DRAW";
             }
 
             // if the preacher has signalled the highest player, return a tie
             $preacher_success = $actions->where('action_type', 'PREACHER_SIGNALS')
-                              ->where('nominee_id', $burning_ids)
+                              ->where('nominee_id', $burning_ids[0])
                               ->count();
 
             if ($preacher_success) {

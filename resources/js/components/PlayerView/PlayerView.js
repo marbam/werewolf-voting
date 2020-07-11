@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import './PlayerView.css';
 
 class PlayerView extends Component {
     constructor() {
@@ -180,9 +181,14 @@ class PlayerView extends Component {
     }
 
     render() {
-        let initialHeading = <h4>Who are you?</h4>;
+        let initialHeading = <h4>Who are you?</h4>
         let initialCheck = this.state.players.map((player, index) =>
-            <button key={index} onClick={() => this.completeInitial(index)}>{player.name}</button>
+            <button className="btn btn-dark right-marg"
+                    key={index}
+                    onClick={() => this.completeInitial(index)}
+            >
+                {player.name}
+            </button>
         )
 
         let doubleHeading = <h4>Type it (with Capitals) to confirm!</h4>
@@ -190,13 +196,20 @@ class PlayerView extends Component {
                             value={this.enteredName}
                             onChange={this.updateName}
                             ></input>;
-        let nameSubmit = <button onClick={this.completeDouble}>Confirm!</button>;
+        let nameSubmit = <button
+                            className="btn btn-primary left-marg"
+                            onClick={this.completeDouble}>Confirm!
+                        </button>;
 
         // We'll populate this further when we get to the two moon stuff!
         let optionHeading = <h4>Hi, {this.state.enteredName}! What action will you take?</h4>
         let options = <p>Your Options:
             {this.state.myActionOptions.map((option, index) =>
-                <button key={index} onClick={() => this.setOption(option)}>
+                <button
+                    className="btn btn-dark right-marg"
+                    key={index}
+                    onClick={() => this.setOption(option)}
+                >
                     {option.description}
                 </button>
             )}
@@ -207,12 +220,21 @@ class PlayerView extends Component {
         let nominees = this.state.players.filter(player => {return player.isNominee});
 
         let votables = nominees.map((player, index) =>
-            <button key={index} onClick={() => this.selectChoices(player)}>
+            <button
+                className="btn btn-secondary left-marg"
+                key={index}
+                onClick={() => this.selectChoices(player)}
+            >
                 {player.name}
             </button>
         )
 
+        let choiceListing = this.state.choices.map((player, index) =>
+            <li>{player.name}</li>
+        )
+
         let submitButton = <button
+                            className="btn btn-primary left-marg"
                             onClick={this.submitChoice}
                             disabled={this.state.disableSubmit}
                            >
@@ -221,7 +243,7 @@ class PlayerView extends Component {
 
         let spyTable = null;
         if (this.state.spyData.length) {
-            spyTable = <table>
+            spyTable = <table className="table">
                 <thead>
                     <tr>
                         <td>Player</td>
@@ -252,7 +274,12 @@ class PlayerView extends Component {
                     spyTable
                 }
                 {!this.state.showSpyData ? null :
-                    <button onClick={this.doSpyStuff}>Refresh</button>
+                    <button
+                        className="btn btn-primary"
+                        onClick={this.doSpyStuff}
+                    >
+                        Refresh
+                    </button>
                 }
             </div>
         }
@@ -269,6 +296,8 @@ class PlayerView extends Component {
                 {this.state.showOptions ? options : null}
                 {this.state.showVotables ? votingHeading : null}
                 {this.state.showVotables ? votables : null}
+                {this.state.choices.length ? <h4>You have selected:</h4> : null}
+                {this.state.choices.length ? choiceListing : null}
                 {this.state.showSubmit ? <br/> : null}
                 {this.state.showSubmit ? submitButton : null}
             </div>

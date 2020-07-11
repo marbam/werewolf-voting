@@ -1,0 +1,12 @@
+.centre-td {
+    display: block;
+    margin: auto;
+}
+
+.centre-text {
+    text-align: center;
+}
+
+.right-marg {
+    margin-right: 5px;
+}
