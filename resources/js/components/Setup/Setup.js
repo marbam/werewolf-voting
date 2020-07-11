@@ -179,62 +179,81 @@ class Setup extends Component {
         return (
             <div className="container">
                 <div className="row justify-content-center">
-                    <div className="col-md-8">
+                    <div className="col-md-12">
                         <label>Number of Players:</label>
                         <button onClick={() => this.addRemovePlayer('minus')}>-</button>
                         <input value={this.state.playerCount} onChange={this.updatePlayerCount}></input>
                         <button onClick={() => this.addRemovePlayer('add')}>+</button>
                     </div>
-                    <h4>Player / Role List</h4>
-                    {this.state.players.map((player, index) =>
-                        <PlayerRow
-                            key={index}
-                            index={index}
-                            name={player.name}
-                            selectedRole={player.roleId}
-                            roles={this.state.roles}
-                            nameC={this.changeName}
-                            roleC={this.changeRole}
-                        >
-                        </PlayerRow>
+                    <div className="col-md-12">
+                        <h4>Player / Role List</h4>
+                        {this.state.players.map((player, index) =>
+                            <PlayerRow
+                                key={index}
+                                index={index}
+                                name={player.name}
+                                selectedRole={player.roleId}
+                                roles={this.state.roles}
+                                nameC={this.changeName}
+                                roleC={this.changeRole}
+                            >
+                            </PlayerRow>
+                        )}
+                    </div>
+                    <div>
+                        { this.state.showError ?
+                            <p style={{color: 'red'}}>Please ensure all players have a name and a role!</p>
+                            : null
+                        }
+                    </div>
+                    <div>
+                        <button className="btn btn-primary" type="button" onClick={this.save}>Ready to go!</button>
+                    </div>
+                </div>
+                <br/>
+                <div className="row justify-content-center">
+                    <div>
+                        <h4>Speedy Input</h4>
+                        <label>Enter names separated with a comma: </label>
+                        <input
+                            value={this.state.playerNames}
+                            onChange={(event) => {this.setState({playerNames: event.target.value})}}
+                        ></input>
+                        { this.state.playerNames.length < 20 ? null :
+                            <button onClick={this.assignToPlayers}>Assign Names to Players</button>
+                        }
+                        <br/>
+                    </div>
+                </div>
+
+                <div className="row">
+                    <h4>Selectable Roles</h4>
+                    {this.state.roles.map((role, index) =>
+                        <button type="button" key={index} onClick={() => this.selectRole(index)}>{role.name}</button>
                     )}
                 </div>
-                { this.state.showError ?
-                    <p style={{color: 'red'}}>Please ensure all players have a name and a role!</p>
-                    : null
-                }
-                <button type="button" onClick={this.save}>Ready to go!</button>
-                <hr/>
-                <h4>Speedy Input</h4>
-                <label>Enter names separated with a comma: </label>
-                <input
-                    value={this.state.playerNames}
-                    onChange={(event) => {this.setState({playerNames: event.target.value})}}
-                    ></input>
-                { this.state.playerNames.length < 20 ? null :
-                    <button onClick={this.assignToPlayers}>Assign Names to Players</button>
-                }
                 <br/>
-                <h4>Selectable Roles</h4>
-                {this.state.roles.map((role, index) =>
-                    <button type="button" key={index} onClick={() => this.selectRole(index)}>{role.name}</button>
-                    )}
-                <br/>
-                <h4>Selected Roles {this.state.selectedRoles.length ? '('+this.state.selectedRoles.length+')' : null}</h4>
-                <table>
-                    <tbody>
-                        {this.state.selectedRoles.map((role, index) =>
-                            <tr key={index}>
-                                <td>{role.name}</td>
-                                <td><button type="button" onClick={() => this.removeSelected(index)}>Remove</button></td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-                <br/>
-                {this.state.selectedRoles.length <= 7 ? null :
-                    <button type="button" onClick={this.assignRoles}>Assign Roles to Players</button>
-                }
+                <div className="row">
+                    <div className="col-md-12">
+                        <h4>Selected Roles {this.state.selectedRoles.length ? '('+this.state.selectedRoles.length+')' : null}</h4>
+                    </div>
+                    <div className="col-md-12">
+                        <table>
+                            <tbody>
+                                {this.state.selectedRoles.map((role, index) =>
+                                    <tr key={index}>
+                                        <td>{role.name}</td>
+                                        <td><button type="button" onClick={() => this.removeSelected(index)}>Remove</button></td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                        <br/>
+                        {this.state.selectedRoles.length <= 7 ? null :
+                            <button type="button" onClick={this.assignRoles}>Assign Roles to Players</button>
+                        }
+                    </div>
+                </div>
             </div>
         );
     }
