@@ -66599,7 +66599,12 @@ var ModView = /*#__PURE__*/function (_Component) {
           roundId: response.data.general.roundId,
           accusationsUrl: response.data.general.url,
           accusations_outcomes: response.data.byVoter,
-          accusationTotals: response.data.byNominee
+          accusationTotals: response.data.byNominee,
+          accusationsComplete: false,
+          ballotActions: [],
+          ballotRound: null,
+          ballotUrl: '',
+          ballotFeedback: null
         });
       });
     }
@@ -66821,7 +66826,7 @@ var ModView = /*#__PURE__*/function (_Component) {
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.newAccusations
-      }, "New Accusations"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Generate New Accusations"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
         onClick: this.grabLastAccusations
       }, this.state.recallAccusationsText), this.state.accusationsUrl ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share This Accusations Link with Players: ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, this.state.accusationsUrl)) : null, !this.state.accusationsUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66829,12 +66834,16 @@ var ModView = /*#__PURE__*/function (_Component) {
         onClick: this.refreshAccusations,
         disabled: this.state.refreshingAccusations
       }, this.state.refreshButtonText), !this.state.accusationsUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Listing of who is voting for who:"), !this.state.accusationsUrl ? null : votingTable, accusationTotalsTable ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Listing of votes by target:") : null, accusationTotalsTable, !this.state.accusationsComplete ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        className: "btn btn-primary right-marg",
         onClick: this.generateBallot
-      }, "Generate Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Generate New Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        className: "btn btn-primary right-marg",
         onClick: this.recallLastBallot
       }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        className: "btn btn-primary right-marg",
         onClick: this.refreshBallot
       }, "Refresh Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        className: "btn btn-primary right-marg",
         onClick: this.showBallotOutcome
       }, "Show Outcome"), !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Outcome is guidance only and doesn't take Jesters etc into account!"), this.state.ballotFeedback));
     }
@@ -67201,6 +67210,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
 
       if (this.state.submitted) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, this.state.submittedText), !this.state.showSpyData ? null : spyTable, !this.state.showSpyData ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          className: "btn btn-primary",
           onClick: this.doSpyStuff
         }, "Refresh"));
       }

@@ -67,9 +67,17 @@ class ModView extends Component {
                 accusationsUrl: response.data.general.url,
                 accusations_outcomes: response.data.byVoter,
                 accusationTotals: response.data.byNominee,
+                accusationsComplete: false,
+                ballotActions: [],
+                ballotRound: null,
+                ballotUrl: '',
+                ballotFeedback: null
+
             });
         })
     }
+
+
 
     refreshAccusations() {
         this.setState({
@@ -326,7 +334,7 @@ class ModView extends Component {
                     className="btn btn-primary right-marg"
                     onClick={this.newAccusations}
                 >
-                    New Accusations
+                    Generate New Accusations
                 </button>
                 <button
                     className="btn btn-primary"
@@ -349,12 +357,32 @@ class ModView extends Component {
                 {accusationTotalsTable}
                 {!this.state.accusationsComplete ? null :
                     <div>
-                        <button onClick={this.generateBallot}>Generate Ballot</button>
-                        <button onClick={this.recallLastBallot}>Recall Most Recent Ballot</button>
+                        <button
+                            className="btn btn-primary right-marg"
+                            onClick={this.generateBallot}
+                        >
+                            Generate New Ballot
+                        </button>
+                        <button
+                            className="btn btn-primary right-marg"
+                            onClick={this.recallLastBallot}
+                        >
+                            Recall Most Recent Ballot
+                        </button>
                         {!this.state.ballotUrl ? null : <p>Share Ballot Link with Players: {this.state.ballotUrl}</p> }
                         {ballotOutcomes}
-                        <button onClick={this.refreshBallot}>Refresh Ballot</button>
-                        <button onClick={this.showBallotOutcome}>Show Outcome</button>
+                        <button
+                            className="btn btn-primary right-marg"
+                            onClick={this.refreshBallot}
+                        >
+                            Refresh Ballot
+                        </button>
+                        <button
+                            className="btn btn-primary right-marg"
+                            onClick={this.showBallotOutcome}
+                        >
+                            Show Outcome
+                        </button>
                         {!this.state.ballotFeedback ? null : <p>Outcome is guidance only and doesn't take Jesters etc into account!</p>}
                         {this.state.ballotFeedback}
                     </div>
