@@ -37,7 +37,7 @@ Route::post('/who_burns', 'ModController@getBurn');
 // Routes for Player View
 Route::post('/get_accusable', 'PlayerController@getAccusable');
 Route::post('/get_actions', 'PlayerController@getActionOptions');
-Route::post('/submit_action/{game_id}/{round_id}', 'PlayerController@submitAction');
+Route::post('/submit_action/{game_id}/{round_id}', 'PlayerController@submitAction'); // leave additionals in
 Route::post('/get_spy_data', 'PlayerController@getSpyTable');
 
 // Role-call Route
