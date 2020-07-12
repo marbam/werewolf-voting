@@ -10,3 +10,8 @@
 .right-marg {
     margin-right: 5px;
 }
+
+.killed {
+    text-decoration: line-through;
+    background-color:#b6b8b6;
+}

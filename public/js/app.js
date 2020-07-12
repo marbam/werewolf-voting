@@ -6341,7 +6341,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".centre-td {\n    display: block;\n    margin: auto;\n}\n\n.centre-text {\n    text-align: center;\n}\n\n.right-marg {\n    margin-right: 5px;\n}\n", ""]);
+exports.push([module.i, ".centre-td {\n    display: block;\n    margin: auto;\n}\n\n.centre-text {\n    text-align: center;\n}\n\n.right-marg {\n    margin-right: 5px;\n}\n\n.killed {\n    text-decoration: line-through;\n    background-color:#b6b8b6;\n}", ""]);
 
 // exports
 
@@ -66802,7 +66802,8 @@ var ModView = /*#__PURE__*/function (_Component) {
         className: "centre-text"
       }, "Possessed"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
-          key: index
+          key: index,
+          className: "".concat(player.alive ? null : "killed")
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.mystic ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.corrupt || player.cursed_farmer || player.cursed_necromancer || player.cursed_hag ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary",
           onClick: function onClick() {

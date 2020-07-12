@@ -294,7 +294,7 @@ class ModView extends Component {
                     </thead>
                     <tbody>
                         {this.state.players.map((player, index) =>
-                            <tr key={index}>
+                            <tr key={index} className={`${player.alive ? null : "killed"}`}>
                                 <td>{player.name}</td>
                                 <td>{player.role}</td>
                                 <td>{player.mystic ? "✓" : null}</td>
