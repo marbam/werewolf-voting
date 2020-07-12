@@ -32,7 +32,7 @@ class Setup extends Component {
     }
 
     componentDidMount() {
-        axios.get('api/get_roles').then(response => {
+        axios.post('api/get_roles').then(response => {
             this.setState({
               roles: response.data
             })

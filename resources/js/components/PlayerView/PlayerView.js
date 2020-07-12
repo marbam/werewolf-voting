@@ -34,9 +34,12 @@ class PlayerView extends Component {
     }
 
     componentDidMount() {
-        let game_id = this.props.game_id;
-        let round_id = this.props.round_id;
-        axios.get('/api/get_accusable/'+game_id+'/'+round_id).then(response => {
+        let payload = {
+            game_id: this.props.game_id,
+            round_id: this.props.round_id
+        }
+
+        axios.post('/api/get_accusable', payload).then(response => {
             this.setState({
               players: response.data
             })

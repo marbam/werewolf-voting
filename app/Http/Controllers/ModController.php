@@ -16,9 +16,11 @@ class ModController extends Controller
         return view('modView', ['game_id' => $game->id]);
     }
 
-    public function getPlayers($gameId)
+    public function getPlayers(Request $request)
     {
-        return Player::where('game_id', $gameId)
+        $game_id = $request->game_id;
+
+        return Player::where('game_id', $game_id)
                          ->join('roles', 'players.allocated_role_id', '=', 'roles.id')
                          ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
                          ->get([
@@ -283,18 +285,21 @@ class ModController extends Controller
         return $results;
     }
 
-    public function newAccusations($game_id)
+    public function newAccusations(Request $request)
     {
-        return $this->combinedAccusations($game_id, ['new' => 1]);
+        return $this->combinedAccusations($request->game_id, ['new' => 1]);
     }
 
-    public function refreshAccusations($game_id, Round $round)
+    public function refreshAccusations(Request $request)
     {
+        $game_id = $request->game_id;
+        $round = Round::findOrFail($request->round_id);
         return $this->combinedAccusations($game_id, ['round' => $round]);
     }
 
-    public function recallAccusations($game_id)
+    public function recallAccusations(Request $request)
     {
+        $game_id = $request->game_id;
         $round = Round::where([
             'game_id' => $game_id,
             'type' => 'Accusations',
@@ -355,8 +360,10 @@ class ModController extends Controller
         return $this->getBallot($game_id, $addedData);
     }
 
-    public function recallLastBallot($game_id)
+    public function recallLastBallot(Request $request)
     {
+        $game_id = $request->game_id;
+
         $round_id = Round::where([
             'game_id' => $game_id,
             'type' => 'Ballot',
@@ -373,8 +380,11 @@ class ModController extends Controller
         return $this->getBallot($game_id, $addedData);
     }
 
-    public function refreshVoteCounts($game_id, $round_id)
+    public function refreshVoteCounts(Request $request)
     {
+        $game_id = $request->game_id;
+        $round_id = $request->round_id;
+
         $accusations_round = Round::where([
             'game_id' => $game_id,
             'type' => 'Accusations'
@@ -463,8 +473,11 @@ class ModController extends Controller
         ];
     }
 
-    public function getBurn($game_id, $round_id)
+    public function getBurn(Request $request)
     {
+        $game_id = $request->game_id;
+        $round_id = $request->round_id;
+
         $players = Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
                          ->join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
                          ->where('players.game_id', $game_id)

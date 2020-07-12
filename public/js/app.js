@@ -66563,7 +66563,10 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios.get('/api/get_players/' + this.props.game_id).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id
+      };
+      axios.post('/api/get_players/', payload).then(function (response) {
         _this2.setState({
           players: response.data
         });
@@ -66593,7 +66596,10 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function newAccusations() {
       var _this4 = this;
 
-      axios.get('/api/new_accusations/' + this.props.game_id).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id
+      };
+      axios.post('/api/new_accusations/', payload).then(function (response) {
         _this4.setState({
           roundType: response.data.general.roundType,
           roundId: response.data.general.roundId,
@@ -66617,7 +66623,11 @@ var ModView = /*#__PURE__*/function (_Component) {
         refreshingAccusations: true,
         refreshButtonText: 'Refreshing...'
       });
-      axios.get('/api/refresh_accusations/' + this.props.game_id + '/' + this.state.roundId).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.state.roundId
+      };
+      axios.post('/api/refresh_accusations', payload).then(function (response) {
         _this5.setState({
           accusations_outcomes: response.data.byVoter,
           accusationTotals: response.data.byNominee,
@@ -66633,7 +66643,10 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function grabLastAccusations() {
       var _this6 = this;
 
-      axios.get('/api/recall_accusations/' + this.props.game_id).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id
+      };
+      axios.post('/api/recall_accusations/', payload).then(function (response) {
         if (response.data == "NO PREVIOUS") {
           _this6.setState({
             recallAccusationsText: "No Previous!"
@@ -66690,8 +66703,11 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function refreshBallot() {
       var _this8 = this;
 
-      var url = '/api/refresh_ballot/' + this.props.game_id + '/' + this.state.ballotRound;
-      axios.get(url).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.state.ballotRound
+      };
+      axios.post('/api/refresh_ballot', payload).then(function (response) {
         _this8.setState({
           ballotRound: response.data.roundId,
           ballotActions: response.data.voters,
@@ -66704,8 +66720,10 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function recallLastBallot() {
       var _this9 = this;
 
-      var url = '/api/recall_last_ballot/' + this.props.game_id;
-      axios.get(url).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id
+      };
+      axios.post('/api/recall_last_ballot', payload).then(function (response) {
         _this9.setState({
           ballotRound: response.data.roundId,
           ballotActions: response.data.voters,
@@ -66718,9 +66736,12 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function showBallotOutcome() {
       var _this10 = this;
 
-      var url = '/api/who_burns/' + this.props.game_id + '/' + this.state.ballotRound;
-      axios.get(url).then(function (response) {
-        var feedback = 'test';
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.state.ballotRound
+      };
+      axios.post('/api/who_burns', payload).then(function (response) {
+        var feedback = null;
 
         if (response.data == "DRAW") {
           feedback = "The village is undecided";
@@ -66839,7 +66860,7 @@ var ModView = /*#__PURE__*/function (_Component) {
       }, "Generate New Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.recallLastBallot
-      }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, this.state.ballotUrl)), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.refreshBallot
       }, "Refresh Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66978,9 +66999,11 @@ var PlayerView = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      var game_id = this.props.game_id;
-      var round_id = this.props.round_id;
-      axios.get('/api/get_accusable/' + game_id + '/' + round_id).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.props.round_id
+      };
+      axios.post('/api/get_accusable', payload).then(function (response) {
         _this2.setState({
           players: response.data
         });
@@ -67304,7 +67327,10 @@ var RoleCall = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios.get('/api/role_call/' + this.props.game_id).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id
+      };
+      axios.post('/api/role_call/', payload).then(function (response) {
         _this2.setState({
           players: response.data
         });
@@ -67328,7 +67354,9 @@ var RoleCall = /*#__PURE__*/function (_Component) {
         onClick: this.showListing
       }, "I'm a spectator!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.showListing
-      }, "The game is over!")) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Role"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, key) {
+      }, "The game is over!")) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
+        className: "table"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Role"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, key) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: key
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role));
@@ -67494,7 +67522,7 @@ var Setup = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios.get('api/get_roles').then(function (response) {
+      axios.post('api/get_roles').then(function (response) {
         _this2.setState({
           roles: response.data
         });

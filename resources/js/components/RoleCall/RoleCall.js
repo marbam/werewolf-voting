@@ -12,7 +12,12 @@ class RoleCall extends Component {
     }
 
     componentDidMount() {
-        axios.get('/api/role_call/'+this.props.game_id).then(response => {
+
+        let payload = {
+            game_id: this.props.game_id
+        };
+
+        axios.post('/api/role_call/', payload).then(response => {
             this.setState({
               players: response.data
             })
@@ -37,7 +42,7 @@ class RoleCall extends Component {
                     <button onClick={this.showListing}>The game is over!</button>
                 </div>
             : <div>
-                <table>
+                <table className="table">
                     <thead>
                         <tr>
                             <td>Name</td>

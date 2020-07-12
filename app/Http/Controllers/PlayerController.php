@@ -37,8 +37,11 @@ class PlayerController extends Controller
         ]);
     }
 
-    public function getAccusable(Game $game, Round $round)
+    public function getAccusable(Request $request)
     {
+        $game = Game::findOrFail($request->game_id);
+        $round = Round::findOrFail($request->round_id);
+
         $players = Player::where('game_id', $game->id)
                         ->join('roles', 'players.allocated_role_id', '=', 'roles.id')
                         ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
@@ -141,10 +144,10 @@ class PlayerController extends Controller
         ]);
     }
 
-    public function getRoleCall($game_id)
+    public function getRoleCall(Request $request)
     {
         return Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
-                         ->where('players.game_id', $game_id)
+                         ->where('players.game_id', $request->game_id)
                          ->get(['players.name', 'roles.name as role'])->toArray();
     }
 
