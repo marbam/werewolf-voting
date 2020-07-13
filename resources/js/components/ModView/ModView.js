@@ -214,6 +214,29 @@ class ModView extends Component {
         })
     }
 
+    deleteAccusationAction(result, roundId) {
+
+        let payload = {
+            round_id: roundId,
+            voter_id: result.voter_id
+        }
+
+        axios.post('/api/delete_action', payload).then(response => {
+            alert('deleted! (update shortly)');
+        });
+    }
+
+    deleteBallotAction(result, roundId) {
+        let payload = {
+            round_id: roundId,
+            voter_id: result.id
+        }
+
+        axios.post('/api/delete_action', payload).then(response => {
+            alert('deleted! (update shortly)');
+        });
+    }
+
     render() {
         let votingTable = <table className="table">
             <thead>
@@ -221,6 +244,7 @@ class ModView extends Component {
                     <td>Voter</td>
                     <td>Chose</td>
                     <td>Type</td>
+                    <td>Options</td>
                 </tr>
             </thead>
             <tbody>
@@ -229,6 +253,11 @@ class ModView extends Component {
                         <td>{result.voter}</td>
                         <td>{result.chose}</td>
                         <td>{result.type}</td>
+                        <td>{result.voter_id ? <button
+                                className="btn btn-sm btn-danger"
+                                onClick={() => this.deleteAccusationAction(result, this.state.roundId)}>Delete
+                            </button> : null}
+                        </td>
                     </tr>
                 )}
             </tbody>
@@ -261,6 +290,7 @@ class ModView extends Component {
                 <tr>
                     <td>Name</td>
                     <td>Voted For</td>
+                    <td>Options</td>
                 </tr>
             </thead>
             <tbody>
@@ -268,6 +298,12 @@ class ModView extends Component {
                     <tr key={index}>
                         <td>{result.name}</td>
                         <td>{result.voted_for_name}</td>
+                        <td>
+                            {result.voted_for_id ? <button
+                                className="btn btn-sm btn-danger"
+                                onClick={() => this.deleteBallotAction(result, this.state.ballotRound)}>Delete
+                            </button> : null}
+                        </td>
                     </tr>
                 )}
             </tbody>
