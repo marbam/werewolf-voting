@@ -67095,7 +67095,14 @@ var PlayerView = /*#__PURE__*/function (_Component) {
   }, {
     key: "setOption",
     value: function setOption(action) {
-      if (action.alias == "SPY_SIGNAL") {
+      if (action.alias != "SPY_SIGNAL" && action.alias != "LAWYER_SIGNAL") {
+        this.setState({
+          action: action,
+          showVotables: true,
+          choices: [],
+          showSubmit: false
+        });
+      } else if (action.alias == "SPY_SIGNAL") {
         this.setState({
           players: [this.state.firstResult],
           action: action,
@@ -67104,8 +67111,13 @@ var PlayerView = /*#__PURE__*/function (_Component) {
           choices: [],
           showSubmit: false
         });
-      } else {
+      } else if (action.alias == "LAWYER_SIGNAL") {
+        var myId = this.state.firstResult.id;
+        var noLawyer = this.state.players.filter(function (player) {
+          return player.id != myId;
+        });
         this.setState({
+          players: noLawyer,
           action: action,
           showVotables: true,
           choices: [],

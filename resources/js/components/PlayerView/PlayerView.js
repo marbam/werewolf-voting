@@ -93,7 +93,15 @@ class PlayerView extends Component {
     }
 
     setOption(action) {
-        if (action.alias == "SPY_SIGNAL") {
+
+        if (action.alias != "SPY_SIGNAL" && action.alias != "LAWYER_SIGNAL") {
+            this.setState({
+                action: action,
+                showVotables: true,
+                choices: [],
+                showSubmit: false
+            });
+        } else if (action.alias == "SPY_SIGNAL") {
             this.setState({
                 players: [this.state.firstResult],
                 action: action,
@@ -102,8 +110,13 @@ class PlayerView extends Component {
                 choices: [],
                 showSubmit: false
             })
-        } else {
+        } else if (action.alias == "LAWYER_SIGNAL") {
+
+            let myId = this.state.firstResult.id;
+            let noLawyer = this.state.players.filter(player => {return player.id != myId});
+
             this.setState({
+                players: noLawyer,
                 action: action,
                 showVotables: true,
                 choices: [],
