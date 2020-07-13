@@ -1,8 +1,17 @@
 .left-marg {
     margin-left: 5px;
+    margin-top: 2px;
 }
 
-
 .right-marg {
+    margin-right: 5px;
+    margin-top: 2px;
+}
+
+.top-marg {
+    margin-top: 10px;
+}
+
+.shift-right {
     margin-right: 5px;
 }

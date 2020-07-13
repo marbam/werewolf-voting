@@ -35,7 +35,12 @@ class ModView extends Component {
     }
 
     componentDidMount() {
-        axios.get('/api/get_players/'+this.props.game_id).then(response => {
+
+        let payload = {
+            game_id: this.props.game_id
+        };
+
+        axios.post('/api/get_players/', payload).then(response => {
             this.setState({
               players: response.data
             })
@@ -60,7 +65,12 @@ class ModView extends Component {
     }
 
     newAccusations() {
-        axios.get('/api/new_accusations/'+this.props.game_id).then(response => {
+
+        let payload = {
+            game_id: this.props.game_id
+        };
+
+        axios.post('/api/new_accusations/', payload).then(response => {
             this.setState({
                 roundType: response.data.general.roundType,
                 roundId: response.data.general.roundId,
@@ -85,7 +95,12 @@ class ModView extends Component {
             refreshButtonText: 'Refreshing...'
         })
 
-        axios.get('/api/refresh_accusations/'+this.props.game_id+'/'+this.state.roundId).then(response => {
+        let payload = {
+            game_id: this.props.game_id,
+            round_id: this.state.roundId
+        }
+
+        axios.post('/api/refresh_accusations', payload).then(response => {
             this.setState({
                 accusations_outcomes: response.data.byVoter,
                 accusationTotals: response.data.byNominee,
@@ -98,7 +113,12 @@ class ModView extends Component {
     }
 
     grabLastAccusations() {
-        axios.get('/api/recall_accusations/'+this.props.game_id).then(response => {
+
+        let payload = {
+            game_id: this.props.game_id
+        }
+
+        axios.post('/api/recall_accusations/', payload).then(response => {
             if (response.data == "NO PREVIOUS") {
                 this.setState({
                     recallAccusationsText: "No Previous!"
@@ -147,8 +167,12 @@ class ModView extends Component {
     }
 
     refreshBallot() {
-        let url = '/api/refresh_ballot/'+this.props.game_id+'/'+this.state.ballotRound;
-        axios.get(url).then(response => {
+        let payload =  {
+            game_id: this.props.game_id,
+            round_id: this.state.ballotRound
+        }
+
+        axios.post('/api/refresh_ballot', payload).then(response => {
             this.setState({
                 ballotRound: response.data.roundId,
                 ballotActions: response.data.voters,
@@ -158,8 +182,11 @@ class ModView extends Component {
     }
 
     recallLastBallot() {
-        let url = '/api/recall_last_ballot/'+this.props.game_id;
-        axios.get(url).then(response => {
+        let payload = {
+            game_id: this.props.game_id
+        }
+
+        axios.post('/api/recall_last_ballot', payload).then(response => {
             this.setState({
                 ballotRound: response.data.roundId,
                 ballotActions: response.data.voters,
@@ -169,9 +196,13 @@ class ModView extends Component {
     }
 
     showBallotOutcome() {
-        let url = '/api/who_burns/'+this.props.game_id+'/'+this.state.ballotRound;
-        axios.get(url).then(response => {
-            let feedback = 'test';
+        let payload = {
+            game_id: this.props.game_id,
+            round_id: this.state.ballotRound
+        }
+
+        axios.post('/api/who_burns', payload).then(response => {
+            let feedback = null;
             if (response.data == "DRAW") {
                 feedback = "The village is undecided";
             } else {
@@ -263,7 +294,7 @@ class ModView extends Component {
                     </thead>
                     <tbody>
                         {this.state.players.map((player, index) =>
-                            <tr key={index}>
+                            <tr key={index} className={`${player.alive ? null : "killed"}`}>
                                 <td>{player.name}</td>
                                 <td>{player.role}</td>
                                 <td>{player.mystic ? "✓" : null}</td>
@@ -369,7 +400,7 @@ class ModView extends Component {
                         >
                             Recall Most Recent Ballot
                         </button>
-                        {!this.state.ballotUrl ? null : <p>Share Ballot Link with Players: {this.state.ballotUrl}</p> }
+                        {!this.state.ballotUrl ? null : <p>Share Ballot Link with Players: <strong>{this.state.ballotUrl}</strong></p> }
                         {ballotOutcomes}
                         <button
                             className="btn btn-primary right-marg"

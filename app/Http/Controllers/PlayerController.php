@@ -12,6 +12,10 @@ use App\Nominee;
 use App\ActionType;
 use App\PlayerStatus;
 
+use App\Http\Requests\GameValidator;
+use App\Http\Requests\GameRoundValidator;
+use App\Http\Requests\PlayerRoundRoleValidator;
+
 class PlayerController extends Controller
 {
 
@@ -37,8 +41,15 @@ class PlayerController extends Controller
         ]);
     }
 
-    public function getAccusable(Game $game, Round $round)
+    public function getAccusable(GameRoundValidator $request)
     {
+        $game = Game::findOrFail($request->game_id);
+        $round = Round::findOrFail($request->round_id);
+
+        if ($round->game_id != $game->id) {
+            abort(404);
+        }
+
         $players = Player::where('game_id', $game->id)
                         ->join('roles', 'players.allocated_role_id', '=', 'roles.id')
                         ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
@@ -70,7 +81,7 @@ class PlayerController extends Controller
         return abort(404);
     }
 
-    public function getActionOptions(Request $request)
+    public function getActionOptions(PlayerRoundRoleValidator $request)
     {
         $data = $request->all();
         $round = Round::find($data['round_id']);
@@ -141,14 +152,14 @@ class PlayerController extends Controller
         ]);
     }
 
-    public function getRoleCall($game_id)
+    public function getRoleCall(GameValidator $request)
     {
         return Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
-                         ->where('players.game_id', $game_id)
+                         ->where('players.game_id', $request->game_id)
                          ->get(['players.name', 'roles.name as role'])->toArray();
     }
 
-    public function getSpyTable(Request $request)
+    public function getSpyTable(GameRoundValidator $request)
     {
         $r = $request->all();
         $data = app(ModController::class)->getData($r['round_id'], $r['game_id']);

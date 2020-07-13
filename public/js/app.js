@@ -6341,7 +6341,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".centre-td {\n    display: block;\n    margin: auto;\n}\n\n.centre-text {\n    text-align: center;\n}\n\n.right-marg {\n    margin-right: 5px;\n}\n", ""]);
+exports.push([module.i, ".centre-td {\n    display: block;\n    margin: auto;\n}\n\n.centre-text {\n    text-align: center;\n}\n\n.right-marg {\n    margin-right: 5px;\n}\n\n.killed {\n    text-decoration: line-through;\n    background-color:#b6b8b6;\n}", ""]);
 
 // exports
 
@@ -6360,7 +6360,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".left-marg {\n    margin-left: 5px;\n}\n\n\n.right-marg {\n    margin-right: 5px;\n}\n", ""]);
+exports.push([module.i, ".left-marg {\n    margin-left: 5px;\n    margin-top: 2px;\n}\n\n.right-marg {\n    margin-right: 5px;\n    margin-top: 2px;\n}\n\n.top-marg {\n    margin-top: 10px;\n}\n\n.shift-right {\n    margin-right: 5px;\n}", ""]);
 
 // exports
 
@@ -66563,7 +66563,10 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios.get('/api/get_players/' + this.props.game_id).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id
+      };
+      axios.post('/api/get_players/', payload).then(function (response) {
         _this2.setState({
           players: response.data
         });
@@ -66593,7 +66596,10 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function newAccusations() {
       var _this4 = this;
 
-      axios.get('/api/new_accusations/' + this.props.game_id).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id
+      };
+      axios.post('/api/new_accusations/', payload).then(function (response) {
         _this4.setState({
           roundType: response.data.general.roundType,
           roundId: response.data.general.roundId,
@@ -66617,7 +66623,11 @@ var ModView = /*#__PURE__*/function (_Component) {
         refreshingAccusations: true,
         refreshButtonText: 'Refreshing...'
       });
-      axios.get('/api/refresh_accusations/' + this.props.game_id + '/' + this.state.roundId).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.state.roundId
+      };
+      axios.post('/api/refresh_accusations', payload).then(function (response) {
         _this5.setState({
           accusations_outcomes: response.data.byVoter,
           accusationTotals: response.data.byNominee,
@@ -66633,7 +66643,10 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function grabLastAccusations() {
       var _this6 = this;
 
-      axios.get('/api/recall_accusations/' + this.props.game_id).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id
+      };
+      axios.post('/api/recall_accusations/', payload).then(function (response) {
         if (response.data == "NO PREVIOUS") {
           _this6.setState({
             recallAccusationsText: "No Previous!"
@@ -66690,8 +66703,11 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function refreshBallot() {
       var _this8 = this;
 
-      var url = '/api/refresh_ballot/' + this.props.game_id + '/' + this.state.ballotRound;
-      axios.get(url).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.state.ballotRound
+      };
+      axios.post('/api/refresh_ballot', payload).then(function (response) {
         _this8.setState({
           ballotRound: response.data.roundId,
           ballotActions: response.data.voters,
@@ -66704,8 +66720,10 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function recallLastBallot() {
       var _this9 = this;
 
-      var url = '/api/recall_last_ballot/' + this.props.game_id;
-      axios.get(url).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id
+      };
+      axios.post('/api/recall_last_ballot', payload).then(function (response) {
         _this9.setState({
           ballotRound: response.data.roundId,
           ballotActions: response.data.voters,
@@ -66718,9 +66736,12 @@ var ModView = /*#__PURE__*/function (_Component) {
     value: function showBallotOutcome() {
       var _this10 = this;
 
-      var url = '/api/who_burns/' + this.props.game_id + '/' + this.state.ballotRound;
-      axios.get(url).then(function (response) {
-        var feedback = 'test';
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.state.ballotRound
+      };
+      axios.post('/api/who_burns', payload).then(function (response) {
+        var feedback = null;
 
         if (response.data == "DRAW") {
           feedback = "The village is undecided";
@@ -66781,7 +66802,8 @@ var ModView = /*#__PURE__*/function (_Component) {
         className: "centre-text"
       }, "Possessed"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
-          key: index
+          key: index,
+          className: "".concat(player.alive ? null : "killed")
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.mystic ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.corrupt || player.cursed_farmer || player.cursed_necromancer || player.cursed_hag ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary",
           onClick: function onClick() {
@@ -66839,7 +66861,7 @@ var ModView = /*#__PURE__*/function (_Component) {
       }, "Generate New Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.recallLastBallot
-      }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", this.state.ballotUrl), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, this.state.ballotUrl)), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.refreshBallot
       }, "Refresh Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66978,9 +67000,11 @@ var PlayerView = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      var game_id = this.props.game_id;
-      var round_id = this.props.round_id;
-      axios.get('/api/get_accusable/' + game_id + '/' + round_id).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.props.round_id
+      };
+      axios.post('/api/get_accusable', payload).then(function (response) {
         _this2.setState({
           players: response.data
         });
@@ -67155,7 +67179,9 @@ var PlayerView = /*#__PURE__*/function (_Component) {
           }
         }, player.name);
       });
-      var doubleHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Type it (with Capitals) to confirm!");
+      var doubleHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", {
+        className: "top-marg"
+      }, "Great! Please type your name exactly as it appears in the button to check it's you!");
       var doubleCheck = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         value: this.enteredName,
         onChange: this.updateName
@@ -67166,7 +67192,9 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       }, "Confirm!"); // We'll populate this further when we get to the two moon stuff!
 
       var optionHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Hi, ", this.state.enteredName, "! What action will you take?");
-      var options = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your Options:", this.state.myActionOptions.map(function (option, index) {
+      var options = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "shift-right"
+      }, "Your Options:"), this.state.myActionOptions.map(function (option, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-dark right-marg",
           key: index,
@@ -67221,11 +67249,13 @@ var PlayerView = /*#__PURE__*/function (_Component) {
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container"
-      }, this.state.showInitialCheck ? initialHeading : null, this.state.showInitialCheck ? initialCheck : null, this.state.showDoubleCheck ? doubleHeading : null, this.state.showDoubleCheck ? doubleCheck : null, this.state.showDoubleCheck && this.state.enteredName.length > 2 ? nameSubmit : null, !this.state.showSelectError ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+      }, this.state.showInitialCheck ? initialHeading : null, this.state.showInitialCheck ? initialCheck : null, this.state.showDoubleCheck ? doubleHeading : null, this.state.showDoubleCheck ? doubleCheck : null, this.state.showDoubleCheck && this.state.enteredName.length >= 2 ? nameSubmit : null, !this.state.showSelectError ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
         style: {
           color: "red"
         }
-      }, "The name you have entered doesn't match!"), this.state.showOptions ? optionHeading : null, this.state.showOptions ? options : null, this.state.showVotables ? votingHeading : null, this.state.showVotables ? votables : null, this.state.choices.length ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "You have selected:") : null, this.state.choices.length ? choiceListing : null, this.state.showSubmit ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null) : null, this.state.showSubmit ? submitButton : null);
+      }, "The name you have entered doesn't match!"), this.state.showOptions ? optionHeading : null, this.state.showOptions ? options : null, this.state.showVotables ? votingHeading : null, this.state.showVotables ? votables : null, this.state.choices.length ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", {
+        className: "top-marg"
+      }, "You have selected:") : null, this.state.choices.length ? choiceListing : null, this.state.showSubmit ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null) : null, this.state.showSubmit ? submitButton : null);
     }
   }]);
 
@@ -67304,7 +67334,10 @@ var RoleCall = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios.get('/api/role_call/' + this.props.game_id).then(function (response) {
+      var payload = {
+        game_id: this.props.game_id
+      };
+      axios.post('/api/role_call/', payload).then(function (response) {
         _this2.setState({
           players: response.data
         });
@@ -67328,7 +67361,9 @@ var RoleCall = /*#__PURE__*/function (_Component) {
         onClick: this.showListing
       }, "I'm a spectator!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.showListing
-      }, "The game is over!")) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Role"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, key) {
+      }, "The game is over!")) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
+        className: "table"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Role"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, key) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: key
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role));
@@ -67494,7 +67529,7 @@ var Setup = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios.get('api/get_roles').then(function (response) {
+      axios.post('api/get_roles').then(function (response) {
         _this2.setState({
           roles: response.data
         });
