@@ -67799,7 +67799,7 @@ var Setup = /*#__PURE__*/function (_Component) {
             return _this3.removeSelected(index);
           }
         }, "Remove")));
-      }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), this.state.selectedRoles.length <= 7 ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), this.state.selectedRoles.length < 5 ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "button",
         onClick: this.assignRoles
       }, "Assign Roles to Players"))));
