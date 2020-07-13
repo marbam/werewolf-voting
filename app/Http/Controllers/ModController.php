@@ -531,7 +531,9 @@ class ModController extends Controller
         }
 
         // Seducer's votes are always halved and rounded up.
-        $seducer = $players->where('alias', 'seducer')->first();
+        $seducer = $players->where('alias', 'seducer')
+                           ->where('minion', 0)
+                           ->first();
         if ($seducer && isset($totals[$seducer->id])) {
             $id = $seducer->id;
             $number_of_votes = $totals[$id];
@@ -541,7 +543,10 @@ class ModController extends Controller
         }
 
         // The merchant receives one fewer vote for every other city player alive on both rounds of voting.
-        $merchant = $players->where('alias', 'merchant')->first();
+        $merchant = $players->where('alias', 'merchant')
+                            ->where('minion', 0)
+                            ->first();
+
         if ($merchant && isset($totals[$merchant->id])) {
             $subtract_votes = $players->whereIn('alias', ['lawyer', 'mayor', 'preacher', 'seducer'])
                                       ->where('minion', 0)
