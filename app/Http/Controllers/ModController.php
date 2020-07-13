@@ -564,7 +564,7 @@ class ModController extends Controller
             if ($target->mystic || $target->shadow || $target->minion || $target->possessed) {
                 foreach($totals as $key => $count) {
                     if ($key != $target_id) {
-                        $totals[$id] = 0;
+                        $totals[$key] = 0;
                     }
                 }
             }
