@@ -66755,12 +66755,22 @@ var ModView = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
-    key: "deleteAction",
-    value: function deleteAction(result, roundId, index) {
-      console.log(this.state.accusations_outcomes);
+    key: "deleteAccusationAction",
+    value: function deleteAccusationAction(result, roundId) {
       var payload = {
         round_id: roundId,
         voter_id: result.voter_id
+      };
+      axios.post('/api/delete_action', payload).then(function (response) {
+        alert('deleted! (update shortly)');
+      });
+    }
+  }, {
+    key: "deleteBallotAction",
+    value: function deleteBallotAction(result, roundId) {
+      var payload = {
+        round_id: roundId,
+        voter_id: result.id
       };
       axios.post('/api/delete_action', payload).then(function (response) {
         alert('deleted! (update shortly)');
@@ -66779,7 +66789,7 @@ var ModView = /*#__PURE__*/function (_Component) {
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voter), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.chose), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.type), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voter_id ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-sm btn-danger",
           onClick: function onClick() {
-            return _this11.deleteAction(result, _this11.state.roundId, index);
+            return _this11.deleteAccusationAction(result, _this11.state.roundId);
           }
         }, "Delete") : null));
       })));
@@ -66792,10 +66802,15 @@ var ModView = /*#__PURE__*/function (_Component) {
       })));
       var ballotOutcomes = !this.state.ballotActions.length ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
         className: "table"
-      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voted For"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.ballotActions.map(function (result, index) {
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Voted For"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Options"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.ballotActions.map(function (result, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: index
-        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voted_for_name));
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voted_for_name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voted_for_id ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          className: "btn btn-sm btn-danger",
+          onClick: function onClick() {
+            return _this11.deleteBallotAction(result, _this11.state.ballotRound);
+          }
+        }, "Delete") : null));
       })));
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container"

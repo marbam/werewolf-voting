@@ -446,7 +446,6 @@ class ModController extends Controller
             }
         }
 
-
         if ($addedData['type'] != 'new') {
             $votes = Action::where('round_id', $round_id)
             ->get();

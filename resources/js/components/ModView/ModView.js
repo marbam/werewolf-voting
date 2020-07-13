@@ -214,8 +214,7 @@ class ModView extends Component {
         })
     }
 
-    deleteAction(result, roundId, index) {
-        console.log(this.state.accusations_outcomes);
+    deleteAccusationAction(result, roundId) {
 
         let payload = {
             round_id: roundId,
@@ -225,7 +224,17 @@ class ModView extends Component {
         axios.post('/api/delete_action', payload).then(response => {
             alert('deleted! (update shortly)');
         });
+    }
 
+    deleteBallotAction(result, roundId) {
+        let payload = {
+            round_id: roundId,
+            voter_id: result.id
+        }
+
+        axios.post('/api/delete_action', payload).then(response => {
+            alert('deleted! (update shortly)');
+        });
     }
 
     render() {
@@ -246,7 +255,7 @@ class ModView extends Component {
                         <td>{result.type}</td>
                         <td>{result.voter_id ? <button
                                 className="btn btn-sm btn-danger"
-                                onClick={() => this.deleteAction(result, this.state.roundId, index)}>Delete
+                                onClick={() => this.deleteAccusationAction(result, this.state.roundId)}>Delete
                             </button> : null}
                         </td>
                     </tr>
@@ -281,6 +290,7 @@ class ModView extends Component {
                 <tr>
                     <td>Name</td>
                     <td>Voted For</td>
+                    <td>Options</td>
                 </tr>
             </thead>
             <tbody>
@@ -288,6 +298,12 @@ class ModView extends Component {
                     <tr key={index}>
                         <td>{result.name}</td>
                         <td>{result.voted_for_name}</td>
+                        <td>
+                            {result.voted_for_id ? <button
+                                className="btn btn-sm btn-danger"
+                                onClick={() => this.deleteBallotAction(result, this.state.ballotRound)}>Delete
+                            </button> : null}
+                        </td>
                     </tr>
                 )}
             </tbody>
