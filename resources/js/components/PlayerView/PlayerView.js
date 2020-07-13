@@ -198,7 +198,9 @@ class PlayerView extends Component {
             </button>
         )
 
-        let doubleHeading = <h4>Type it (with Capitals) to confirm!</h4>
+        let doubleHeading = <h4 className="top-marg">
+            Great! Please type your name exactly as it appears in the button to check it's you!
+        </h4>
         let doubleCheck = <input
                             value={this.enteredName}
                             onChange={this.updateName}
@@ -210,7 +212,7 @@ class PlayerView extends Component {
 
         // We'll populate this further when we get to the two moon stuff!
         let optionHeading = <h4>Hi, {this.state.enteredName}! What action will you take?</h4>
-        let options = <p>Your Options:
+        let options = <p><span className="shift-right">Your Options:</span>
             {this.state.myActionOptions.map((option, index) =>
                 <button
                     className="btn btn-dark right-marg"
@@ -297,13 +299,13 @@ class PlayerView extends Component {
                 {this.state.showInitialCheck ? initialCheck : null}
                 {this.state.showDoubleCheck ? doubleHeading : null}
                 {this.state.showDoubleCheck ? doubleCheck : null}
-                {this.state.showDoubleCheck && this.state.enteredName.length > 2 ? nameSubmit : null}
+                {this.state.showDoubleCheck && this.state.enteredName.length >= 2 ? nameSubmit : null}
                 {!this.state.showSelectError ? null : <p style={{color:"red"}}>The name you have entered doesn't match!</p> }
                 {this.state.showOptions ? optionHeading : null}
                 {this.state.showOptions ? options : null}
                 {this.state.showVotables ? votingHeading : null}
                 {this.state.showVotables ? votables : null}
-                {this.state.choices.length ? <h4>You have selected:</h4> : null}
+                {this.state.choices.length ? <h4 className="top-marg">You have selected:</h4> : null}
                 {this.state.choices.length ? choiceListing : null}
                 {this.state.showSubmit ? <br/> : null}
                 {this.state.showSubmit ? submitButton : null}

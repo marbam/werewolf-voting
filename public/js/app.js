@@ -6360,7 +6360,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".left-marg {\n    margin-left: 5px;\n}\n\n\n.right-marg {\n    margin-right: 5px;\n}\n", ""]);
+exports.push([module.i, ".left-marg {\n    margin-left: 5px;\n    margin-top: 2px;\n}\n\n.right-marg {\n    margin-right: 5px;\n    margin-top: 2px;\n}\n\n.top-marg {\n    margin-top: 10px;\n}\n\n.shift-right {\n    margin-right: 5px;\n}", ""]);
 
 // exports
 
@@ -67179,7 +67179,9 @@ var PlayerView = /*#__PURE__*/function (_Component) {
           }
         }, player.name);
       });
-      var doubleHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Type it (with Capitals) to confirm!");
+      var doubleHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", {
+        className: "top-marg"
+      }, "Great! Please type your name exactly as it appears in the button to check it's you!");
       var doubleCheck = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         value: this.enteredName,
         onChange: this.updateName
@@ -67190,7 +67192,9 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       }, "Confirm!"); // We'll populate this further when we get to the two moon stuff!
 
       var optionHeading = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Hi, ", this.state.enteredName, "! What action will you take?");
-      var options = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your Options:", this.state.myActionOptions.map(function (option, index) {
+      var options = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "shift-right"
+      }, "Your Options:"), this.state.myActionOptions.map(function (option, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-dark right-marg",
           key: index,
@@ -67245,11 +67249,13 @@ var PlayerView = /*#__PURE__*/function (_Component) {
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container"
-      }, this.state.showInitialCheck ? initialHeading : null, this.state.showInitialCheck ? initialCheck : null, this.state.showDoubleCheck ? doubleHeading : null, this.state.showDoubleCheck ? doubleCheck : null, this.state.showDoubleCheck && this.state.enteredName.length > 2 ? nameSubmit : null, !this.state.showSelectError ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+      }, this.state.showInitialCheck ? initialHeading : null, this.state.showInitialCheck ? initialCheck : null, this.state.showDoubleCheck ? doubleHeading : null, this.state.showDoubleCheck ? doubleCheck : null, this.state.showDoubleCheck && this.state.enteredName.length >= 2 ? nameSubmit : null, !this.state.showSelectError ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
         style: {
           color: "red"
         }
-      }, "The name you have entered doesn't match!"), this.state.showOptions ? optionHeading : null, this.state.showOptions ? options : null, this.state.showVotables ? votingHeading : null, this.state.showVotables ? votables : null, this.state.choices.length ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "You have selected:") : null, this.state.choices.length ? choiceListing : null, this.state.showSubmit ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null) : null, this.state.showSubmit ? submitButton : null);
+      }, "The name you have entered doesn't match!"), this.state.showOptions ? optionHeading : null, this.state.showOptions ? options : null, this.state.showVotables ? votingHeading : null, this.state.showVotables ? votables : null, this.state.choices.length ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", {
+        className: "top-marg"
+      }, "You have selected:") : null, this.state.choices.length ? choiceListing : null, this.state.showSubmit ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null) : null, this.state.showSubmit ? submitButton : null);
     }
   }]);
 
