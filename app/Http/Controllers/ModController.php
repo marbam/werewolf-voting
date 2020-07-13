@@ -70,7 +70,7 @@ class ModController extends Controller
         // setup votes array:
         $outcomes = [];
         foreach ($players as $key => $name) {
-            $outcomes[$key] = ['voter' => $name, 'chose' => 'Waiting...', 'type' => ''];
+            $outcomes[$key] = ['voter_id' => null, 'voter' => $name, 'chose' => 'Waiting...', 'type' => ''];
         }
 
         foreach ($actions as $action) {
@@ -82,6 +82,7 @@ class ModController extends Controller
             $action_type = str_replace("_", " ", $action_type);
             $action_type = ucwords($action_type);
             $outcomes[$action->voter_id]['type'] = $action_type;
+            $outcomes[$action->voter_id]['voter_id'] = $action->voter_id;
         }
 
         // If we're returning the data for a spy, trim it down so you can't see who is doing what.
@@ -603,5 +604,12 @@ class ModController extends Controller
             $player = Player::find($burning_ids)->first();
             return [$highest, $player];
         }
+    }
+
+    public function deleteAction(Request $request)
+    {
+        Action::where('round_id', $request->round_id)
+              ->where('voter_id', $request->voter_id)
+              ->delete();
     }
 }

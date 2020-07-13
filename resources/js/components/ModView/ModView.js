@@ -214,6 +214,20 @@ class ModView extends Component {
         })
     }
 
+    deleteAction(result, roundId, index) {
+        console.log(this.state.accusations_outcomes);
+
+        let payload = {
+            round_id: roundId,
+            voter_id: result.voter_id
+        }
+
+        axios.post('/api/delete_action', payload).then(response => {
+            alert('deleted! (update shortly)');
+        });
+
+    }
+
     render() {
         let votingTable = <table className="table">
             <thead>
@@ -221,6 +235,7 @@ class ModView extends Component {
                     <td>Voter</td>
                     <td>Chose</td>
                     <td>Type</td>
+                    <td>Options</td>
                 </tr>
             </thead>
             <tbody>
@@ -229,6 +244,11 @@ class ModView extends Component {
                         <td>{result.voter}</td>
                         <td>{result.chose}</td>
                         <td>{result.type}</td>
+                        <td>{result.voter_id ? <button
+                                className="btn btn-sm btn-danger"
+                                onClick={() => this.deleteAction(result, this.state.roundId, index)}>Delete
+                            </button> : null}
+                        </td>
                     </tr>
                 )}
             </tbody>

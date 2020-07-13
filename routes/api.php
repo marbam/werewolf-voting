@@ -33,6 +33,7 @@ Route::post('/generate_ballot/{gameId}', 'ModController@getNewBallot');
 Route::post('/refresh_ballot', 'ModController@refreshVoteCounts');
 Route::post('/recall_last_ballot', 'ModController@recallLastBallot');
 Route::post('/who_burns', 'ModController@getBurn');
+Route::post('/delete_action', 'ModController@deleteAction');
 
 // Routes for Player View
 Route::post('/get_accusable', 'PlayerController@getAccusable');
