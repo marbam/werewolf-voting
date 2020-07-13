@@ -67014,7 +67014,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       showSubmit: false,
       submittingText: "Submit to Mod!",
       submitted: false,
-      submittedText: "Your feedback has been received! You can now close the window and get back to the game!",
+      submittedText: "Your feedback has been received! You can now close the window and get back to the game. <br/> If you've refreshed and voted again, your initial vote has been overridden. Please let the mod know you've updated your choice!",
       disableSubmit: false,
       spyData: [],
       showSpyData: false
