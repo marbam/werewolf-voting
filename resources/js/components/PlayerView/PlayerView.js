@@ -21,7 +21,10 @@ class PlayerView extends Component {
             showSubmit: false,
             submittingText : "Submit to Mod!",
             submitted: false,
-            submittedText: "Your feedback has been received! You can now close the window and get back to the game. (If you've refreshed and voted again, your initial vote has been overridden. Please let the mod know you've updated your choice)",
+            submittedText: <div>
+                <p>Your feedback has been received! You can now close the window and get back to the game.</p>
+                <p>(If you've refreshed and voted again, your initial vote has been overridden. Please let the mod know you've updated your choice)</p>
+            </div>,
             disableSubmit: false,
             spyData: [],
             showSpyData: false
@@ -106,7 +109,7 @@ class PlayerView extends Component {
                 players: [this.state.firstResult],
                 action: action,
                 showVotables: true,
-                submittedText: "Thank you! See the votes/actions below!",
+                submittedText: <div><p>Thank you! See the votes/actions below!</p></div>,
                 choices: [],
                 showSubmit: false
             })
@@ -194,7 +197,10 @@ class PlayerView extends Component {
         axios.post('/api/get_spy_data/', payload).then(response => {
             this.setState({
                 showSpyData: true,
-                submittedText: "Thanks for the signal, All accusation actions are below. Sparing hit the Refresh Button to update!",
+                submittedText: <div>
+                    <p>Thanks for the signal, All accusation actions are below</p>
+                    <p>Sparing hit the Refresh Button to update!</p>
+                </div>,
                 spyData: response.data
             })
         })
@@ -291,7 +297,7 @@ class PlayerView extends Component {
 
         if (this.state.submitted) {
             return <div>
-                <p>{this.state.submittedText}</p>
+                {this.state.submittedText}
                 {!this.state.showSpyData ? null :
                     spyTable
                 }

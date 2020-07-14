@@ -67014,7 +67014,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       showSubmit: false,
       submittingText: "Submit to Mod!",
       submitted: false,
-      submittedText: "Your feedback has been received! You can now close the window and get back to the game. <br/> If you've refreshed and voted again, your initial vote has been overridden. Please let the mod know you've updated your choice!",
+      submittedText: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your feedback has been received! You can now close the window and get back to the game."), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "(If you've refreshed and voted again, your initial vote has been overridden. Please let the mod know you've updated your choice)")),
       disableSubmit: false,
       spyData: [],
       showSpyData: false
@@ -67107,7 +67107,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
           players: [this.state.firstResult],
           action: action,
           showVotables: true,
-          submittedText: "Thank you! See the votes/actions below!",
+          submittedText: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Thank you! See the votes/actions below!")),
           choices: [],
           showSubmit: false
         });
@@ -67203,7 +67203,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       axios.post('/api/get_spy_data/', payload).then(function (response) {
         _this5.setState({
           showSpyData: true,
-          submittedText: "Thanks for the signal, All accusation actions are below. Sparing hit the Refresh Button to update!",
+          submittedText: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Thanks for the signal, All accusation actions are below"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Sparing hit the Refresh Button to update!")),
           spyData: response.data
         });
       });
@@ -67285,7 +67285,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       }
 
       if (this.state.submitted) {
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, this.state.submittedText), !this.state.showSpyData ? null : spyTable, !this.state.showSpyData ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, this.state.submittedText, !this.state.showSpyData ? null : spyTable, !this.state.showSpyData ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-primary",
           onClick: this.doSpyStuff
         }, "Refresh"));
