@@ -31,12 +31,14 @@ class PlayerView extends Component {
         };
         this.updateName = this.updateName.bind(this);
         this.completeDouble = this.completeDouble.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
         this.setOption = this.setOption.bind(this);
         this.submitChoice = this.submitChoice.bind(this);
         this.doSpyStuff = this.doSpyStuff.bind(this);
     }
 
     componentDidMount() {
+        document.addEventListener("keydown", this.handleKeyDown);
         let payload = {
             game_id: this.props.game_id,
             round_id: this.props.round_id
@@ -47,6 +49,18 @@ class PlayerView extends Component {
               players: response.data
             })
         })
+    }
+
+    handleKeyDown(event) {
+        if (event.keyCode == 13) {
+            if (this.state.showDoubleCheck && this.state.enteredName.length >= 2) {
+                this.completeDouble()
+            }
+        }
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("keydown", this._handleKeyDown);
     }
 
     completeInitial(index) {

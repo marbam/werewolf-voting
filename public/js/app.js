@@ -67021,6 +67021,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
     };
     _this.updateName = _this.updateName.bind(_assertThisInitialized(_this));
     _this.completeDouble = _this.completeDouble.bind(_assertThisInitialized(_this));
+    _this.handleKeyDown = _this.handleKeyDown.bind(_assertThisInitialized(_this));
     _this.setOption = _this.setOption.bind(_assertThisInitialized(_this));
     _this.submitChoice = _this.submitChoice.bind(_assertThisInitialized(_this));
     _this.doSpyStuff = _this.doSpyStuff.bind(_assertThisInitialized(_this));
@@ -67032,6 +67033,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
+      document.addEventListener("keydown", this.handleKeyDown);
       var payload = {
         game_id: this.props.game_id,
         round_id: this.props.round_id
@@ -67041,6 +67043,20 @@ var PlayerView = /*#__PURE__*/function (_Component) {
           players: response.data
         });
       });
+    }
+  }, {
+    key: "handleKeyDown",
+    value: function handleKeyDown(event) {
+      if (event.keyCode == 13) {
+        if (this.state.showDoubleCheck && this.state.enteredName.length >= 2) {
+          this.completeDouble();
+        }
+      }
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      document.removeEventListener("keydown", this._handleKeyDown);
     }
   }, {
     key: "completeInitial",
