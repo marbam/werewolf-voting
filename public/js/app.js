@@ -67277,7 +67277,9 @@ var PlayerView = /*#__PURE__*/function (_Component) {
         }, player.name);
       });
       var choiceListing = this.state.choices.map(function (player, index) {
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", null, player.name);
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
+          key: index
+        }, player.name);
       });
       var submitButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary left-marg",

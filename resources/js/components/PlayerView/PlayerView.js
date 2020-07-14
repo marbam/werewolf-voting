@@ -272,7 +272,7 @@ class PlayerView extends Component {
         )
 
         let choiceListing = this.state.choices.map((player, index) =>
-            <li>{player.name}</li>
+            <li key={index}>{player.name}</li>
         )
 
         let submitButton = <button
