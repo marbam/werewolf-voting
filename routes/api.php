@@ -28,12 +28,12 @@ Route::post('/change_player_status', 'ModController@updatePlayerStatus');
 Route::post('/new_accusations', 'ModController@newAccusations');
 Route::post('/refresh_accusations', 'ModController@refreshAccusations');
 Route::post('/recall_accusations', 'ModController@recallAccusations');
-// Route::get('/get_accusation_totals/{gameId}/{roundId}/', 'ModController@getAccusationResults');
 Route::post('/generate_ballot/{gameId}', 'ModController@getNewBallot');
 Route::post('/refresh_ballot', 'ModController@refreshVoteCounts');
 Route::post('/recall_last_ballot', 'ModController@recallLastBallot');
 Route::post('/who_burns', 'ModController@getBurn');
 Route::post('/delete_action', 'ModController@deleteAction');
+Route::post('/close_ballot', 'ModController@closeBallot');
 
 // Routes for Player View
 Route::post('/get_accusable', 'PlayerController@getAccusable');

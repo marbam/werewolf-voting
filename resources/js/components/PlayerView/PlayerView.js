@@ -21,19 +21,24 @@ class PlayerView extends Component {
             showSubmit: false,
             submittingText : "Submit to Mod!",
             submitted: false,
-            submittedText: "Your feedback has been received! You can now close the window and get back to the game!",
+            submittedText: <div>
+                <p>Your feedback has been received! You can now close the window and get back to the game.</p>
+                <p>(If you've refreshed and voted again, your initial vote has been overridden. Please let the mod know you've updated your choice)</p>
+            </div>,
             disableSubmit: false,
             spyData: [],
             showSpyData: false
         };
         this.updateName = this.updateName.bind(this);
         this.completeDouble = this.completeDouble.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
         this.setOption = this.setOption.bind(this);
         this.submitChoice = this.submitChoice.bind(this);
         this.doSpyStuff = this.doSpyStuff.bind(this);
     }
 
     componentDidMount() {
+        document.addEventListener("keydown", this.handleKeyDown);
         let payload = {
             game_id: this.props.game_id,
             round_id: this.props.round_id
@@ -44,6 +49,18 @@ class PlayerView extends Component {
               players: response.data
             })
         })
+    }
+
+    handleKeyDown(event) {
+        if (event.keyCode == 13) {
+            if (this.state.showDoubleCheck && this.state.enteredName.length >= 2) {
+                this.completeDouble()
+            }
+        }
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("keydown", this._handleKeyDown);
     }
 
     completeInitial(index) {
@@ -93,17 +110,30 @@ class PlayerView extends Component {
     }
 
     setOption(action) {
-        if (action.alias == "SPY_SIGNAL") {
+
+        if (action.alias != "SPY_SIGNAL" && action.alias != "LAWYER_SIGNAL") {
+            this.setState({
+                action: action,
+                showVotables: true,
+                choices: [],
+                showSubmit: false
+            });
+        } else if (action.alias == "SPY_SIGNAL") {
             this.setState({
                 players: [this.state.firstResult],
                 action: action,
                 showVotables: true,
-                submittedText: "Thank you! See the votes/actions below!",
+                submittedText: <div><p>Thank you! See the votes/actions below!</p></div>,
                 choices: [],
                 showSubmit: false
             })
-        } else {
+        } else if (action.alias == "LAWYER_SIGNAL") {
+
+            let myId = this.state.firstResult.id;
+            let noLawyer = this.state.players.filter(player => {return player.id != myId});
+
             this.setState({
+                players: noLawyer,
                 action: action,
                 showVotables: true,
                 choices: [],
@@ -181,7 +211,10 @@ class PlayerView extends Component {
         axios.post('/api/get_spy_data/', payload).then(response => {
             this.setState({
                 showSpyData: true,
-                submittedText: "Thanks for the signal, All accusation actions are below. Sparing hit the Refresh Button to update!",
+                submittedText: <div>
+                    <p>Thanks for the signal, All accusation actions are below</p>
+                    <p>Sparing hit the Refresh Button to update!</p>
+                </div>,
                 spyData: response.data
             })
         })
@@ -239,7 +272,7 @@ class PlayerView extends Component {
         )
 
         let choiceListing = this.state.choices.map((player, index) =>
-            <li>{player.name}</li>
+            <li key={index}>{player.name}</li>
         )
 
         let submitButton = <button
@@ -278,7 +311,7 @@ class PlayerView extends Component {
 
         if (this.state.submitted) {
             return <div>
-                <p>{this.state.submittedText}</p>
+                {this.state.submittedText}
                 {!this.state.showSpyData ? null :
                     spyTable
                 }

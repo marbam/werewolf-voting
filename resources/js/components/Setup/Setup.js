@@ -249,7 +249,7 @@ class Setup extends Component {
                             </tbody>
                         </table>
                         <br/>
-                        {this.state.selectedRoles.length <= 7 ? null :
+                        {this.state.selectedRoles.length < 5 ? null :
                             <button type="button" onClick={this.assignRoles}>Assign Roles to Players</button>
                         }
                     </div>

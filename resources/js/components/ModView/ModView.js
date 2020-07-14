@@ -21,7 +21,8 @@ class ModView extends Component {
             ballotActions: [],
             ballotRound: null,
             ballotUrl: '',
-            ballotFeedback: null
+            ballotFeedback: null,
+            closeBallotText: 'Close Ballot for Voting!'
         };
         this.changeStatus = this.changeStatus.bind(this);
         this.newAccusations = this.newAccusations.bind(this);
@@ -32,6 +33,7 @@ class ModView extends Component {
         this.recallLastBallot = this.recallLastBallot.bind(this);
         this.showBallotOutcome = this.showBallotOutcome.bind(this);
         this.checkAccusationsDone = this.checkAccusationsDone.bind(this);
+        this.closeBallot = this.closeBallot.bind(this);
     }
 
     componentDidMount() {
@@ -237,6 +239,19 @@ class ModView extends Component {
         });
     }
 
+    closeBallot() {
+        let payload = {
+            game_id: this.props.game_id,
+            round_id: this.state.ballotRound
+        }
+
+        axios.post('/api/close_ballot', payload).then(response => {
+            this.setState({
+                closeBallotText: 'Closed!'
+            })
+        });
+    }
+
     render() {
         let votingTable = <table className="table">
             <thead>
@@ -428,7 +443,7 @@ class ModView extends Component {
                             className="btn btn-primary right-marg"
                             onClick={this.generateBallot}
                         >
-                            Generate New Ballot
+                            Generate New Ballot (Closes Accusations for Voting)
                         </button>
                         <button
                             className="btn btn-primary right-marg"
@@ -452,6 +467,11 @@ class ModView extends Component {
                         </button>
                         {!this.state.ballotFeedback ? null : <p>Outcome is guidance only and doesn't take Jesters etc into account!</p>}
                         {this.state.ballotFeedback}
+                        {!this.state.ballotFeedback ? null : <button
+                                                                onClick={this.closeBallot}
+                                                                className="btn btn-primary"
+                                                            >{this.state.closeBallotText}</button>
+                        }
                     </div>
                 }
             </div>

@@ -34,6 +34,10 @@ class PlayerController extends Controller
             abort(404);
         }
 
+        if ($round->completed) {
+            return view('roundClosed');
+        }
+
         return view('playerView',
         [
             'game_id' => $game->id,
@@ -130,17 +134,15 @@ class PlayerController extends Controller
         $alreadySubmitted = Action::where([
             'round_id' => $round_id,
             'voter_id' => $data['voter_id']
-        ])->count();
+        ])->delete();
 
-        if (!$alreadySubmitted) {
-            foreach($data['choices'] as $choice) {
-                Action::insert([
-                    'round_id' => $round_id,
-                    'action_type' => strtoupper($data['action_type']),
-                    'voter_id' => $data['voter_id'],
-                    'nominee_id' => $choice['id'],
-                ]);
-            }
+        foreach ($data['choices'] as $choice) {
+            Action::insert([
+                'round_id' => $round_id,
+                'action_type' => strtoupper($data['action_type']),
+                'voter_id' => $data['voter_id'],
+                'nominee_id' => $choice['id'],
+            ]);
         }
     }
 

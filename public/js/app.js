@@ -66544,7 +66544,8 @@ var ModView = /*#__PURE__*/function (_Component) {
       ballotActions: [],
       ballotRound: null,
       ballotUrl: '',
-      ballotFeedback: null
+      ballotFeedback: null,
+      closeBallotText: 'Close Ballot for Voting!'
     };
     _this.changeStatus = _this.changeStatus.bind(_assertThisInitialized(_this));
     _this.newAccusations = _this.newAccusations.bind(_assertThisInitialized(_this));
@@ -66555,6 +66556,7 @@ var ModView = /*#__PURE__*/function (_Component) {
     _this.recallLastBallot = _this.recallLastBallot.bind(_assertThisInitialized(_this));
     _this.showBallotOutcome = _this.showBallotOutcome.bind(_assertThisInitialized(_this));
     _this.checkAccusationsDone = _this.checkAccusationsDone.bind(_assertThisInitialized(_this));
+    _this.closeBallot = _this.closeBallot.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -66777,9 +66779,24 @@ var ModView = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
+    key: "closeBallot",
+    value: function closeBallot() {
+      var _this11 = this;
+
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.state.ballotRound
+      };
+      axios.post('/api/close_ballot', payload).then(function (response) {
+        _this11.setState({
+          closeBallotText: 'Closed!'
+        });
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
-      var _this11 = this;
+      var _this12 = this;
 
       var votingTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
         className: "table"
@@ -66789,7 +66806,7 @@ var ModView = /*#__PURE__*/function (_Component) {
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voter), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.chose), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.type), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voter_id ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-sm btn-danger",
           onClick: function onClick() {
-            return _this11.deleteAccusationAction(result, _this11.state.roundId);
+            return _this12.deleteAccusationAction(result, _this12.state.roundId);
           }
         }, "Delete") : null));
       })));
@@ -66808,7 +66825,7 @@ var ModView = /*#__PURE__*/function (_Component) {
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voted_for_name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voted_for_id ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-sm btn-danger",
           onClick: function onClick() {
-            return _this11.deleteBallotAction(result, _this11.state.ballotRound);
+            return _this12.deleteBallotAction(result, _this12.state.ballotRound);
           }
         }, "Delete") : null));
       })));
@@ -66839,42 +66856,42 @@ var ModView = /*#__PURE__*/function (_Component) {
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.mystic ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.corrupt || player.cursed_farmer || player.cursed_necromancer || player.cursed_hag ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'alive');
+            return _this12.changeStatus(index, 'alive');
           }
         }, player.alive ? 'Alive' : 'Dead')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'minion');
+            return _this12.changeStatus(index, 'minion');
           }
         }, player.minion ? 'Minion' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'criminalized');
+            return _this12.changeStatus(index, 'criminalized');
           }
         }, player.criminalized ? 'Criminalized' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'guarded');
+            return _this12.changeStatus(index, 'guarded');
           }
         }, player.guarded ? 'Guarded' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'cursed_farmer');
+            return _this12.changeStatus(index, 'cursed_farmer');
           }
         }, player.cursed_farmer ? 'Monster Curse' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'cursed_necromancer');
+            return _this12.changeStatus(index, 'cursed_necromancer');
           }
         }, player.cursed_necromancer ? 'Necromancer Curse' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'cursed_hag');
+            return _this12.changeStatus(index, 'cursed_hag');
           }
         }, player.cursed_hag ? 'Bewitched' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'possessed');
+            return _this12.changeStatus(index, 'possessed');
           }
         }, player.possessed ? 'Possessed' : 'x')));
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66890,7 +66907,7 @@ var ModView = /*#__PURE__*/function (_Component) {
       }, this.state.refreshButtonText), !this.state.accusationsUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Listing of who is voting for who:"), !this.state.accusationsUrl ? null : votingTable, accusationTotalsTable ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Listing of votes by target:") : null, accusationTotalsTable, !this.state.accusationsComplete ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.generateBallot
-      }, "Generate New Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Generate New Ballot (Closes Accusations for Voting)"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.recallLastBallot
       }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, this.state.ballotUrl)), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66899,7 +66916,10 @@ var ModView = /*#__PURE__*/function (_Component) {
       }, "Refresh Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.showBallotOutcome
-      }, "Show Outcome"), !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Outcome is guidance only and doesn't take Jesters etc into account!"), this.state.ballotFeedback));
+      }, "Show Outcome"), !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Outcome is guidance only and doesn't take Jesters etc into account!"), this.state.ballotFeedback, !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.closeBallot,
+        className: "btn btn-primary"
+      }, this.state.closeBallotText)));
     }
   }]);
 
@@ -67014,13 +67034,14 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       showSubmit: false,
       submittingText: "Submit to Mod!",
       submitted: false,
-      submittedText: "Your feedback has been received! You can now close the window and get back to the game!",
+      submittedText: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Your feedback has been received! You can now close the window and get back to the game."), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "(If you've refreshed and voted again, your initial vote has been overridden. Please let the mod know you've updated your choice)")),
       disableSubmit: false,
       spyData: [],
       showSpyData: false
     };
     _this.updateName = _this.updateName.bind(_assertThisInitialized(_this));
     _this.completeDouble = _this.completeDouble.bind(_assertThisInitialized(_this));
+    _this.handleKeyDown = _this.handleKeyDown.bind(_assertThisInitialized(_this));
     _this.setOption = _this.setOption.bind(_assertThisInitialized(_this));
     _this.submitChoice = _this.submitChoice.bind(_assertThisInitialized(_this));
     _this.doSpyStuff = _this.doSpyStuff.bind(_assertThisInitialized(_this));
@@ -67032,6 +67053,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
+      document.addEventListener("keydown", this.handleKeyDown);
       var payload = {
         game_id: this.props.game_id,
         round_id: this.props.round_id
@@ -67041,6 +67063,20 @@ var PlayerView = /*#__PURE__*/function (_Component) {
           players: response.data
         });
       });
+    }
+  }, {
+    key: "handleKeyDown",
+    value: function handleKeyDown(event) {
+      if (event.keyCode == 13) {
+        if (this.state.showDoubleCheck && this.state.enteredName.length >= 2) {
+          this.completeDouble();
+        }
+      }
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      document.removeEventListener("keydown", this._handleKeyDown);
     }
   }, {
     key: "completeInitial",
@@ -67095,17 +67131,29 @@ var PlayerView = /*#__PURE__*/function (_Component) {
   }, {
     key: "setOption",
     value: function setOption(action) {
-      if (action.alias == "SPY_SIGNAL") {
+      if (action.alias != "SPY_SIGNAL" && action.alias != "LAWYER_SIGNAL") {
+        this.setState({
+          action: action,
+          showVotables: true,
+          choices: [],
+          showSubmit: false
+        });
+      } else if (action.alias == "SPY_SIGNAL") {
         this.setState({
           players: [this.state.firstResult],
           action: action,
           showVotables: true,
-          submittedText: "Thank you! See the votes/actions below!",
+          submittedText: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Thank you! See the votes/actions below!")),
           choices: [],
           showSubmit: false
         });
-      } else {
+      } else if (action.alias == "LAWYER_SIGNAL") {
+        var myId = this.state.firstResult.id;
+        var noLawyer = this.state.players.filter(function (player) {
+          return player.id != myId;
+        });
         this.setState({
+          players: noLawyer,
           action: action,
           showVotables: true,
           choices: [],
@@ -67191,7 +67239,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       axios.post('/api/get_spy_data/', payload).then(function (response) {
         _this5.setState({
           showSpyData: true,
-          submittedText: "Thanks for the signal, All accusation actions are below. Sparing hit the Refresh Button to update!",
+          submittedText: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Thanks for the signal, All accusation actions are below"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Sparing hit the Refresh Button to update!")),
           spyData: response.data
         });
       });
@@ -67249,7 +67297,9 @@ var PlayerView = /*#__PURE__*/function (_Component) {
         }, player.name);
       });
       var choiceListing = this.state.choices.map(function (player, index) {
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", null, player.name);
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
+          key: index
+        }, player.name);
       });
       var submitButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary left-marg",
@@ -67273,7 +67323,7 @@ var PlayerView = /*#__PURE__*/function (_Component) {
       }
 
       if (this.state.submitted) {
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, this.state.submittedText), !this.state.showSpyData ? null : spyTable, !this.state.showSpyData ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, this.state.submittedText, !this.state.showSpyData ? null : spyTable, !this.state.showSpyData ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-primary",
           onClick: this.doSpyStuff
         }, "Refresh"));
@@ -67799,7 +67849,7 @@ var Setup = /*#__PURE__*/function (_Component) {
             return _this3.removeSelected(index);
           }
         }, "Remove")));
-      }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), this.state.selectedRoles.length <= 7 ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), this.state.selectedRoles.length < 5 ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "button",
         onClick: this.assignRoles
       }, "Assign Roles to Players"))));

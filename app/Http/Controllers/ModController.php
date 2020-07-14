@@ -362,6 +362,9 @@ class ModController extends Controller
     public function getNewBallot(Request $request, $game_id)
     {
         $addedData = ['type' => 'new', 'request' => $request];
+
+        Round::where('type', 'Accusations')->where('game_id', $game_id)->update(['completed' => 1]);
+
         return $this->getBallot($game_id, $addedData);
     }
 
@@ -531,7 +534,9 @@ class ModController extends Controller
         }
 
         // Seducer's votes are always halved and rounded up.
-        $seducer = $players->where('alias', 'seducer')->first();
+        $seducer = $players->where('alias', 'seducer')
+                           ->where('minion', 0)
+                           ->first();
         if ($seducer && isset($totals[$seducer->id])) {
             $id = $seducer->id;
             $number_of_votes = $totals[$id];
@@ -541,7 +546,10 @@ class ModController extends Controller
         }
 
         // The merchant receives one fewer vote for every other city player alive on both rounds of voting.
-        $merchant = $players->where('alias', 'merchant')->first();
+        $merchant = $players->where('alias', 'merchant')
+                            ->where('minion', 0)
+                            ->first();
+
         if ($merchant && isset($totals[$merchant->id])) {
             $subtract_votes = $players->whereIn('alias', ['lawyer', 'mayor', 'preacher', 'seducer'])
                                       ->where('minion', 0)
@@ -564,7 +572,7 @@ class ModController extends Controller
             if ($target->mystic || $target->shadow || $target->minion || $target->possessed) {
                 foreach($totals as $key => $count) {
                     if ($key != $target_id) {
-                        $totals[$id] = 0;
+                        $totals[$key] = 0;
                     }
                 }
             }
@@ -610,5 +618,18 @@ class ModController extends Controller
         Action::where('round_id', $request->round_id)
               ->where('voter_id', $request->voter_id)
               ->delete();
+    }
+
+    public function closeBallot(Request $request)
+    {
+        $game = Game::findOrFail($request->game_id);
+        $round = Round::findOrFail($request->round_id);
+
+        if ($round->game_id != $game->id) {
+            abort(404);
+        }
+
+        $round->completed = 1;
+        $round->save();
     }
 }
