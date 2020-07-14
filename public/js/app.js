@@ -66544,7 +66544,8 @@ var ModView = /*#__PURE__*/function (_Component) {
       ballotActions: [],
       ballotRound: null,
       ballotUrl: '',
-      ballotFeedback: null
+      ballotFeedback: null,
+      closeBallotText: 'Close Ballot for Voting!'
     };
     _this.changeStatus = _this.changeStatus.bind(_assertThisInitialized(_this));
     _this.newAccusations = _this.newAccusations.bind(_assertThisInitialized(_this));
@@ -66555,6 +66556,7 @@ var ModView = /*#__PURE__*/function (_Component) {
     _this.recallLastBallot = _this.recallLastBallot.bind(_assertThisInitialized(_this));
     _this.showBallotOutcome = _this.showBallotOutcome.bind(_assertThisInitialized(_this));
     _this.checkAccusationsDone = _this.checkAccusationsDone.bind(_assertThisInitialized(_this));
+    _this.closeBallot = _this.closeBallot.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -66777,9 +66779,24 @@ var ModView = /*#__PURE__*/function (_Component) {
       });
     }
   }, {
+    key: "closeBallot",
+    value: function closeBallot() {
+      var _this11 = this;
+
+      var payload = {
+        game_id: this.props.game_id,
+        round_id: this.state.ballotRound
+      };
+      axios.post('/api/close_ballot', payload).then(function (response) {
+        _this11.setState({
+          closeBallotText: 'Closed!'
+        });
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
-      var _this11 = this;
+      var _this12 = this;
 
       var votingTable = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
         className: "table"
@@ -66789,7 +66806,7 @@ var ModView = /*#__PURE__*/function (_Component) {
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voter), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.chose), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.type), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voter_id ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-sm btn-danger",
           onClick: function onClick() {
-            return _this11.deleteAccusationAction(result, _this11.state.roundId);
+            return _this12.deleteAccusationAction(result, _this12.state.roundId);
           }
         }, "Delete") : null));
       })));
@@ -66808,7 +66825,7 @@ var ModView = /*#__PURE__*/function (_Component) {
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voted_for_name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, result.voted_for_id ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-sm btn-danger",
           onClick: function onClick() {
-            return _this11.deleteBallotAction(result, _this11.state.ballotRound);
+            return _this12.deleteBallotAction(result, _this12.state.ballotRound);
           }
         }, "Delete") : null));
       })));
@@ -66839,42 +66856,42 @@ var ModView = /*#__PURE__*/function (_Component) {
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.mystic ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.corrupt || player.cursed_farmer || player.cursed_necromancer || player.cursed_hag ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'alive');
+            return _this12.changeStatus(index, 'alive');
           }
         }, player.alive ? 'Alive' : 'Dead')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'minion');
+            return _this12.changeStatus(index, 'minion');
           }
         }, player.minion ? 'Minion' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'criminalized');
+            return _this12.changeStatus(index, 'criminalized');
           }
         }, player.criminalized ? 'Criminalized' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'guarded');
+            return _this12.changeStatus(index, 'guarded');
           }
         }, player.guarded ? 'Guarded' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'cursed_farmer');
+            return _this12.changeStatus(index, 'cursed_farmer');
           }
         }, player.cursed_farmer ? 'Monster Curse' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'cursed_necromancer');
+            return _this12.changeStatus(index, 'cursed_necromancer');
           }
         }, player.cursed_necromancer ? 'Necromancer Curse' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'cursed_hag');
+            return _this12.changeStatus(index, 'cursed_hag');
           }
         }, player.cursed_hag ? 'Bewitched' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
-            return _this11.changeStatus(index, 'possessed');
+            return _this12.changeStatus(index, 'possessed');
           }
         }, player.possessed ? 'Possessed' : 'x')));
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66890,7 +66907,7 @@ var ModView = /*#__PURE__*/function (_Component) {
       }, this.state.refreshButtonText), !this.state.accusationsUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Listing of who is voting for who:"), !this.state.accusationsUrl ? null : votingTable, accusationTotalsTable ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Listing of votes by target:") : null, accusationTotalsTable, !this.state.accusationsComplete ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.generateBallot
-      }, "Generate New Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Generate New Ballot (Closes Accusations for Voting)"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.recallLastBallot
       }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, this.state.ballotUrl)), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -66899,7 +66916,10 @@ var ModView = /*#__PURE__*/function (_Component) {
       }, "Refresh Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.showBallotOutcome
-      }, "Show Outcome"), !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Outcome is guidance only and doesn't take Jesters etc into account!"), this.state.ballotFeedback));
+      }, "Show Outcome"), !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Outcome is guidance only and doesn't take Jesters etc into account!"), this.state.ballotFeedback, !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: this.closeBallot,
+        className: "btn btn-primary"
+      }, this.state.closeBallotText)));
     }
   }]);
 

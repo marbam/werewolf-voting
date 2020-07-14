@@ -34,6 +34,10 @@ class PlayerController extends Controller
             abort(404);
         }
 
+        if ($round->completed) {
+            return view('roundClosed');
+        }
+
         return view('playerView',
         [
             'game_id' => $game->id,

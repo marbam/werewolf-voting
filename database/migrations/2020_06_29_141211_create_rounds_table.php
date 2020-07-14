@@ -18,6 +18,7 @@ class CreateRoundsTable extends Migration
             $table->unsignedBigInteger('game_id');
             $table->foreign('game_id')->references('id')->on('games');
             $table->string('type', 20);
+            $table->boolean('completed')->default(0);
             $table->timestamps();
         });
     }

@@ -362,6 +362,9 @@ class ModController extends Controller
     public function getNewBallot(Request $request, $game_id)
     {
         $addedData = ['type' => 'new', 'request' => $request];
+
+        Round::where('type', 'Accusations')->where('game_id', $game_id)->update(['completed' => 1]);
+
         return $this->getBallot($game_id, $addedData);
     }
 
@@ -615,5 +618,18 @@ class ModController extends Controller
         Action::where('round_id', $request->round_id)
               ->where('voter_id', $request->voter_id)
               ->delete();
+    }
+
+    public function closeBallot(Request $request)
+    {
+        $game = Game::findOrFail($request->game_id);
+        $round = Round::findOrFail($request->round_id);
+
+        if ($round->game_id != $game->id) {
+            abort(404);
+        }
+
+        $round->completed = 1;
+        $round->save();
     }
 }
