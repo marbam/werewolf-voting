@@ -24,7 +24,7 @@ class ModController extends Controller
     {
         $game_id = $request->game_id;
 
-        return Player::where('game_id', $game_id)
+        $data['players'] = Player::where('game_id', $game_id)
                          ->join('roles', 'players.allocated_role_id', '=', 'roles.id')
                          ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
                          ->get([
@@ -32,6 +32,7 @@ class ModController extends Controller
                              'players.name',
                              'roles.id as roleId',
                              'roles.name as role',
+                             'roles.alias',
                              'roles.mystic',
                              'roles.corrupt',
                              'player_statuses.alive',
@@ -43,6 +44,19 @@ class ModController extends Controller
                              'player_statuses.cursed_hag',
                              'player_statuses.possessed',
                          ]);
+
+        $aliases_to_check = [
+            'angel', 'vampire', 'nosferatu', 'hag', 'guild', 'possessed', 'necromancer', 'vampire', 'farmer'
+        ];
+
+        $data['showSettings'] = [];
+        foreach($aliases_to_check as $alias) {
+            if ($data['players']->where('alias', $alias)->count()) {
+                $data['showSettings'][] = $alias;
+            }
+        }
+
+        return $data;
     }
 
     public function updatePlayerStatus(Request $request)

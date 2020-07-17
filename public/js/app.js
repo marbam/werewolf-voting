@@ -66532,6 +66532,7 @@ var ModView = /*#__PURE__*/function (_Component) {
         roleId: 1,
         alive: true
       }],
+      showSettings: [],
       roundType: 'accusations',
       roundId: null,
       accusationsUrl: null,
@@ -66570,7 +66571,8 @@ var ModView = /*#__PURE__*/function (_Component) {
       };
       axios.post('/api/get_players/', payload).then(function (response) {
         _this2.setState({
-          players: response.data
+          players: response.data['players'],
+          showSettings: response.data['showSettings']
         });
       });
     }
@@ -66835,65 +66837,65 @@ var ModView = /*#__PURE__*/function (_Component) {
         className: "table"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Role"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "M"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "C"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
         className: "centre-text"
-      }, "Alive"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+      }, "Alive"), this.state.showSettings.includes('vampire') || this.state.showSettings.includes('nosferatu') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
         className: "centre-text"
-      }, "Minion"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+      }, "Minion") : null, this.state.showSettings.includes('guild') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
         className: "centre-text"
-      }, "Criminalized"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+      }, "Criminalized") : null, this.state.showSettings.includes('angel') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
         className: "centre-text"
-      }, "Guarded"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+      }, "Guarded") : null, this.state.showSettings.includes('farmer') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
         className: "centre-text"
-      }, "Farmer Curse"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+      }, "Farmer Curse") : null, this.state.showSettings.includes('necromancer') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
         className: "centre-text"
-      }, "Necromancer Curse"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+      }, "Necromancer Curse") : null, this.state.showSettings.includes('hag') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
         className: "centre-text"
-      }, "Hag Curse"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+      }, "Hag Curse") : null, this.state.showSettings.includes('possessed') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
         className: "centre-text"
-      }, "Possessed"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, index) {
+      }, "Possessed") : null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, index) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: index,
           className: "".concat(player.alive ? null : "killed")
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.mystic ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.corrupt || player.cursed_farmer || player.cursed_necromancer || player.cursed_hag ? "✓" : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-          className: "btn btn-secondary",
+          className: "btn btn-secondary centre-td",
           onClick: function onClick() {
             return _this12.changeStatus(index, 'alive');
           }
-        }, player.alive ? 'Alive' : 'Dead')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        }, player.alive ? 'Alive' : 'Dead')), _this12.state.showSettings.includes('vampire') || _this12.state.showSettings.includes('nosferatu') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
             return _this12.changeStatus(index, 'minion');
           }
-        }, player.minion ? 'Minion' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        }, player.minion ? 'Minion' : 'x')) : null, _this12.state.showSettings.includes('guild') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
             return _this12.changeStatus(index, 'criminalized');
           }
-        }, player.criminalized ? 'Criminalized' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        }, player.criminalized ? 'Criminalized' : 'x')) : null, _this12.state.showSettings.includes('angel') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
             return _this12.changeStatus(index, 'guarded');
           }
-        }, player.guarded ? 'Guarded' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        }, player.guarded ? 'Guarded' : 'x')) : null, _this12.state.showSettings.includes('farmer') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
             return _this12.changeStatus(index, 'cursed_farmer');
           }
-        }, player.cursed_farmer ? 'Monster Curse' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        }, player.cursed_farmer ? 'Monster Curse' : 'x')) : null, _this12.state.showSettings.includes('necromancer') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
             return _this12.changeStatus(index, 'cursed_necromancer');
           }
-        }, player.cursed_necromancer ? 'Necromancer Curse' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        }, player.cursed_necromancer ? 'Necromancer Curse' : 'x')) : null, _this12.state.showSettings.includes('hag') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
             return _this12.changeStatus(index, 'cursed_hag');
           }
-        }, player.cursed_hag ? 'Bewitched' : 'x')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        }, player.cursed_hag ? 'Bewitched' : 'x')) : null, _this12.state.showSettings.includes('possessed') ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
           className: "btn btn-secondary centre-td",
           onClick: function onClick() {
             return _this12.changeStatus(index, 'possessed');
           }
-        }, player.possessed ? 'Possessed' : 'x')));
+        }, player.possessed ? 'Possessed' : 'x')) : null);
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.newAccusations
