@@ -432,9 +432,12 @@ class ModController extends Controller
         }
 
         $cityInGame = Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                            ->join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
                             ->where('game_id', $game_id)
                             ->whereIn('alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'seducer'])
-                            ->pluck('players.id')->toArray();
+                            ->where('minion', 0)
+                            ->pluck('players.id')
+                            ->toArray();
 
         $voters = [];
         foreach ($voteData as $player) {
@@ -593,7 +596,10 @@ class ModController extends Controller
 
             // preacher checks
             // if the preacher is alive and the person to be burned is city, return a tie.
-            $city_ids = $players->whereIn('alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'seducer'])->pluck('id')->toArray();
+            $city_ids = $players->whereIn('alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'seducer'])
+                                ->where('minion')
+                                ->pluck('id')
+                                ->toArray();
             if (in_array($burning_ids[0], $city_ids)) {
                 return "DRAW";
             }
