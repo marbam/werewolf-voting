@@ -238,6 +238,7 @@ class ModController extends Controller
         $guardedPlayer = Player::where('game_id', $game_id)
                                ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
                                ->where('player_statuses.guarded', 1)
+                               ->where('player_statuses.alive', 1)
                                ->first(['players.id']);
 
         if ($guardedPlayer && $results[$guardedPlayer->id]['on_ballot']) {
@@ -249,8 +250,14 @@ class ModController extends Controller
                                  ->where('player_statuses.alive', 1)
                                  ->first(['players.id']);
 
-            $results[$guardedPlayer->id]['on_ballot'] = 0;
-            $results[$guardian->id]['on_ballot'] = 1;
+            // wrap these two in if statements just in case of moderator error:
+            if (isset($results[$guardedPlayer->id])) {
+                $results[$guardedPlayer->id]['on_ballot'] = 0;
+            }
+
+            if (isset($results[$guardian->id])) {
+                $results[$guardian->id]['on_ballot'] = 1;
+            }
         }
 
         // find out if one of the votes is of type "LAYWER_SIGNAL", if so, check if the target is a City or Criminal.
@@ -435,7 +442,8 @@ class ModController extends Controller
                             ->join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
                             ->where('game_id', $game_id)
                             ->whereIn('alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'seducer'])
-                            ->where('minion', 0)
+                            ->where('player_statuses.minion', 0)
+                            ->where('player_statuses.alive', 1)
                             ->pluck('players.id')
                             ->toArray();
 
@@ -523,7 +531,6 @@ class ModController extends Controller
 
         $cursed_player_ids = Player::where('game_id', $game_id)
                                    ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
-                                   ->where('player_statuses.alive', 1)
                                    ->where(function($curses) {
                                        $curses->where('player_statuses.cursed_farmer', 1)
                                               ->orWhere('player_statuses.cursed_necromancer', 1)
@@ -540,6 +547,7 @@ class ModController extends Controller
         $seducer = $players->where('alias', 'seducer')
                            ->where('minion', 0)
                            ->first();
+
         if ($seducer && isset($totals[$seducer->id])) {
             $id = $seducer->id;
             $number_of_votes = $totals[$id];
@@ -596,12 +604,19 @@ class ModController extends Controller
 
             // preacher checks
             // if the preacher is alive and the person to be burned is city, return a tie.
-            $city_ids = $players->whereIn('alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'seducer'])
-                                ->where('minion')
-                                ->pluck('id')
-                                ->toArray();
-            if (in_array($burning_ids[0], $city_ids)) {
-                return "DRAW";
+            $preacher_alive = $players->where('alias', 'preacher')
+                                      ->where('minion', 0)
+                                      ->count();
+
+            if ($preacher_alive) {
+                $city_ids = $players->whereIn('alias', ['lawyer', 'mayor', 'merchant', 'preacher', 'seducer'])
+                ->where('minion')
+                ->pluck('id')
+                ->toArray();
+
+                if (in_array($burning_ids[0], $city_ids)) {
+                    return "DRAW";
+                }
             }
 
             // if the preacher has signalled the highest player, return a tie
