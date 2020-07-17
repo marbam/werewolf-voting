@@ -9,6 +9,7 @@ class ModView extends Component {
             players: [
                 {id: 1, name: 'Martin', role: 'Clairvoyant', roleId: 1, alive: true},
             ],
+            showSettings: [],
             roundType: 'accusations',
             roundId: null,
             accusationsUrl: null,
@@ -44,7 +45,8 @@ class ModView extends Component {
 
         axios.post('/api/get_players/', payload).then(response => {
             this.setState({
-              players: response.data
+              players: response.data['players'],
+              showSettings: response.data['showSettings']
             })
         })
     }
@@ -88,8 +90,6 @@ class ModView extends Component {
             });
         })
     }
-
-
 
     refreshAccusations() {
         this.setState({
@@ -286,6 +286,7 @@ class ModView extends Component {
                     <td>Name</td>
                     <td>Votes</td>
                     <td>On Ballot?</td>
+                    <td>Notes</td>
                 </tr>
             </thead>
             <tbody>
@@ -294,6 +295,12 @@ class ModView extends Component {
                         <td>{result.name}</td>
                         <td>{result.votes}</td>
                         <td>{result.on_ballot ? "Yes" : "No"}</td>
+                        <td>{result.notes.map((note, key) =>
+                            <span
+                                className="badge badge-info"
+                                key={key}
+                            >{note}</span>
+                        )}</td>
                     </tr>
                 )}
             </tbody>
@@ -334,13 +341,27 @@ class ModView extends Component {
                             <th>M</th>
                             <th>C</th>
                             <th className="centre-text">Alive</th>
-                            <th className="centre-text">Minion</th>
-                            <th className="centre-text">Criminalized</th>
-                            <th className="centre-text">Guarded</th>
-                            <th className="centre-text">Farmer Curse</th>
-                            <th className="centre-text">Necromancer Curse</th>
-                            <th className="centre-text">Hag Curse</th>
-                            <th className="centre-text">Possessed</th>
+                            {this.state.showSettings.includes('vampire') || this.state.showSettings.includes('nosferatu') ?
+                                <th className="centre-text">Minion</th>
+                            : null}
+                            {this.state.showSettings.includes('guild') ?
+                                <th className="centre-text">Criminalized</th>
+                            : null}
+                            {this.state.showSettings.includes('angel') ?
+                                <th className="centre-text">Guarded</th>
+                            : null}
+                            {this.state.showSettings.includes('farmer') ?
+                                <th className="centre-text">Farmer Curse</th>
+                            : null}
+                            {this.state.showSettings.includes('necromancer') ?
+                                <th className="centre-text">Necromancer Curse</th>
+                            : null}
+                            {this.state.showSettings.includes('hag') ?
+                                <th className="centre-text">Hag Curse</th>
+                            : null}
+                            {this.state.showSettings.includes('possessed') ?
+                                <th className="centre-text">Possessed</th>
+                            : null}
                         </tr>
                     </thead>
                     <tbody>
@@ -354,60 +375,74 @@ class ModView extends Component {
                                 </td>
                                 <td>
                                     <button
-                                        className="btn btn-secondary"
+                                        className="btn btn-secondary centre-td"
                                         onClick={() => this.changeStatus(index, 'alive')}>
                                         {player.alive ? 'Alive' : 'Dead'}
                                     </button>
                                 </td>
-                                <td>
-                                    <button
-                                        className="btn btn-secondary centre-td"
-                                        onClick={() => this.changeStatus(index, 'minion')}>
-                                        {player.minion ? 'Minion' : 'x'}
-                                    </button>
-                                </td>
-                                <td>
-                                    <button
-                                        className="btn btn-secondary centre-td"
-                                        onClick={() => this.changeStatus(index, 'criminalized')}>
-                                        {player.criminalized ? 'Criminalized' : 'x'}
-                                    </button>
-                                </td>
-                                <td>
-                                    <button
-                                        className="btn btn-secondary centre-td"
-                                        onClick={() => this.changeStatus(index, 'guarded')}>
-                                        {player.guarded ? 'Guarded' : 'x'}
-                                    </button>
-                                </td>
-                                <td>
-                                    <button
-                                        className="btn btn-secondary centre-td"
-                                        onClick={() => this.changeStatus(index, 'cursed_farmer')}>
-                                        {player.cursed_farmer ? 'Monster Curse' : 'x'}
-                                    </button>
-                                </td>
-                                <td>
-                                    <button
-                                        className="btn btn-secondary centre-td"
-                                        onClick={() => this.changeStatus(index, 'cursed_necromancer')}>
-                                        {player.cursed_necromancer ? 'Necromancer Curse' : 'x'}
-                                    </button>
-                                </td>
-                                <td>
-                                    <button
-                                        className="btn btn-secondary centre-td"
-                                        onClick={() => this.changeStatus(index, 'cursed_hag')}>
-                                        {player.cursed_hag ? 'Bewitched' : 'x'}
-                                    </button>
-                                </td>
-                                <td>
-                                    <button
-                                        className="btn btn-secondary centre-td"
-                                        onClick={() => this.changeStatus(index, 'possessed')}>
-                                        {player.possessed ? 'Possessed' : 'x'}
-                                    </button>
-                                </td>
+                                {this.state.showSettings.includes('vampire') || this.state.showSettings.includes('nosferatu') ?
+                                    <td>
+                                        <button
+                                            className="btn btn-secondary centre-td"
+                                            onClick={() => this.changeStatus(index, 'minion')}>
+                                            {player.minion ? 'Minion' : 'x'}
+                                        </button>
+                                    </td>
+                                : null}
+                                {this.state.showSettings.includes('guild') ?
+                                    <td>
+                                        <button
+                                            className="btn btn-secondary centre-td"
+                                            onClick={() => this.changeStatus(index, 'criminalized')}>
+                                            {player.criminalized ? 'Criminalized' : 'x'}
+                                        </button>
+                                    </td>
+                                : null}
+                                {this.state.showSettings.includes('angel') ?
+                                    <td>
+                                        <button
+                                            className="btn btn-secondary centre-td"
+                                            onClick={() => this.changeStatus(index, 'guarded')}>
+                                            {player.guarded ? 'Guarded' : 'x'}
+                                        </button>
+                                    </td>
+                                : null}
+                                {this.state.showSettings.includes('farmer') ?
+                                    <td>
+                                        <button
+                                            className="btn btn-secondary centre-td"
+                                            onClick={() => this.changeStatus(index, 'cursed_farmer')}>
+                                            {player.cursed_farmer ? 'Monster Curse' : 'x'}
+                                        </button>
+                                    </td>
+                                : null}
+                                {this.state.showSettings.includes('necromancer') ?
+                                    <td>
+                                        <button
+                                            className="btn btn-secondary centre-td"
+                                            onClick={() => this.changeStatus(index, 'cursed_necromancer')}>
+                                            {player.cursed_necromancer ? 'Necromancer Curse' : 'x'}
+                                        </button>
+                                    </td>
+                                : null}
+                                {this.state.showSettings.includes('hag') ?
+                                    <td>
+                                        <button
+                                            className="btn btn-secondary centre-td"
+                                            onClick={() => this.changeStatus(index, 'cursed_hag')}>
+                                            {player.cursed_hag ? 'Bewitched' : 'x'}
+                                        </button>
+                                    </td>
+                                : null}
+                                {this.state.showSettings.includes('possessed') ?
+                                    <td>
+                                        <button
+                                            className="btn btn-secondary centre-td"
+                                            onClick={() => this.changeStatus(index, 'possessed')}>
+                                            {player.possessed ? 'Possessed' : 'x'}
+                                        </button>
+                                    </td>
+                                : null }
                             </tr>
                         )}
                     </tbody>
