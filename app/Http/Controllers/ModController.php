@@ -161,11 +161,15 @@ class ModController extends Controller
             $results[$id]['name'] = $name;
             $results[$id]['votes'] = 0;
             $results[$id]['on_ballot'] = 0;
+            $results[$id]['notes'] = [];
         }
 
         foreach ($actions as $action) {
-            if (strpos($action->action_type, "VOTE") !== false || $action->action_type == "SPY_SIGNAL") {
+            if (strpos($action->action_type, "VOTE") !== false) {
                 $results[$action->nominee_id]['votes']++;
+            } else if ($action->action_type == "SPY_SIGNAL") {
+                $results[$action->nominee_id]['votes']++;
+                $results[$action->nominee_id]['notes'][] = "Spy Signalled";
             }
         }
 
@@ -181,6 +185,7 @@ class ModController extends Controller
 
         foreach ($cursed_player_ids as $id) {
             $results[$id]['votes']++;
+            $results[$id]['notes'][] = 'Cursed';
         }
 
         // get the city roles in the game!
@@ -199,6 +204,7 @@ class ModController extends Controller
             $halve_it = $number_of_votes / 2;
             $rounded_up = ceil($halve_it);
             $results[$seducer->id]['votes'] = $rounded_up;
+            $results[$seducer->id]['notes'][] = "Votes Halved (Rounded up)";
         }
 
         // The merchant receives one fewer vote for every other city player alive on both rounds of voting.
@@ -211,6 +217,7 @@ class ModController extends Controller
                 $number_of_votes = 0;
             }
             $results[$merchant->id]['votes'] = $number_of_votes;
+            $results[$merchant->id]['notes'][] = "Minus ".$subtract_votes." City Votes";
         }
 
         // get a count of each number of votes so we can calculate the top two tiers:
@@ -255,22 +262,24 @@ class ModController extends Controller
                                ->where('player_statuses.alive', 1)
                                ->first(['players.id']);
 
+        $results[$guardedPlayer->id]['notes'][] = "Guarded";
         if ($guardedPlayer && $results[$guardedPlayer->id]['on_ballot']) {
+
             // remove the guarded from the ballot, find and add the guardian to it.
             $guardian = Player::where('game_id', $game_id)
                                  ->join('roles', 'players.allocated_role_id', '=', 'roles.id')
                                  ->where('roles.alias', 'angel')
                                  ->join('player_statuses', 'players.id', '=', 'player_statuses.player_id')
                                  ->where('player_statuses.alive', 1)
+                                 ->where('player_statuses.minion', 0)
                                  ->first(['players.id']);
 
-            // wrap these two in if statements just in case of moderator error:
-            if (isset($results[$guardedPlayer->id])) {
-                $results[$guardedPlayer->id]['on_ballot'] = 0;
-            }
+            $results[$guardedPlayer->id]['on_ballot'] = 0;
+            $results[$guardedPlayer->id]['notes'][] = "Guardian Angel Takes Place on Ballot";
 
-            if (isset($results[$guardian->id])) {
+            if ($guardian && isset($results[$guardian->id])) {
                 $results[$guardian->id]['on_ballot'] = 1;
+                $results[$guardian->id]['notes'][] = "Replaces Guarded on Ballot";
             }
         }
 
@@ -288,8 +297,10 @@ class ModController extends Controller
 
             if (in_array($target->name, ['Criminals', 'City']) || $target->criminalized ) {
                 $results[$target->id]['on_ballot'] = 0;
+                $results[$target->id]['notes'][] = "Lawyer Signal (Removed from Ballot)";
             } else {
                 $results[$target->id]['on_ballot'] = 1; // always on ballot if they're not criminal or city
+                $results[$target->id]['notes'][] = "Lawyer Signal (Added to Ballot)";
             }
         }
 
@@ -301,9 +312,12 @@ class ModController extends Controller
                 ->get(['players.id', 'roles.mystic'])
                 ->first();
 
+            $note = "Inquisitor Signalled";
             if ($target->mystic) {
                 $results[$target->id]['on_ballot'] = 1;
+                $note = "Inquisitor Signalled - Added to Ballot";
             }
+            $results[$target->id]['notes'][] = $note;
         }
 
         $results = array_values($results); // reset the outer keys so it's mappable in javascript

@@ -286,6 +286,7 @@ class ModView extends Component {
                     <td>Name</td>
                     <td>Votes</td>
                     <td>On Ballot?</td>
+                    <td>Notes</td>
                 </tr>
             </thead>
             <tbody>
@@ -294,6 +295,12 @@ class ModView extends Component {
                         <td>{result.name}</td>
                         <td>{result.votes}</td>
                         <td>{result.on_ballot ? "Yes" : "No"}</td>
+                        <td>{result.notes.map((note, key) =>
+                            <span
+                                className="badge badge-info"
+                                key={key}
+                            >{note}</span>
+                        )}</td>
                     </tr>
                 )}
             </tbody>
