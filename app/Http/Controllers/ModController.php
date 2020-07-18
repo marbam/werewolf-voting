@@ -262,7 +262,10 @@ class ModController extends Controller
                                ->where('player_statuses.alive', 1)
                                ->first(['players.id']);
 
-        $results[$guardedPlayer->id]['notes'][] = "Guarded";
+        if ($guardedPlayer) {
+            $results[$guardedPlayer->id]['notes'][] = "Guarded";
+        }
+
         if ($guardedPlayer && $results[$guardedPlayer->id]['on_ballot']) {
 
             // remove the guarded from the ballot, find and add the guardian to it.
