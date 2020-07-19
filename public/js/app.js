@@ -67757,7 +67757,7 @@ var Setup = /*#__PURE__*/function (_Component) {
         // submit
         axios.post('/api/save_players', [this.state.players]).then(function (response) {
           if (response['status'] == 200 && response.data.game_id) {
-            window.location.replace("/game/" + response.data.game_id); // yes this should definitely be using BrowserRouter and whatnot but this isn't a SPA, and this works. Eh.
+            window.location.replace("/game/" + response.data.game_id + "/mod"); // yes this should definitely be using BrowserRouter and whatnot but this isn't a SPA, and this works. Eh.
             // can refactor later.
           }
         });

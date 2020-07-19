@@ -21,6 +21,6 @@ Route::get('/start', function () {
     return view('gameSetup');
 });
 
-Route::get('/game/{game}', 'ModController@showGame');
+Route::get('/game/{game}/mod', 'ModController@showGame');
 Route::get('/game/{game}/{type}/{round}/', 'PlayerController@showNominees');
 Route::get('/game/{game}/roles', 'PlayerController@showRoleCall');

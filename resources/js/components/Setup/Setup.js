@@ -102,7 +102,7 @@ class Setup extends Component {
             ])
             .then(response => {
                 if (response['status'] == 200 && response.data.game_id) {
-                    window.location.replace("/game/"+response.data.game_id);
+                    window.location.replace("/game/"+response.data.game_id+"/mod");
                     // yes this should definitely be using BrowserRouter and whatnot but this isn't a SPA, and this works. Eh.
                     // can refactor later.
                 }
