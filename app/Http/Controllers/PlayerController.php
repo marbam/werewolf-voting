@@ -157,8 +157,14 @@ class PlayerController extends Controller
     public function getRoleCall(GameValidator $request)
     {
         return Player::join('roles', 'players.allocated_role_id', '=', 'roles.id')
+                     ->join('player_statuses', 'player_statuses.player_id', '=', 'players.id')
                          ->where('players.game_id', $request->game_id)
-                         ->get(['players.name', 'roles.name as role'])->toArray();
+                         ->get([
+                            'players.id',
+                            'players.name',
+                            'roles.name as role',
+                            'player_statuses.alive'
+                        ])->toArray();
     }
 
     public function getSpyTable(GameRoundValidator $request)
