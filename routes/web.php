@@ -24,3 +24,7 @@ Route::get('/start', function () {
 Route::get('/game/{game}/mod', 'ModController@showGame');
 Route::get('/game/{game}/{type}/{round}/', 'PlayerController@showNominees');
 Route::get('/game/{game}/roles', 'PlayerController@showRoleCall');
+
+Route::get('/guide', function() {
+    return view('guide');
+});
