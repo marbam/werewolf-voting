@@ -66917,13 +66917,13 @@ var ModView = /*#__PURE__*/function (_Component) {
       }, "Generate New Ballot (Closes Accusations for Voting)"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.recallLastBallot
-      }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, this.state.ballotUrl)), ballotOutcomes, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Recall Most Recent Ballot"), !this.state.ballotUrl ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Share Ballot Link with Players: ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, this.state.ballotUrl)), ballotOutcomes, this.state.ballotUrl ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.refreshBallot
       }, "Refresh Ballot"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary right-marg",
         onClick: this.showBallotOutcome
-      }, "Show Outcome"), !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Outcome is guidance only and doesn't take Jesters etc into account!"), this.state.ballotFeedback, !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, "Show Outcome")) : null, !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Outcome is guidance only and doesn't take Jesters etc into account!"), this.state.ballotFeedback, !this.state.ballotFeedback ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         onClick: this.closeBallot,
         className: "btn btn-primary"
       }, this.state.closeBallotText)));
