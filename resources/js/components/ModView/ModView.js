@@ -488,18 +488,22 @@ class ModView extends Component {
                         </button>
                         {!this.state.ballotUrl ? null : <p>Share Ballot Link with Players: <strong>{this.state.ballotUrl}</strong></p> }
                         {ballotOutcomes}
-                        <button
-                            className="btn btn-primary right-marg"
-                            onClick={this.refreshBallot}
-                        >
-                            Refresh Ballot
-                        </button>
-                        <button
-                            className="btn btn-primary right-marg"
-                            onClick={this.showBallotOutcome}
-                        >
-                            Show Outcome
-                        </button>
+                        {this.state.ballotUrl ?
+                            <div>
+                                <button
+                                className="btn btn-primary right-marg"
+                                onClick={this.refreshBallot}
+                                >
+                                    Refresh Ballot
+                                </button>
+                                <button
+                                className="btn btn-primary right-marg"
+                                onClick={this.showBallotOutcome}
+                                >
+                                    Show Outcome
+                                </button>
+                            </div>
+                        : null}
                         {!this.state.ballotFeedback ? null : <p>Outcome is guidance only and doesn't take Jesters etc into account!</p>}
                         {this.state.ballotFeedback}
                         {!this.state.ballotFeedback ? null : <button
