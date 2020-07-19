@@ -67412,9 +67412,14 @@ var RoleCall = /*#__PURE__*/function (_Component) {
     _this = _super.call(this);
     _this.state = {
       players: [],
-      showButtons: true
+      tableShown: false,
+      revealRoles: false,
+      singleShown: true,
+      initialPlayers: []
     };
-    _this.showListing = _this.showListing.bind(_assertThisInitialized(_this));
+    _this.buttonClicked = _this.buttonClicked.bind(_assertThisInitialized(_this));
+    _this.showRole = _this.showRole.bind(_assertThisInitialized(_this));
+    _this.idiotButtonClicked = _this.idiotButtonClicked.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -67428,35 +67433,88 @@ var RoleCall = /*#__PURE__*/function (_Component) {
       };
       axios.post('/api/role_call/', payload).then(function (response) {
         _this2.setState({
-          players: response.data
+          players: response.data,
+          initialPlayers: response.data
         });
       });
     }
   }, {
-    key: "showListing",
-    value: function showListing() {
-      if (confirm('Are you sure you want to show the listing?')) {
+    key: "buttonClicked",
+    value: function buttonClicked(player) {
+      if (player == "Spectating" && confirm("Please confirm you're okay to see all the roles!")) {
         this.setState({
-          showButtons: false
+          tableShown: true,
+          revealRoles: true,
+          singleShown: false
+        });
+      } else if (!player.alive) {
+        this.setState({
+          tableShown: true,
+          revealRoles: true,
+          singleShown: false
+        });
+      } else {
+        var players = this.state.players.filter(function (pl) {
+          return pl.id == player.id;
+        });
+        this.setState({
+          players: players,
+          tableShown: true
         });
       }
     }
   }, {
+    key: "showRole",
+    value: function showRole() {
+      this.setState({
+        revealRoles: true
+      });
+    }
+  }, {
+    key: "idiotButtonClicked",
+    value: function idiotButtonClicked() {
+      this.setState({
+        players: this.state.initialPlayers,
+        tableShown: false,
+        revealRoles: false,
+        singleShown: true
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
-      return this.state.showButtons ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Click one of these buttons to confirm you're good to look at the role list!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        onClick: this.showListing
-      }, "I'm dead!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        onClick: this.showListing
-      }, "I'm a spectator!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        onClick: this.showListing
-      }, "The game is over!")) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
+      var _this3 = this;
+
+      var header = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Role Allocation / Role Call"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", null, "If it's the start of the game, click your name to get your role."), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", null, "If you have died, click your name to show the roles of all players.")));
+      var playerButtons = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, this.state.players.map(function (player, index) {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          key: index,
+          className: "btn btn-secondary right-marg",
+          onClick: function onClick() {
+            return _this3.buttonClicked(player);
+          }
+        }, player.name);
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        className: "btn btn-secondary right-marg",
+        onClick: function onClick() {
+          return _this3.buttonClicked("Spectating");
+        }
+      }, "I'm spectating!"));
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "container"
+      }, !this.state.tableShown ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, header, playerButtons) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
         className: "table"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Role"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, this.state.players.map(function (player, key) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
           key: key
-        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.role));
-      }))));
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, player.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, _this3.state.revealRoles ? player.role : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          onClick: _this3.showRole,
+          className: "btn btn-success right-marg"
+        }, "Click to show role"), !_this3.state.revealRoles ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          onClick: _this3.idiotButtonClicked,
+          className: "btn btn-danger right-marg"
+        }, "I clicked on the wrong one. Take me back!") : null));
+      })))));
     }
   }]);
 
@@ -67699,7 +67757,7 @@ var Setup = /*#__PURE__*/function (_Component) {
         // submit
         axios.post('/api/save_players', [this.state.players]).then(function (response) {
           if (response['status'] == 200 && response.data.game_id) {
-            window.location.replace("/game/" + response.data.game_id); // yes this should definitely be using BrowserRouter and whatnot but this isn't a SPA, and this works. Eh.
+            window.location.replace("/game/" + response.data.game_id + "/mod"); // yes this should definitely be using BrowserRouter and whatnot but this isn't a SPA, and this works. Eh.
             // can refactor later.
           }
         });
